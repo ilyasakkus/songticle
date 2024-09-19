@@ -68,5 +68,10 @@ export const singers = [
     id: 14,
     name: "Axl Rose",
     bio: "Axl Rose, born William Bruce Rose Jr. on February 6, 1962, in Lafayette, Indiana, is one of rock music's most iconic and controversial figures. As the lead vocalist of Guns N' Roses, Rose helped redefine hard rock in the late 1980s and early 1990s. Known for his distinctive voice, wide vocal range, and electrifying stage presence, Axl Rose has left an indelible mark on the music industry.",
+  },
+  {
+    id: 15,
+    name: "Kurt Cobain",
+    bio: "Kurt Cobain, born on February 20, 1967, in Aberdeen, Washington, was the iconic frontman of Nirvana who left an indelible mark on the music world. Pioneering the grunge movement and reshaping alternative rock, Cobain's raw, emotive vocals, introspective lyrics, and explosive guitar work catapulted Nirvana to global stardom. Despite his tragic death in 1994 at the age of 27, Cobain's influence continues to resonate with musicians and fans alike.",
   }
 ];
