@@ -33,6 +33,8 @@ const Index = () => {
         return '/janis-joplin';
       case 10:
         return '/roy-orbison';
+      case 11:
+        return '/ray-charles';
       default:
         return '/';
     }

@@ -48,5 +48,10 @@ export const singers = [
     id: 10,
     name: "Roy Orbison",
     bio: "Roy Kelton Orbison, born on April 23, 1936, in Vernon, Texas, was one of the most distinctive and influential voices in popular music. Known for his powerful, impassioned vocals, complex song structures, and dark emotional ballads, Orbison stood out in the rock and roll era of the 1950s and 60s. His three-octave vocal range and vulnerable, often operatic style earned him the nicknames \"the Caruso of Rock\" and \"the Big O.\"",
+  },
+  {
+    id: 11,
+    name: "Ray Charles",
+    bio: "Ray Charles Robinson, born on September 23, 1930, in Albany, Georgia, was a pioneering musician who helped shape the sound of rhythm and blues and brought it into mainstream pop music. Nicknamed \"The Genius,\" Charles was known for his soulful voice, masterful piano playing, and his ability to blend genres including gospel, blues, jazz, and country.",
   }
 ];
