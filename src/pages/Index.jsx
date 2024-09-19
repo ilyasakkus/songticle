@@ -79,7 +79,7 @@ const Index = () => {
             <div className="max-w-3xl mx-auto">
               <input
                 type="text"
-                className="w-full px-4 py-2 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 animated-placeholder"
+                className="w-full px-4 py-2 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 typewriter-placeholder"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search for a singer..."
@@ -134,17 +134,19 @@ const Index = () => {
       </main>
       <Footer />
       <style jsx>{`
-        .animated-placeholder::placeholder {
-          opacity: 1;
-          animation: typingAnimation 4s steps(25, end) infinite;
+        @keyframes typewriter {
+          from { width: 0; }
+          to { width: 100%; }
         }
 
-        @keyframes typingAnimation {
-          0% { content: ''; }
-          100% { content: 'Search for a singer...'; }
+        .typewriter-placeholder::placeholder {
+          overflow: hidden;
+          display: inline-block;
+          white-space: nowrap;
+          animation: typewriter 4s steps(25, end) infinite;
         }
 
-        .animated-placeholder:not(:placeholder-shown) {
+        .typewriter-placeholder:not(:placeholder-shown) {
           animation: none;
         }
       `}</style>
