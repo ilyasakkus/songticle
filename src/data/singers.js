@@ -28,5 +28,10 @@ export const singers = [
     id: 6,
     name: "Freddie Mercury",
     bio: "Farrokh Bulsara, known professionally as Freddie Mercury, was born on September 5, 1946, in Stone Town, Zanzibar. As the lead vocalist and pianist of Queen, Mercury became one of the most iconic and influential figures in rock music history. Known for his powerful four-octave vocal range, flamboyant stage presence, and innovative songwriting, Mercury helped redefine the boundaries of rock music.",
+  },
+  {
+    id: 7,
+    name: "Whitney Houston",
+    bio: "Whitney Elizabeth Houston, born on August 9, 1963, in Newark, New Jersey, was one of the most celebrated and influential singers of all time. Known as \"The Voice,\" Houston possessed a powerful, soulful soprano that set new standards in popular music. Her ability to blend pop, R&B, and gospel influences created a unique sound that dominated the charts for nearly three decades.",
   }
 ];
