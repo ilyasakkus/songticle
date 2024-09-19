@@ -163,5 +163,10 @@ export const singers = [
     id: 33,
     name: "Ice Spice",
     bio: "Ice Spice, born Isis Naija Gaston on January 1, 2000, hails from the Bronx, New York. Growing up in this iconic borough, known for its rich hip-hop history, undoubtedly influenced her future career path. While details about her childhood are limited, it's known that she was raised in a musical environment, with her father being an underground rapper. Ice Spice's journey in the music industry began in earnest around 2021. She started by releasing freestyles and original tracks on SoundCloud, gradually building a following. Her unique style, blending catchy hooks with a laid-back delivery, began to catch the attention of listeners and industry insiders alike.",
+  },
+  {
+    id: 34,
+    name: "Bandmanrill",
+    bio: "Bandmanrill, the trailblazing American rapper and songwriter hailing from Newark, New Jersey, emerged as a beacon of creativity amidst the challenges of the COVID-19 pandemic. Captivating audiences with his innovative fusion of Jersey club and drill elements, Bandmanrill's rise to fame under Warner Music Group was swift. His debut opus, \"Club Godfather,\" featuring collaborations with NLE Choppa, Lay Bankz, Skaiwater, Sha EK, and DJ swill, solidified his status as a pioneer in the hip-hop scene.",
   }
 ];
