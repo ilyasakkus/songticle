@@ -153,5 +153,10 @@ export const singers = [
     id: 31,
     name: "Björk",
     bio: "Björk Guðmundsdóttir, born November 21, 1965, in Reykjavík, Iceland, is an iconic singer, songwriter, actress, and music producer. Known for her eclectic musical style, innovative artistry, and distinctive voice, Björk has been a pioneering force in alternative and experimental music since the 1990s. Her work spans various genres, including electronic, pop, experimental, trip hop, and avant-garde music. Björk's career began as the lead singer of the alternative rock band The Sugarcubes before she embarked on a highly successful solo career. Her albums, including 'Debut', 'Post', and 'Homogenic', have received critical acclaim and have influenced countless artists across multiple genres.",
+  },
+  {
+    id: 32,
+    name: "Liv.e",
+    bio: "Liv.e, hailing from Dallas, Texas, is an enigmatic singer-songwriter, rapper, and producer who has emerged as a visionary force in the music industry. Known for her ingenious blend of R&B, jazz, soul, and hip-hop, Liv.e has redefined the boundaries of genre with her ethereal melodies and soul-stirring lyrics. Her unique voice and ability to craft evocative narratives have captivated audiences and critics alike, establishing her as an unparalleled musical talent in contemporary music.",
   }
 ];

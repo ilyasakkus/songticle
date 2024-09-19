@@ -75,6 +75,8 @@ const Index = () => {
         return '/radiohead';
       case 31:
         return '/bjork';
+      case 32:
+        return '/live';
       default:
         return '/';
     }
