@@ -15,6 +15,7 @@ import JanisJoplin from "./pages/JanisJoplin";
 import RoyOrbison from "./pages/RoyOrbison";
 import RayCharles from "./pages/RayCharles";
 import WalkUpSongs from "./pages/WalkUpSongs";
+import ArethaFranklin from "./pages/ArethaFranklin";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ const App = () => (
           <Route path="/roy-orbison" element={<RoyOrbison />} />
           <Route path="/ray-charles" element={<RayCharles />} />
           <Route path="/walk-up-songs" element={<WalkUpSongs />} />
+          <Route path="/aretha-franklin" element={<ArethaFranklin />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

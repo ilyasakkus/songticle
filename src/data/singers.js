@@ -53,5 +53,10 @@ export const singers = [
     id: 11,
     name: "Ray Charles",
     bio: "Ray Charles Robinson, born on September 23, 1930, in Albany, Georgia, was a pioneering musician who helped shape the sound of rhythm and blues and brought it into mainstream pop music. Nicknamed \"The Genius,\" Charles was known for his soulful voice, masterful piano playing, and his ability to blend genres including gospel, blues, jazz, and country.",
+  },
+  {
+    id: 12,
+    name: "Aretha Franklin",
+    bio: "Aretha Franklin, born on March 25, 1942, in Memphis, Tennessee, was an American singer, songwriter, and pianist. Known as the \"Queen of Soul,\" Franklin was a pioneer of soul music and one of the most influential vocalists of the 20th century. Her powerful voice, emotional delivery, and ability to blend gospel, R&B, and pop elements made her a cultural icon and one of the best-selling music artists of all time.",
   }
 ];
