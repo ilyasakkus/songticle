@@ -18,5 +18,10 @@ export const singers = [
     id: 4,
     name: "Sabrina Carpenter",
     bio: "Sabrina Carpenter, born on May 11, 1999, in Lehigh Valley, Pennsylvania, has quickly become one of the most promising young pop stars of her generation. Rising to fame through her role as Maya Hart in the Disney Channel series \"Girl Meets World,\" Carpenter has since established herself as a talented singer-songwriter with a distinctive voice and relatable lyrics.",
+  },
+  {
+    id: 5,
+    name: "Mariah Carey",
+    bio: "Mariah Carey, born on March 27, 1969, in Huntington, New York, is one of the most successful and influential pop divas of all time. Known for her five-octave vocal range, whistle register, and melismatic singing style, Carey has been a dominant force in the music industry since her debut in 1990. With numerous number-one hits, Grammy Awards, and record-breaking achievements, Carey has established herself as the \"Songbird Supreme.\"",
   }
 ];
