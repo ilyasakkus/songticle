@@ -98,5 +98,10 @@ export const singers = [
     id: 20,
     name: "Kidz Bop",
     bio: "Kidz Bop, established in 2001 by Razor & Tie co-founders Cliff Chenfeld and Craig Balsam, is a prominent children's music group and brand that specializes in creating family-friendly renditions of popular songs. The concept revolves around producing compilation albums featuring children singing sanitized versions of contemporary pop hits. Since its inception, Kidz Bop has enjoyed significant commercial success, selling over 21 million albums and accumulating more than 4.5 billion streams.",
+  },
+  {
+    id: 21,
+    name: "Jackie Wilson",
+    bio: "Jackie Wilson, often referred to as \"Mr. Excitement,\" was a trailblazing American singer and performer who left an indelible mark on the music industry. Born on June 9, 1934, he rose to fame during the 1950s and 1960s, becoming a prominent figure in the evolution of rhythm and blues into the vibrant world of soul music. Wilson's electrifying stage presence, charismatic showmanship, and remarkable vocal talents set him apart as one of the most dynamic entertainers in the history of soul, R&B, and rock and roll.",
   }
 ];
