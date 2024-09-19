@@ -43,5 +43,10 @@ export const singers = [
     id: 9,
     name: "Janis Joplin",
     bio: "Janis Lyn Joplin, born on January 19, 1943, in Port Arthur, Texas, was one of the most iconic and influential rock singers of the 1960s. Known for her powerful, bluesy vocals and electric stage presence, Joplin broke new ground for women in rock music. Her raw, emotional performances and distinctive voice set her apart from her contemporaries.",
+  },
+  {
+    id: 10,
+    name: "Roy Orbison",
+    bio: "Roy Kelton Orbison, born on April 23, 1936, in Vernon, Texas, was one of the most distinctive and influential voices in popular music. Known for his powerful, impassioned vocals, complex song structures, and dark emotional ballads, Orbison stood out in the rock and roll era of the 1950s and 60s. His three-octave vocal range and vulnerable, often operatic style earned him the nicknames \"the Caruso of Rock\" and \"the Big O.\"",
   }
 ];
