@@ -158,5 +158,10 @@ export const singers = [
     id: 32,
     name: "Liv.e",
     bio: "Liv.e, hailing from Dallas, Texas, is an enigmatic singer-songwriter, rapper, and producer who has emerged as a visionary force in the music industry. Known for her ingenious blend of R&B, jazz, soul, and hip-hop, Liv.e has redefined the boundaries of genre with her ethereal melodies and soul-stirring lyrics. Her unique voice and ability to craft evocative narratives have captivated audiences and critics alike, establishing her as an unparalleled musical talent in contemporary music.",
+  },
+  {
+    id: 33,
+    name: "Ice Spice",
+    bio: "Ice Spice, born Isis Naija Gaston on January 1, 2000, hails from the Bronx, New York. Growing up in this iconic borough, known for its rich hip-hop history, undoubtedly influenced her future career path. While details about her childhood are limited, it's known that she was raised in a musical environment, with her father being an underground rapper. Ice Spice's journey in the music industry began in earnest around 2021. She started by releasing freestyles and original tracks on SoundCloud, gradually building a following. Her unique style, blending catchy hooks with a laid-back delivery, began to catch the attention of listeners and industry insiders alike.",
   }
 ];

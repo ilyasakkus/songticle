@@ -77,6 +77,8 @@ const Index = () => {
         return '/bjork';
       case 32:
         return '/live';
+      case 33:
+        return '/ice-spice';
       default:
         return '/';
     }
