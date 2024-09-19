@@ -103,5 +103,10 @@ export const singers = [
     id: 21,
     name: "Jackie Wilson",
     bio: "Jackie Wilson, often referred to as \"Mr. Excitement,\" was a trailblazing American singer and performer who left an indelible mark on the music industry. Born on June 9, 1934, he rose to fame during the 1950s and 1960s, becoming a prominent figure in the evolution of rhythm and blues into the vibrant world of soul music. Wilson's electrifying stage presence, charismatic showmanship, and remarkable vocal talents set him apart as one of the most dynamic entertainers in the history of soul, R&B, and rock and roll.",
+  },
+  {
+    id: 22,
+    name: "Ed Sheeran",
+    bio: "Ed Sheeran, born on February 17, 1991, in Halifax, West Yorkshire, is an English singer-songwriter who has become one of the most successful and influential artists of his generation. Known for his soulful voice, heartfelt lyrics, and masterful guitar playing, Sheeran has captivated audiences worldwide with his unique blend of pop, folk, and hip-hop influences. His debut album '+' (Plus) in 2011 launched him to stardom, and he has since released multiple chart-topping albums and singles, earning numerous awards including multiple Grammy Awards and Brit Awards.",
   }
 ];

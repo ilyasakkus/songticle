@@ -55,6 +55,8 @@ const Index = () => {
         return '/kidz-bop';
       case 21:
         return '/jackie-wilson';
+      case 22:
+        return '/ed-sheeran';
       default:
         return '/';
     }
