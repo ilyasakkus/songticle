@@ -83,5 +83,10 @@ export const singers = [
     id: 17,
     name: "Vanessa Paradis",
     bio: "Vanessa Chantal Paradis, born on December 22, 1972, is a French icon renowned for her exceptional talents in singing, modeling, and acting. She catapulted to stardom at the age of 14 with the international hit \"Joe le taxi\" in 1987, marking the beginning of a remarkable career. Recognized with France's highest honors at the age of 18, Vanessa received the Prix Romy Schneider and the César Award for Most Promising Actress for her role in \"Noce Blanche\" and the Victoires de la Musique for Best Female Singer for her album \"Variations sur le même t'aime.\"",
+  },
+  {
+    id: 18,
+    name: "Zachary Lane Bryan",
+    bio: "Zachary Lane Bryan, born on April 2, 1996, has emerged as a notable figure in the American country music scene. Hailing from Oologah, Oklahoma, Bryan made a significant impact with his major-label debut album, \"American Heartbreak,\" which entered the U.S. Billboard 200 at an impressive number five. His self-titled album released in 2023 debuted at the number one spot on the US Billboard 200, featuring the chart-topping track \"I Remember Everything,\" a collaboration with Kacey Musgraves.",
   }
 ];
