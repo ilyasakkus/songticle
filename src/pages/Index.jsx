@@ -79,8 +79,7 @@ const Index = () => {
             <div className="max-w-3xl mx-auto">
               <input
                 type="text"
-                placeholder="Search for a singer..."
-                className="w-full px-4 py-2 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 animated-placeholder"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -133,6 +132,25 @@ const Index = () => {
         </div>
       </main>
       <Footer />
+      <style jsx>{`
+        .animated-placeholder::placeholder {
+          opacity: 0;
+          animation: typingAnimation 4s infinite;
+        }
+
+        @keyframes typingAnimation {
+          0%, 100% { content: ''; }
+          20% { content: 'S'; }
+          40% { content: 'Se'; }
+          60% { content: 'Sea'; }
+          80% { content: 'Sear'; }
+          100% { content: 'Search for a singer...'; }
+        }
+
+        .animated-placeholder:not(:placeholder-shown) {
+          animation: none;
+        }
+      `}</style>
     </div>
   );
 };
