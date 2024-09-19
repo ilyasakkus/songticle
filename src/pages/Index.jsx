@@ -17,7 +17,7 @@ const Index = () => {
       <main className="flex-grow">
         <div className="bg-blue-100 py-16">
           <div className="container mx-auto px-4">
-            <h1 className="text-4xl font-bold mb-8 text-center">Discover Jazz Legends</h1>
+            <h1 className="text-4xl font-bold mb-8 text-center">Discover Songticles</h1>
             <div className="max-w-3xl mx-auto">
               <input
                 type="text"
