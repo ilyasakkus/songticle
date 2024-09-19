@@ -58,5 +58,10 @@ export const singers = [
     id: 12,
     name: "Aretha Franklin",
     bio: "Aretha Franklin, born on March 25, 1942, in Memphis, Tennessee, was an American singer, songwriter, and pianist. Known as the \"Queen of Soul,\" Franklin was a pioneer of soul music and one of the most influential vocalists of the 20th century. Her powerful voice, emotional delivery, and ability to blend gospel, R&B, and pop elements made her a cultural icon and one of the best-selling music artists of all time.",
+  },
+  {
+    id: 13,
+    name: "Tom Petty",
+    bio: "Thomas Earl Petty, born on October 20, 1950, in Gainesville, Florida, was one of the most influential and beloved American rock musicians of the late 20th and early 21st centuries. As the lead vocalist and guitarist of Tom Petty and the Heartbreakers, and as a successful solo artist, Petty crafted a distinctive sound that blended elements of rock, folk, and Americana. Known for his honest songwriting, distinctive nasal voice, and jangly guitar sound, Petty's music resonated with millions of fans across multiple generations.",
   }
 ];
