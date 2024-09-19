@@ -108,5 +108,10 @@ export const singers = [
     id: 22,
     name: "Ed Sheeran",
     bio: "Ed Sheeran, born on February 17, 1991, in Halifax, West Yorkshire, is an English singer-songwriter who has become one of the most successful and influential artists of his generation. Known for his soulful voice, heartfelt lyrics, and masterful guitar playing, Sheeran has captivated audiences worldwide with his unique blend of pop, folk, and hip-hop influences. His debut album '+' (Plus) in 2011 launched him to stardom, and he has since released multiple chart-topping albums and singles, earning numerous awards including multiple Grammy Awards and Brit Awards.",
+  },
+  {
+    id: 23,
+    name: "Tarkan",
+    bio: "Tarkan, the Turkish music sensation, has undeniably left an indelible mark on the global music scene with his irresistible blend of pop, dance, and traditional Turkish sounds. With a career spanning over three decades, Tarkan's discography boasts an array of hit songs that have captured the hearts of millions worldwide. His music transcends borders, and his impact on the music industry is undeniable. Whether he's delivering sultry love songs or high-energy dance tracks, Tarkan continues to enchant listeners with his unparalleled artistry and musical innovation.",
   }
 ];
