@@ -61,6 +61,8 @@ const Index = () => {
         return '/tarkan';
       case 24:
         return '/benjamin-biolay';
+      case 25:
+        return '/hank-williams';
       default:
         return '/';
     }

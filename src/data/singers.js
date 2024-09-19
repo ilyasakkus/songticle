@@ -112,11 +112,16 @@ export const singers = [
   {
     id: 23,
     name: "Tarkan",
-    bio: "Tarkan, the Turkish music sensation, has undeniably left an indelible mark on the global music scene with his irresistible blend of pop, dance, and traditional Turkish sounds. With a career spanning over three decades, Tarkan's discography boasts an array of hit songs that have captured the hearts of millions worldwide. His music transcends borders, and his impact on the music industry is undeniable. Whether he's delivering sultry love songs or high-energy dance tracks, Tarkan continues to enchant listeners with his unparalleled artistry and musical innovation.",
+    bio: "Tarkan, the Turkish music sensation, has undeniably left an indelible mark on the global music scene with his irresistible blend of pop, dance, and traditional Turkish sounds. With a career spanning over three decades, Tarkan's discography boasts an array of hit songs that have captured the hearts of millions worldwide. His music transcends borders, an his impact on the music industry is undeniable. Whether he's delivering sultry love songs or high-energy dance tracks, Tarkan continues to enchant listeners with his unparalleled artistry and musical innovation.",
   },
   {
     id: 24,
     name: "Benjamin Biolay",
     bio: "Benjamin Biolay, the versatile French virtuoso, has crafted an exceptional musical legacy characterized by his gentle vocals, poetic songwriting, and adept production skills. Drawing comparisons to iconic pop star Étienne Daho, Biolay's influence extends far and wide. His collaborations have left an indelible mark, including co-writing and producing for his sister Coralie Clément's albums, contributing to Henri Salvador's triumphant return with \"Chambre avec Vue,\" and working with French music legends like Françoise Hardy and Vanessa Paradis. Biolay's sonic journey spans introspective melodies to avant-garde compositions, a range evident in his extensive discography.",
+  },
+  {
+    id: 25,
+    name: "Hank Williams",
+    bio: "Hank Williams, an emblematic figure of 20th-century American music, left an indelible imprint with his poignant songs delving into the depths of human emotions. Born in Alabama, Williams' journey to musical greatness began under the guidance of blues artist Rufus Payne, eventually leading him from local stages to radio waves. His chart-topping singles, numbering over 55, captured the essence of universal experiences like love and heartache, while iconic tracks such as \"Lovesick Blues,\" \"Your Cheatin' Heart,\" and \"Hey, Good Lookin'\" showcased his storytelling prowess.",
   }
 ];
