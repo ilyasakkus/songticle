@@ -1,0 +1,35 @@
+export const singers = [
+  {
+    id: 1,
+    name: "Singer 1",
+    songs: [
+      "Song 1",
+      "Song 2",
+      "Song 3",
+      "Song 4",
+      "Song 5",
+      "Song 6",
+      "Song 7",
+      "Song 8",
+      "Song 9",
+      "Song 10",
+    ],
+  },
+  {
+    id: 2,
+    name: "Singer 2",
+    songs: [
+      "Song 1",
+      "Song 2",
+      "Song 3",
+      "Song 4",
+      "Song 5",
+      "Song 6",
+      "Song 7",
+      "Song 8",
+      "Song 9",
+      "Song 10",
+    ],
+  },
+  // Add more singers here
+];
