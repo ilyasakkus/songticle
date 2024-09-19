@@ -183,5 +183,10 @@ export const singers = [
     id: 37,
     name: "Marie Osmond",
     bio: "Marie Osmond is an American singer, actress, and television personality known for her role in the popular singing group \"The Osmonds\" and her successful solo career. Born into a musical family, Marie showcased her talent from a young age and achieved international fame in the 1970s. She has released numerous hit songs, including \"Paper Roses,\" and has excelled in various genres. Marie has also pursued acting, hosting her own talk show with her brother Donny, and engaging in philanthropy. With her enduring success, authenticity, and dedication, Marie Osmond has left a lasting impact on the entertainment industry and popular culture.",
+  },
+  {
+    id: 38,
+    name: "Sam Cooke",
+    bio: "Sam Cooke's smooth voice and timeless melodies have made him one of the most influential figures in the history of soul music. Born in 1931 in Clarksdale, Mississippi, Cooke began his musical journey as a member of the gospel group The Soul Stirrers. His rich and emotive voice quickly gained attention, captivating audiences with its power and versatility. In the late 1950s, Cooke transitioned to secular music, embarking on a solo career that would solidify his status as a music icon. He seamlessly blended gospel, R&B, and pop influences, creating a unique sound that resonated with listeners of all backgrounds. Tragically, Cooke's life was cut short in 1964, but his music continues to inspire and enchant audiences, making him an everlasting legend in the music industry.",
   }
 ];
