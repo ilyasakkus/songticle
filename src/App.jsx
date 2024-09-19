@@ -28,6 +28,7 @@ import KidzBop from "./pages/KidzBop";
 import JackieWilson from "./pages/JackieWilson";
 import EdSheeran from "./pages/EdSheeran";
 import Tarkan from "./pages/Tarkan";
+import BenjaminBiolay from "./pages/BenjaminBiolay";
 
 const queryClient = new QueryClient();
 
@@ -63,6 +64,7 @@ const App = () => (
           <Route path="/jackie-wilson" element={<JackieWilson />} />
           <Route path="/ed-sheeran" element={<EdSheeran />} />
           <Route path="/tarkan" element={<Tarkan />} />
+          <Route path="/benjamin-biolay" element={<BenjaminBiolay />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
