@@ -82,6 +82,7 @@ const Index = () => {
                 className="w-full px-4 py-2 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 animated-placeholder"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search for a singer..."
               />
             </div>
           </div>
