@@ -143,5 +143,10 @@ export const singers = [
     id: 29,
     name: "Lutan Fyah",
     bio: "Lutan Fyah, born as Anthony Martin in Spanish Town, Saint Catherine Parish, Jamaica, is a powerful voice in reggae music. A devout member of the Rastafari movement Bobo Shanti, Lutan Fyah has emerged as a beacon of social consciousness and spiritual awakening through his soul-stirring compositions. Initially pursuing architecture and professional football, he found his true calling in music, embarking on a soaring career in 1999. His magnetic vocals and profound lyricism have earned him collaborations with renowned artists across genres and continents, solidifying his status as a reggae luminary and a revered figure in the global music scene.",
+  },
+  {
+    id: 30,
+    name: "Radiohead",
+    bio: "Radiohead is an English rock band formed in Abingdon, Oxfordshire, in 1985. The band consists of Thom Yorke, brothers Jonny Greenwood and Colin Greenwood, Ed O'Brien, and Philip Selway. Radiohead's experimental approach to rock music has made them one of the most acclaimed and influential bands of the 1990s and 2000s. Their evolution from alternative rock to more diverse styles incorporating electronic, jazz and classical influences has continually pushed the boundaries of popular music.",
   }
 ];
