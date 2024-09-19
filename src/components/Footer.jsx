@@ -6,8 +6,8 @@ const Footer = () => {
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="mb-4 md:mb-0">
-            <h3 className="text-xl font-bold">Jazz Legends</h3>
-            <p className="text-sm">Celebrating the greatest voices in jazz history</p>
+            <h3 className="text-xl font-bold">Songticle</h3>
+            <p className="text-sm">Discover and explore the best songs of legendary artists</p>
           </div>
           <div className="flex space-x-4">
             <a href="#" className="hover:text-blue-400">About</a>
@@ -16,7 +16,7 @@ const Footer = () => {
           </div>
         </div>
         <div className="mt-8 text-center text-sm">
-          © {new Date().getFullYear()} Jazz Legends. All rights reserved.
+          © {new Date().getFullYear()} Songticle. All rights reserved.
         </div>
       </div>
     </footer>
