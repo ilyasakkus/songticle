@@ -31,6 +31,7 @@ import Tarkan from "./pages/Tarkan";
 import BenjaminBiolay from "./pages/BenjaminBiolay";
 import HankWilliams from "./pages/HankWilliams";
 import TheCarpenters from "./pages/TheCarpenters";
+import JoniMitchell from "./pages/JoniMitchell";
 
 const queryClient = new QueryClient();
 
@@ -69,6 +70,7 @@ const App = () => (
           <Route path="/benjamin-biolay" element={<BenjaminBiolay />} />
           <Route path="/hank-williams" element={<HankWilliams />} />
           <Route path="/the-carpenters" element={<TheCarpenters />} />
+          <Route path="/joni-mitchell" element={<JoniMitchell />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

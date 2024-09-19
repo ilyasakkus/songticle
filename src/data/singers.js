@@ -128,5 +128,10 @@ export const singers = [
     id: 26,
     name: "The Carpenters",
     bio: "The Carpenters, comprised of siblings Karen and Richard Carpenter, stand as one of the most beloved and influential musical acts of the 20th century. Known for their melodic soft rock sound and Karen's distinctive contralto vocals, The Carpenters left an indelible mark on the music industry, selling over 100 million records worldwide. Their journey from Downey, California, to international stardom is a testament to their extraordinary talent and the universal appeal of their music.",
+  },
+  {
+    id: 27,
+    name: "Joni Mitchell",
+    bio: "Joni Mitchell, born Roberta Joan Anderson on November 7, 1943, in Fort Macleod, Alberta, Canada, is a legendary singer-songwriter whose poetic lyrics and innovative musical style have influenced generations of artists. Known for her unique vocal range and unconventional tunings on guitar, Mitchell's career spans over five decades, during which she has explored and fused various musical genres including folk, pop, rock, and jazz. Her deeply personal and introspective songwriting, combined with her distinctive voice and musical arrangements, have earned her numerous accolades and a place among the most respected and influential musicians of the 20th and 21st centuries.",
   }
 ];
