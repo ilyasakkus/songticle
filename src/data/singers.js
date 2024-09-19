@@ -38,5 +38,10 @@ export const singers = [
     id: 8,
     name: "Elvis Presley",
     bio: "Elvis Aaron Presley, born on January 8, 1935, in Tupelo, Mississippi, is widely regarded as one of the most significant cultural icons of the 20th century. Known as the \"King of Rock and Roll,\" Elvis revolutionized popular music and culture in the 1950s with his energetic performances, distinctive voice, and blend of genres including rock and roll, country, blues, and gospel.",
+  },
+  {
+    id: 9,
+    name: "Janis Joplin",
+    bio: "Janis Lyn Joplin, born on January 19, 1943, in Port Arthur, Texas, was one of the most iconic and influential rock singers of the 1960s. Known for her powerful, bluesy vocals and electric stage presence, Joplin broke new ground for women in rock music. Her raw, emotional performances and distinctive voice set her apart from her contemporaries.",
   }
 ];
