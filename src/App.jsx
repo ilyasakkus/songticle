@@ -17,6 +17,7 @@ import RayCharles from "./pages/RayCharles";
 import WalkUpSongs from "./pages/WalkUpSongs";
 import ArethaFranklin from "./pages/ArethaFranklin";
 import TomPetty from "./pages/TomPetty";
+import GreatestJazzSongs from "./pages/GreatestJazzSongs";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ const App = () => (
           <Route path="/walk-up-songs" element={<WalkUpSongs />} />
           <Route path="/aretha-franklin" element={<ArethaFranklin />} />
           <Route path="/tom-petty" element={<TomPetty />} />
+          <Route path="/greatest-jazz-songs" element={<GreatestJazzSongs />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
