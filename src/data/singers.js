@@ -123,5 +123,10 @@ export const singers = [
     id: 25,
     name: "Hank Williams",
     bio: "Hank Williams, an emblematic figure of 20th-century American music, left an indelible imprint with his poignant songs delving into the depths of human emotions. Born in Alabama, Williams' journey to musical greatness began under the guidance of blues artist Rufus Payne, eventually leading him from local stages to radio waves. His chart-topping singles, numbering over 55, captured the essence of universal experiences like love and heartache, while iconic tracks such as \"Lovesick Blues,\" \"Your Cheatin' Heart,\" and \"Hey, Good Lookin'\" showcased his storytelling prowess.",
+  },
+  {
+    id: 26,
+    name: "The Carpenters",
+    bio: "The Carpenters, comprised of siblings Karen and Richard Carpenter, stand as one of the most beloved and influential musical acts of the 20th century. Known for their melodic soft rock sound and Karen's distinctive contralto vocals, The Carpenters left an indelible mark on the music industry, selling over 100 million records worldwide. Their journey from Downey, California, to international stardom is a testament to their extraordinary talent and the universal appeal of their music.",
   }
 ];
