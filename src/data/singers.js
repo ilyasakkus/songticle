@@ -138,5 +138,10 @@ export const singers = [
     id: 28,
     name: "George Jones",
     bio: "George Jones, the illustrious American country musician, remains an enduring icon in the realm of musical brilliance. With a distinctive voice and a soulful phrasing that captured the hearts of millions, Jones' melodies transcended borders, earning him international fame. Adored for his emotional ballads, none could rival the depths to which Jones submerged himself in the essence of each song, evoking profound sentiments within listeners. Revered as the \"Rolls-Royce of Country Music,\" his chart-topping records exceeded 160 singles, etching his name indelibly into the annals of musical history.",
+  },
+  {
+    id: 29,
+    name: "Lutan Fyah",
+    bio: "Lutan Fyah, born as Anthony Martin in Spanish Town, Saint Catherine Parish, Jamaica, is a powerful voice in reggae music. A devout member of the Rastafari movement Bobo Shanti, Lutan Fyah has emerged as a beacon of social consciousness and spiritual awakening through his soul-stirring compositions. Initially pursuing architecture and professional football, he found his true calling in music, embarking on a soaring career in 1999. His magnetic vocals and profound lyricism have earned him collaborations with renowned artists across genres and continents, solidifying his status as a reggae luminary and a revered figure in the global music scene.",
   }
 ];

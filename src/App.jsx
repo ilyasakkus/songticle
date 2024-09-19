@@ -33,6 +33,7 @@ import HankWilliams from "./pages/HankWilliams";
 import TheCarpenters from "./pages/TheCarpenters";
 import JoniMitchell from "./pages/JoniMitchell";
 import GeorgeJones from "./pages/GeorgeJones";
+import LutanFyah from "./pages/LutanFyah";
 
 const queryClient = new QueryClient();
 
@@ -73,6 +74,7 @@ const App = () => (
           <Route path="/the-carpenters" element={<TheCarpenters />} />
           <Route path="/joni-mitchell" element={<JoniMitchell />} />
           <Route path="/george-jones" element={<GeorgeJones />} />
+          <Route path="/lutan-fyah" element={<LutanFyah />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
