@@ -78,5 +78,10 @@ export const singers = [
     id: 16,
     name: "Stevie Nicks",
     bio: "Stevie Nicks, born on May 26, 1948, in Phoenix, Arizona, is the legendary \"Queen of Rock and Roll\" who has been enchanting audiences for over five decades with her mesmerizing voice and poetic lyrics. Rising to fame as a member of Fleetwood Mac before launching a successful solo career, Nicks's unique style, both musically and visually, has made her an icon in the music industry. With multiple Grammy nominations, an induction into the Rock and Roll Hall of Fame (twice!), and over 140 million records sold worldwide, Stevie Nicks has solidified her place in music history.",
+  },
+  {
+    id: 17,
+    name: "Vanessa Paradis",
+    bio: "Vanessa Chantal Paradis, born on December 22, 1972, is a French icon renowned for her exceptional talents in singing, modeling, and acting. She catapulted to stardom at the age of 14 with the international hit \"Joe le taxi\" in 1987, marking the beginning of a remarkable career. Recognized with France's highest honors at the age of 18, Vanessa received the Prix Romy Schneider and the César Award for Most Promising Actress for her role in \"Noce Blanche\" and the Victoires de la Musique for Best Female Singer for her album \"Variations sur le même t'aime.\"",
   }
 ];
