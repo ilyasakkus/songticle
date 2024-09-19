@@ -11,6 +11,19 @@ const Index = () => {
     singer.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const getSingerPath = (singerId) => {
+    switch (singerId) {
+      case 1:
+        return '/adelaide-louise-hall';
+      case 2:
+        return '/metro-boomin';
+      case 3:
+        return '/kendrick-lamar';
+      default:
+        return '/';
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -34,7 +47,7 @@ const Index = () => {
             {filteredSingers.map((singer) => (
               <Link
                 key={singer.id}
-                to={`/singer/${singer.id}`}
+                to={getSingerPath(singer.id)}
                 className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
               >
                 <h2 className="text-2xl font-semibold mb-2">{singer.name}</h2>
