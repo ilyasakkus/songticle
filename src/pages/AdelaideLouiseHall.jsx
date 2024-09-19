@@ -87,7 +87,7 @@ const AdelaideLouiseHall = () => {
                   {index + 1}. {song.title} ({song.year})
                 </h3>
                 <p className="text-gray-600 mb-4">{song.description}</p>
-                <div className="aspect-w-16 aspect-h-9">
+                <div className="aspect-w-16 aspect-h-9" style={{ height: '480px' }}>
                   <iframe
                     src={`https://www.youtube.com/embed/${song.youtubeEmbed}`}
                     frameBorder="0"
