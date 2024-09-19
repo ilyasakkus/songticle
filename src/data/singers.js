@@ -100,5 +100,22 @@ export const singers = [
       { title: "Bank Account", year: 2017, description: "Features one of Metro Boomin's most minimalist yet effective beats." },
       { title: "Overdue", year: 2018, description: "This atmospheric track from Metro Boomin's debut studio album showcases his evolution as a producer." }
     ]
+  },
+  {
+    id: 7,
+    name: "Kendrick Lamar",
+    bio: "Kendrick Lamar Duckworth, born on June 17, 1987, in Compton, California, is widely regarded as one of the most influential and critically acclaimed rappers of his generation. Known for his intricate wordplay, storytelling ability, and socially conscious lyrics, Lamar has pushed the boundaries of hip-hop and redefined what it means to be a modern rap artist.",
+    songs: [
+      { title: "Alright", year: 2015, description: "This powerful anthem from 'To Pimp a Butterfly' became a rallying cry for the Black Lives Matter movement." },
+      { title: "HUMBLE.", year: 2017, description: "With its hard-hitting beat and memorable hook, 'HUMBLE.' showcases Lamar's ability to create chart-topping hits without compromising his artistic integrity." },
+      { title: "m.A.A.d city", year: 2012, description: "This epic track from 'good kid, m.A.A.d city' demonstrates Lamar's storytelling prowess." },
+      { title: "Swimming Pools (Drank)", year: 2012, description: "While often misinterpreted as a party anthem, this song is a nuanced exploration of alcohol abuse." },
+      { title: "DNA.", year: 2017, description: "This high-energy track showcases Lamar's technical skill as a rapper." },
+      { title: "King Kunta", year: 2015, description: "With its funk-influenced beat and confident lyrics, 'King Kunta' is a celebration of African American culture and a critique of the music industry." },
+      { title: "The Blacker the Berry", year: 2015, description: "This hard-hitting song addresses racial tensions and internalized racism." },
+      { title: "Bitch, Don't Kill My Vibe", year: 2012, description: "This laid-back track showcases Lamar's smoother side." },
+      { title: "i", year: 2014, description: "This uplifting, Grammy-winning single promotes self-love and positivity." },
+      { title: "u", year: 2015, description: "Closing our top 10 is this emotionally raw track from 'To Pimp a Butterfly'." }
+    ]
   }
 ];
