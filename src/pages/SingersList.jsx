@@ -10,7 +10,7 @@ const SingersList = () => {
       <Header />
       <main className="flex-grow bg-gray-100 py-8">
         <div className="container mx-auto px-4">
-          <h1 className="text-4xl font-bold mb-8 text-center">Famous Jazz Singers</h1>
+          <h1 className="text-4xl font-bold mb-8 text-center">Featured Singers</h1>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {singers.map((singer) => (
               <Link

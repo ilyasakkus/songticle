@@ -21,7 +21,7 @@ const Index = () => {
             <div className="max-w-3xl mx-auto">
               <input
                 type="text"
-                placeholder="Search for a jazz singer..."
+                placeholder="Search for a singer..."
                 className="w-full px-4 py-2 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
