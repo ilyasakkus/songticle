@@ -39,6 +39,7 @@ const Index = () => {
         return '/roy-orbison';
       case 11:
         return '/ray-charles';
+      
       case 12:
         return '/aretha-franklin';
       case 13:
@@ -128,7 +129,14 @@ const Index = () => {
                 to={getSingerPath(singer.id)}
                 className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
               >
-                <h2 className="text-2xl font-semibold mb-2">{singer.name}</h2>
+                <div className="flex items-center mb-4">
+                  <img
+                    src={singer.image}
+                    alt={singer.name}
+                    className="w-16 h-16 rounded-full object-cover mr-4"
+                  />
+                  <h2 className="text-2xl font-semibold">{singer.name}</h2>
+                </div>
                 <p className="text-gray-600 mb-4">{singer.bio.substring(0, 100)}...</p>
                 <span className="text-blue-500 hover:underline">View top 10 songs</span>
               </Link>
