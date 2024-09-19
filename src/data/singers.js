@@ -87,18 +87,18 @@ export const singers = [
   {
     id: 6,
     name: "Metro Boomin",
-    bio: "Leland Tyler Wayne, professionally known as Metro Boomin, born on September 16, 1993, in St. Louis, Missouri, has become one of the most influential producers in modern hip-hop and trap music. Known for his distinctive sound, characterized by heavy bass, atmospheric synths, and crisp drums, Metro Boomin has shaped the sound of contemporary rap.",
+    bio: "Leland Tyler Wayne, professionally known as Metro Boomin, born on September 16, 1993, in St. Louis, Missouri, has become one of the most influential producers in modern hip-hop and trap music. Known for his distinctive sound, characterized by heavy bass, atmospheric synths, and crisp drums, Metro Boomin has shaped the sound of contemporary rap. His collaborations with numerous high-profile artists have resulted in multiple chart-topping hits and critically acclaimed tracks.",
     songs: [
-      { title: "Bad and Boujee", year: 2016, description: "This cultural phenomenon showcases Metro Boomin's ability to create an instantly recognizable beat." },
-      { title: "Mask Off", year: 2017, description: "Demonstrates Metro Boomin's skill in sampling and creating atmospheric beats." },
-      { title: "Father Stretch My Hands Pt. 1", year: 2016, description: "Co-produced with Kanye West, this track bears Metro Boomin's distinct sonic fingerprint." },
-      { title: "Jumpman", year: 2015, description: "This high-energy collaboration between Drake and Future features one of Metro Boomin's most infectious beats." },
-      { title: "Tuesday", year: 2014, description: "Represents a departure from Metro Boomin's typical sound, showcasing his versatility as a producer." },
-      { title: "X", year: 2016, description: "This collaboration with 21 Savage exemplifies Metro Boomin's signature dark, atmospheric production style." },
-      { title: "No Complaints", year: 2017, description: "Metro Boomin steps into the spotlight as the lead artist on this smooth, R&B-influenced track." },
-      { title: "Congratulations", year: 2016, description: "While co-produced with Frank Dukes and Louis Bell, this track bears Metro Boomin's influence in its trap-inspired drums and atmospheric synths." },
-      { title: "Bank Account", year: 2017, description: "Features one of Metro Boomin's most minimalist yet effective beats." },
-      { title: "Overdue", year: 2018, description: "This atmospheric track from Metro Boomin's debut studio album showcases his evolution as a producer." }
+      { title: "Bad and Boujee", year: 2016, description: "This cultural phenomenon showcases Metro Boomin's ability to create an instantly recognizable beat. The track's minimalist production, featuring a haunting piano loop and crisp hi-hats, provides the perfect backdrop for Migos' and Lil Uzi Vert's catchy flows.", youtubeEmbed: "S-sJp1FfG7Q" },
+      { title: "Mask Off", year: 2017, description: "\"Mask Off\" demonstrates Metro Boomin's skill in sampling and creating atmospheric beats. The track's iconic flute sample, taken from Tommy Butler's \"Prison Song,\" is layered over trap drums to create a mesmerizing soundscape.", youtubeEmbed: "xvZqHgFz51I" },
+      { title: "Father Stretch My Hands Pt. 1", year: 2016, description: "While co-produced with Kanye West, this track bears Metro Boomin's distinct sonic fingerprint. The song's use of a pitched-up soul sample, combined with booming 808s and a gospel choir, creates a euphoric atmosphere that perfectly complements Kanye's vocals.", youtubeEmbed: "_MIsk8VoNhM" },
+      { title: "Jumpman", year: 2015, description: "This high-energy collaboration between Drake and Future features one of Metro Boomin's most infectious beats. The track's bouncy synth line, paired with hard-hitting drums and a catchy hook, created an instant club anthem.", youtubeEmbed: "drprt4Dft7Y" },
+      { title: "Tuesday", year: 2014, description: "\"Tuesday\" represents a departure from Metro Boomin's typical sound, showcasing his versatility as a producer. The track's dreamy, laid-back beat, featuring ethereal synths and a subtle bassline, creates a unique atmosphere that perfectly complements ILOVEMAKONNEN's unconventional vocals.", youtubeEmbed: "avFq9errZCk" },
+      { title: "X", year: 2016, description: "This collaboration with 21 Savage exemplifies Metro Boomin's signature dark, atmospheric production style. The track's ominous piano melody, coupled with heavy 808s and skittering hi-hats, creates a tense, cinematic backdrop for 21 Savage and Future's verses.", youtubeEmbed: "SpXw0qiy3Wo" },
+      { title: "No Complaints", year: 2017, description: "On \"No Complaints,\" Metro Boomin steps into the spotlight as the lead artist. The track's smooth, R&B-influenced production demonstrates his ability to create more melodic, radio-friendly beats.", youtubeEmbed: "WSHhp-VXTZs" },
+      { title: "Congratulations", year: 2016, description: "While co-produced with Frank Dukes and Louis Bell, \"Congratulations\" bears Metro Boomin's influence in its trap-inspired drums and atmospheric synths. The track's uplifting vibe and memorable melody helped propel Post Malone to superstardom.", youtubeEmbed: "SC4xMk98Pdc" },
+      { title: "Bank Account", year: 2017, description: "\"Bank Account\" features one of Metro Boomin's most minimalist yet effective beats. The track's simple piano loop and sparse percussion create a hypnotic backdrop for 21 Savage's deadpan delivery.", youtubeEmbed: "H1KBHFXm2Bg" },
+      { title: "Overdue", year: 2018, description: "Closing our top 10 is this atmospheric track from Metro Boomin's debut studio album \"Not All Heroes Wear Capes.\" The song's dreamy production, featuring reverb-heavy guitars and subtle vocal samples, creates a spacey, psychedelic vibe that perfectly complements Travis Scott's auto-tuned vocals.", youtubeEmbed: "ThRbi74tkLw" }
     ]
   },
   {
@@ -106,16 +106,16 @@ export const singers = [
     name: "Kendrick Lamar",
     bio: "Kendrick Lamar Duckworth, born on June 17, 1987, in Compton, California, is widely regarded as one of the most influential and critically acclaimed rappers of his generation. Known for his intricate wordplay, storytelling ability, and socially conscious lyrics, Lamar has pushed the boundaries of hip-hop and redefined what it means to be a modern rap artist.",
     songs: [
-      { title: "Alright", year: 2015, description: "This powerful anthem from 'To Pimp a Butterfly' became a rallying cry for the Black Lives Matter movement." },
-      { title: "HUMBLE.", year: 2017, description: "With its hard-hitting beat and memorable hook, 'HUMBLE.' showcases Lamar's ability to create chart-topping hits without compromising his artistic integrity." },
-      { title: "m.A.A.d city", year: 2012, description: "This epic track from 'good kid, m.A.A.d city' demonstrates Lamar's storytelling prowess." },
-      { title: "Swimming Pools (Drank)", year: 2012, description: "While often misinterpreted as a party anthem, this song is a nuanced exploration of alcohol abuse." },
-      { title: "DNA.", year: 2017, description: "This high-energy track showcases Lamar's technical skill as a rapper." },
-      { title: "King Kunta", year: 2015, description: "With its funk-influenced beat and confident lyrics, 'King Kunta' is a celebration of African American culture and a critique of the music industry." },
-      { title: "The Blacker the Berry", year: 2015, description: "This hard-hitting song addresses racial tensions and internalized racism." },
-      { title: "Bitch, Don't Kill My Vibe", year: 2012, description: "This laid-back track showcases Lamar's smoother side." },
-      { title: "i", year: 2014, description: "This uplifting, Grammy-winning single promotes self-love and positivity." },
-      { title: "u", year: 2015, description: "Closing our top 10 is this emotionally raw track from 'To Pimp a Butterfly'." }
+      { title: "Alright", year: 2015, description: "This powerful anthem from 'To Pimp a Butterfly' became a rallying cry for the Black Lives Matter movement.", youtubeEmbed: "Z-48u_uWMHY" },
+      { title: "HUMBLE.", year: 2017, description: "With its hard-hitting beat and memorable hook, 'HUMBLE.' showcases Lamar's ability to create chart-topping hits without compromising his artistic integrity.", youtubeEmbed: "tvTRZJ-4EyI" },
+      { title: "m.A.A.d city", year: 2012, description: "This epic track from 'good kid, m.A.A.d city' demonstrates Lamar's storytelling prowess.", youtubeEmbed: "KKCSwOVudMo" },
+      { title: "Swimming Pools (Drank)", year: 2012, description: "While often misinterpreted as a party anthem, this song is a nuanced exploration of alcohol abuse.", youtubeEmbed: "B5YNiCfWC3A" },
+      { title: "DNA.", year: 2017, description: "This high-energy track showcases Lamar's technical skill as a rapper.", youtubeEmbed: "NLZRYQMLDW4" },
+      { title: "King Kunta", year: 2015, description: "With its funk-influenced beat and confident lyrics, 'King Kunta' is a celebration of African American culture and a critique of the music industry.", youtubeEmbed: "hRK7PVJFbS8" },
+      { title: "The Blacker the Berry", year: 2015, description: "This hard-hitting song addresses racial tensions and internalized racism.", youtubeEmbed: "Qhd8aWMcAfw" },
+      { title: "Bitch, Don't Kill My Vibe", year: 2012, description: "This laid-back track showcases Lamar's smoother side.", youtubeEmbed: "GF8aaTu2kg0" },
+      { title: "i", year: 2014, description: "This uplifting, Grammy-winning single promotes self-love and positivity.", youtubeEmbed: "8aShfolR6w8" },
+      { title: "u", year: 2015, description: "Closing our top 10 is this emotionally raw track from 'To Pimp a Butterfly'.", youtubeEmbed: "XGC4QpDIpJc" }
     ]
   }
 ];
