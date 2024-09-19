@@ -63,5 +63,10 @@ export const singers = [
     id: 13,
     name: "Tom Petty",
     bio: "Thomas Earl Petty, born on October 20, 1950, in Gainesville, Florida, was one of the most influential and beloved American rock musicians of the late 20th and early 21st centuries. As the lead vocalist and guitarist of Tom Petty and the Heartbreakers, and as a successful solo artist, Petty crafted a distinctive sound that blended elements of rock, folk, and Americana. Known for his honest songwriting, distinctive nasal voice, and jangly guitar sound, Petty's music resonated with millions of fans across multiple generations.",
+  },
+  {
+    id: 14,
+    name: "Axl Rose",
+    bio: "Axl Rose, born William Bruce Rose Jr. on February 6, 1962, in Lafayette, Indiana, is one of rock music's most iconic and controversial figures. As the lead vocalist of Guns N' Roses, Rose helped redefine hard rock in the late 1980s and early 1990s. Known for his distinctive voice, wide vocal range, and electrifying stage presence, Axl Rose has left an indelible mark on the music industry.",
   }
 ];
