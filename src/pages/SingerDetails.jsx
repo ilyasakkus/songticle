@@ -31,9 +31,25 @@ const SingerDetails = () => {
           <h1 className="text-4xl font-bold mb-4 text-center">{singer.name}</h1>
           <p className="text-xl text-gray-600 mb-8 text-center">{singer.bio}</p>
           <h2 className="text-3xl font-semibold mb-6 text-center">Top 10 Songs</h2>
-          <div className="space-y-4">
+          <div className="space-y-8">
             {singer.songs.map((song, index) => (
-              <SongItem key={index} song={song} index={index + 1} />
+              <div key={index} className="bg-white rounded-lg shadow-md p-6">
+                <h3 className="text-2xl font-semibold mb-2">
+                  {index + 1}. {song.title} ({song.year})
+                </h3>
+                <p className="text-gray-600 mb-4">{song.description}</p>
+                {song.youtubeEmbed && (
+                  <div className="aspect-w-16 aspect-h-9 mb-4">
+                    <iframe
+                      src={`https://www.youtube.com/embed/${song.youtubeEmbed}`}
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      className="w-full h-full"
+                    ></iframe>
+                  </div>
+                )}
+              </div>
             ))}
           </div>
         </div>
