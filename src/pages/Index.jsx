@@ -71,6 +71,14 @@ const Index = () => {
                 <span className="text-blue-500 hover:underline">View top 10 songs</span>
               </Link>
             ))}
+            <Link
+              to="/walk-up-songs"
+              className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
+            >
+              <h2 className="text-2xl font-semibold mb-2">Top 10 Walk-Up Songs in Baseball</h2>
+              <p className="text-gray-600 mb-4">Discover the most iconic and energizing walk-up songs used by baseball players...</p>
+              <span className="text-blue-500 hover:underline">View top 10 songs</span>
+            </Link>
           </div>
         </div>
       </main>
