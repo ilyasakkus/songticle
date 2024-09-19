@@ -40,6 +40,7 @@ import Live from "./pages/Live";
 import IceSpice from "./pages/IceSpice";
 import Bandmanrill from "./pages/Bandmanrill";
 import GloRilla from "./pages/GloRilla";
+import AyraStarr from "./pages/AyraStarr";
 
 const queryClient = new QueryClient();
 
@@ -87,6 +88,7 @@ const App = () => (
           <Route path="/ice-spice" element={<IceSpice />} />
           <Route path="/bandmanrill" element={<Bandmanrill />} />
           <Route path="/glorilla" element={<GloRilla />} />
+          <Route path="/ayra-starr" element={<AyraStarr />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

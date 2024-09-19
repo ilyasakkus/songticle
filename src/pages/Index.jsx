@@ -83,6 +83,8 @@ const Index = () => {
         return '/bandmanrill';
       case 35:
         return '/glorilla';
+      case 36:
+        return '/ayra-starr';
       default:
         return '/';
     }

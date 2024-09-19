@@ -173,5 +173,10 @@ export const singers = [
     id: 35,
     name: "GloRilla",
     bio: "GloRilla, the enigmatic band that has left an indelible mark on the music scene, has gifted us with countless unforgettable songs over the years. From their early days as underground sensations to their meteoric rise to international acclaim, GloRilla's discography is a testament to their extraordinary talent and sonic innovation. Their tracks have not only resonated deeply with fans but have also become cultural touchstones, inspiring generations with their powerful lyrics, infectious melodies, and genre-defying arrangements.",
+  },
+  {
+    id: 36,
+    name: "Ayra Starr",
+    bio: "Ayra Starr, a Beninese-born Nigerian singer, is an artist who emerged with a celestial allure that captivates hearts from the very first note. From her humble beginnings as a budding fashion model to her meteoric rise in the music industry, Ayra's journey has been nothing short of awe-inspiring. Her hauntingly soulful voice and poignant storytelling have earned her accolades and a legion of fans around the world.",
   }
 ];
