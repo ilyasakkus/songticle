@@ -148,5 +148,10 @@ export const singers = [
     id: 30,
     name: "Radiohead",
     bio: "Radiohead is an English rock band formed in Abingdon, Oxfordshire, in 1985. The band consists of Thom Yorke, brothers Jonny Greenwood and Colin Greenwood, Ed O'Brien, and Philip Selway. Radiohead's experimental approach to rock music has made them one of the most acclaimed and influential bands of the 1990s and 2000s. Their evolution from alternative rock to more diverse styles incorporating electronic, jazz and classical influences has continually pushed the boundaries of popular music.",
+  },
+  {
+    id: 31,
+    name: "Björk",
+    bio: "Björk Guðmundsdóttir, born November 21, 1965, in Reykjavík, Iceland, is an iconic singer, songwriter, actress, and music producer. Known for her eclectic musical style, innovative artistry, and distinctive voice, Björk has been a pioneering force in alternative and experimental music since the 1990s. Her work spans various genres, including electronic, pop, experimental, trip hop, and avant-garde music. Björk's career began as the lead singer of the alternative rock band The Sugarcubes before she embarked on a highly successful solo career. Her albums, including 'Debut', 'Post', and 'Homogenic', have received critical acclaim and have influenced countless artists across multiple genres.",
   }
 ];
