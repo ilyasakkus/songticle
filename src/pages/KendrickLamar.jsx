@@ -5,6 +5,69 @@ import Footer from '../components/Footer';
 import { ArrowLeft } from 'lucide-react';
 
 const KendrickLamar = () => {
+  const songs = [
+    {
+      title: "Alright",
+      year: 2015,
+      description: "This powerful anthem from \"To Pimp a Butterfly\" became a rallying cry for the Black Lives Matter movement. Its uplifting message of resilience, combined with Lamar's dynamic flow and the jazz-influenced production, created a timeless piece of protest music.",
+      youtubeEmbed: "Z-48u_uWMHY"
+    },
+    {
+      title: "HUMBLE.",
+      year: 2017,
+      description: "With its hard-hitting beat and memorable hook, \"HUMBLE.\" showcases Lamar's ability to create chart-topping hits without compromising his artistic integrity. The song's stark video and Lamar's confident delivery earned him widespread acclaim and multiple awards.",
+      youtubeEmbed: "tvTRZJ-4EyI"
+    },
+    {
+      title: "m.A.A.d city",
+      year: 2012,
+      description: "This epic track from \"good kid, m.A.A.d city\" demonstrates Lamar's storytelling prowess. Its vivid depiction of life in Compton and Lamar's intense delivery create a cinematic listening experience.",
+      youtubeEmbed: "KKCSwOVudMo"
+    },
+    {
+      title: "Swimming Pools (Drank)",
+      year: 2012,
+      description: "While often misinterpreted as a party anthem, this song is a nuanced exploration of alcohol abuse. Lamar's clever wordplay and the song's hypnotic production make it both commercially appealing and deeply thoughtful.",
+      youtubeEmbed: "B5YNiCfWC3A"
+    },
+    {
+      title: "DNA.",
+      year: 2017,
+      description: "This high-energy track showcases Lamar's technical skill as a rapper. Its rapid-fire lyrics and aggressive delivery, coupled with a beat switch midway through, highlight his versatility as an artist.",
+      youtubeEmbed: "NLZRYQMLDW4"
+    },
+    {
+      title: "King Kunta",
+      year: 2015,
+      description: "With its funk-influenced beat and confident lyrics, \"King Kunta\" is a celebration of African American culture and a critique of the music industry. Lamar's clever references and the song's infectious groove make it a standout track.",
+      youtubeEmbed: "hRK7PVJFbS8"
+    },
+    {
+      title: "The Blacker the Berry",
+      year: 2015,
+      description: "This hard-hitting song addresses racial tensions and internalized racism. Lamar's passionate delivery and the track's intense production create a powerful and thought-provoking listening experience.",
+      youtubeEmbed: "Qhd8aWMcAfw"
+    },
+    {
+      title: "Bitch, Don't Kill My Vibe",
+      year: 2012,
+      description: "This laid-back track showcases Lamar's smoother side. Its introspective lyrics and mellow beat demonstrate his ability to create more relaxed, vibe-oriented songs without losing his lyrical depth.",
+      youtubeEmbed: "GF8aaTu2kg0"
+    },
+    {
+      title: "i",
+      year: 2014,
+      description: "This uplifting, Grammy-winning single promotes self-love and positivity. Its sample of the Isley Brothers' \"That Lady\" and Lamar's energetic performance create a feel-good anthem with a powerful message.",
+      youtubeEmbed: "8aShfolR6w8"
+    },
+    {
+      title: "u",
+      year: 2015,
+      description: "Closing our top 10 is this emotionally raw track from \"To Pimp a Butterfly.\" Lamar's vulnerable performance, addressing his own insecurities and survivor's guilt, showcases his ability to create deeply personal and affecting music.",
+      youtubeEmbed: "XGC4QpDIpJc"
+    }
+  ];
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -16,72 +79,11 @@ const KendrickLamar = () => {
           </Link>
           <h1 className="text-4xl font-bold mb-4">Kendrick Lamar</h1>
           <p className="text-xl mb-8">
-            Kendrick Lamar Duckworth, born on June 17, 1987, in Compton, California, is widely regarded as one of the most influential and critically acclaimed rappers of his generation. Known for his intricate wordplay, storytelling ability, and socially conscious lyrics, Lamar has pushed the boundaries of hip-hop and redefined what it means to be a modern rap artist.
+            Kendrick Lamar Duckworth, born on June 17, 1987, in Compton, California, is widely regarded as one of the most influential and critically acclaimed rappers of his generation. Known for his intricate wordplay, storytelling ability, and socially conscious lyrics, Lamar has pushed the boundaries of hip-hop and redefined what it means to be a modern rap artist. His music often addresses complex themes such as race, identity, and social justice, all while maintaining commercial success.
           </p>
           <h2 className="text-3xl font-semibold mb-6">Top 10 Songs</h2>
           <div className="space-y-8">
-            {[
-              {
-                title: "Alright",
-                year: 2015,
-                description: "This powerful anthem from 'To Pimp a Butterfly' became a rallying cry for the Black Lives Matter movement.",
-                youtubeEmbed: "Z-48u_uWMHY"
-              },
-              {
-                title: "HUMBLE.",
-                year: 2017,
-                description: "With its hard-hitting beat and memorable hook, 'HUMBLE.' showcases Lamar's ability to create chart-topping hits without compromising his artistic integrity.",
-                youtubeEmbed: "tvTRZJ-4EyI"
-              },
-              {
-                title: "m.A.A.d city",
-                year: 2012,
-                description: "This epic track from 'good kid, m.A.A.d city' demonstrates Lamar's storytelling prowess.",
-                youtubeEmbed: "KKCSwOVudMo"
-              },
-              {
-                title: "Swimming Pools (Drank)",
-                year: 2012,
-                description: "While often misinterpreted as a party anthem, this song is a nuanced exploration of alcohol abuse.",
-                youtubeEmbed: "B5YNiCfWC3A"
-              },
-              {
-                title: "DNA.",
-                year: 2017,
-                description: "This high-energy track showcases Lamar's technical skill as a rapper.",
-                youtubeEmbed: "NLZRYQMLDW4"
-              },
-              {
-                title: "King Kunta",
-                year: 2015,
-                description: "With its funk-influenced beat and confident lyrics, 'King Kunta' is a celebration of African American culture and a critique of the music industry.",
-                youtubeEmbed: "hRK7PVJFbS8"
-              },
-              {
-                title: "The Blacker the Berry",
-                year: 2015,
-                description: "This hard-hitting song addresses racial tensions and internalized racism.",
-                youtubeEmbed: "Qhd8aWMcAfw"
-              },
-              {
-                title: "Bitch, Don't Kill My Vibe",
-                year: 2012,
-                description: "This laid-back track showcases Lamar's smoother side.",
-                youtubeEmbed: "GF8aaTu2kg0"
-              },
-              {
-                title: "i",
-                year: 2014,
-                description: "This uplifting, Grammy-winning single promotes self-love and positivity.",
-                youtubeEmbed: "8aShfolR6w8"
-              },
-              {
-                title: "u",
-                year: 2015,
-                description: "Closing our top 10 is this emotionally raw track from 'To Pimp a Butterfly'.",
-                youtubeEmbed: "XGC4QpDIpJc"
-              }
-            ].map((song, index) => (
+            {songs.map((song, index) => (
               <div key={index} className="bg-white rounded-lg shadow-md p-6">
                 <h3 className="text-2xl font-semibold mb-2">
                   {index + 1}. {song.title} ({song.year})
