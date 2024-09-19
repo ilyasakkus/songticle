@@ -135,16 +135,12 @@ const Index = () => {
       <Footer />
       <style jsx>{`
         .animated-placeholder::placeholder {
-          opacity: 0;
-          animation: typingAnimation 4s infinite;
+          opacity: 1;
+          animation: typingAnimation 4s steps(25, end) infinite;
         }
 
         @keyframes typingAnimation {
-          0%, 100% { content: ''; }
-          20% { content: 'S'; }
-          40% { content: 'Se'; }
-          60% { content: 'Sea'; }
-          80% { content: 'Sear'; }
+          0% { content: ''; }
           100% { content: 'Search for a singer...'; }
         }
 
