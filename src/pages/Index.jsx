@@ -27,6 +27,8 @@ const Index = () => {
         return '/freddie-mercury';
       case 7:
         return '/whitney-houston';
+      case 8:
+        return '/elvis-presley';
       default:
         return '/';
     }

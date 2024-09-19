@@ -33,5 +33,10 @@ export const singers = [
     id: 7,
     name: "Whitney Houston",
     bio: "Whitney Elizabeth Houston, born on August 9, 1963, in Newark, New Jersey, was one of the most celebrated and influential singers of all time. Known as \"The Voice,\" Houston possessed a powerful, soulful soprano that set new standards in popular music. Her ability to blend pop, R&B, and gospel influences created a unique sound that dominated the charts for nearly three decades.",
+  },
+  {
+    id: 8,
+    name: "Elvis Presley",
+    bio: "Elvis Aaron Presley, born on January 8, 1935, in Tupelo, Mississippi, is widely regarded as one of the most significant cultural icons of the 20th century. Known as the \"King of Rock and Roll,\" Elvis revolutionized popular music and culture in the 1950s with his energetic performances, distinctive voice, and blend of genres including rock and roll, country, blues, and gospel.",
   }
 ];
