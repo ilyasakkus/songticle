@@ -23,6 +23,8 @@ const Index = () => {
         return '/sabrina-carpenter';
       case 5:
         return '/mariah-carey';
+      case 6:
+        return '/freddie-mercury';
       default:
         return '/';
     }

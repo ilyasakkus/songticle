@@ -23,5 +23,10 @@ export const singers = [
     id: 5,
     name: "Mariah Carey",
     bio: "Mariah Carey, born on March 27, 1969, in Huntington, New York, is one of the most successful and influential pop divas of all time. Known for her five-octave vocal range, whistle register, and melismatic singing style, Carey has been a dominant force in the music industry since her debut in 1990. With numerous number-one hits, Grammy Awards, and record-breaking achievements, Carey has established herself as the \"Songbird Supreme.\"",
+  },
+  {
+    id: 6,
+    name: "Freddie Mercury",
+    bio: "Farrokh Bulsara, known professionally as Freddie Mercury, was born on September 5, 1946, in Stone Town, Zanzibar. As the lead vocalist and pianist of Queen, Mercury became one of the most iconic and influential figures in rock music history. Known for his powerful four-octave vocal range, flamboyant stage presence, and innovative songwriting, Mercury helped redefine the boundaries of rock music.",
   }
 ];
