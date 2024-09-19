@@ -132,6 +132,11 @@ export const singers = [
   {
     id: 27,
     name: "Joni Mitchell",
-    bio: "Joni Mitchell, born Roberta Joan Anderson on November 7, 1943, in Fort Macleod, Alberta, Canada, is a legendary singer-songwriter whose poetic lyrics and innovative musical style have influenced generations of artists. Known for her unique vocal range and unconventional tunings on guitar, Mitchell's career spans over five decades, during which she has explored and fused various musical genres including folk, pop, rock, and jazz. Her deeply personal and introspective songwriting, combined with her distinctive voice and musical arrangements, have earned her numerous accolades and a place among the most respected and influential musicians of the 20th and 21st centuries.",
+    bio: "Joni Mitchell, born Roberta Joan Anderson on November 7, 1943, in Fort Macleod, Alberta, Canada, is a legendary singer-songwriter whose po etic lyrics and innovative musical style have influenced generations of artists. Known for her unique vocal range and unconventional tunings on guitar, Mitchell's career spans over five decades, during which she has explored and fused various musical genres including folk, pop, rock, and jazz. Her deeply personal and introspective songwriting, combined with her distinctive voice and musical arrangements, have earned her numerous accolades and a place among the most respected and influential musicians of the 20th and 21st centuries.",
+  },
+  {
+    id: 28,
+    name: "George Jones",
+    bio: "George Jones, the illustrious American country musician, remains an enduring icon in the realm of musical brilliance. With a distinctive voice and a soulful phrasing that captured the hearts of millions, Jones' melodies transcended borders, earning him international fame. Adored for his emotional ballads, none could rival the depths to which Jones submerged himself in the essence of each song, evoking profound sentiments within listeners. Revered as the \"Rolls-Royce of Country Music,\" his chart-topping records exceeded 160 singles, etching his name indelibly into the annals of musical history.",
   }
 ];
