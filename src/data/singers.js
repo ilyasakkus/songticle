@@ -178,5 +178,10 @@ export const singers = [
     id: 36,
     name: "Ayra Starr",
     bio: "Ayra Starr, a Beninese-born Nigerian singer, is an artist who emerged with a celestial allure that captivates hearts from the very first note. From her humble beginnings as a budding fashion model to her meteoric rise in the music industry, Ayra's journey has been nothing short of awe-inspiring. Her hauntingly soulful voice and poignant storytelling have earned her accolades and a legion of fans around the world.",
+  },
+  {
+    id: 37,
+    name: "Marie Osmond",
+    bio: "Marie Osmond is an American singer, actress, and television personality known for her role in the popular singing group \"The Osmonds\" and her successful solo career. Born into a musical family, Marie showcased her talent from a young age and achieved international fame in the 1970s. She has released numerous hit songs, including \"Paper Roses,\" and has excelled in various genres. Marie has also pursued acting, hosting her own talk show with her brother Donny, and engaging in philanthropy. With her enduring success, authenticity, and dedication, Marie Osmond has left a lasting impact on the entertainment industry and popular culture.",
   }
 ];

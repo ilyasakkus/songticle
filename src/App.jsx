@@ -41,6 +41,7 @@ import IceSpice from "./pages/IceSpice";
 import Bandmanrill from "./pages/Bandmanrill";
 import GloRilla from "./pages/GloRilla";
 import AyraStarr from "./pages/AyraStarr";
+import MarieOsmond from "./pages/MarieOsmond";
 
 const queryClient = new QueryClient();
 
@@ -89,6 +90,7 @@ const App = () => (
           <Route path="/bandmanrill" element={<Bandmanrill />} />
           <Route path="/glorilla" element={<GloRilla />} />
           <Route path="/ayra-starr" element={<AyraStarr />} />
+          <Route path="/marie-osmond" element={<MarieOsmond />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
