@@ -88,5 +88,10 @@ export const singers = [
     id: 18,
     name: "Zachary Lane Bryan",
     bio: "Zachary Lane Bryan, born on April 2, 1996, has emerged as a notable figure in the American country music scene. Hailing from Oologah, Oklahoma, Bryan made a significant impact with his major-label debut album, \"American Heartbreak,\" which entered the U.S. Billboard 200 at an impressive number five. His self-titled album released in 2023 debuted at the number one spot on the US Billboard 200, featuring the chart-topping track \"I Remember Everything,\" a collaboration with Kacey Musgraves.",
+  },
+  {
+    id: 19,
+    name: "Billie Holiday",
+    bio: "Billie Holiday, born Eleanora Fagan in 1915, emerged as a luminous force in the realm of jazz and swing music. Nicknamed \"Lady Day\" by her friend Lester Young, her vocal style, inspired by jazz instrumentalists, redefined the art of phrasing and tempo manipulation. Despite a tumultuous life marked by legal troubles and drug abuse, Holiday's resilience and artistry shone through, leaving an enduring legacy in the form of iconic hits and posthumous accolades.",
   }
 ];
