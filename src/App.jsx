@@ -2,7 +2,10 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { navItems } from "./nav-items";
+import Index from "./pages/Index";
+import AdelaideLouiseHall from "./pages/AdelaideLouiseHall";
+import MetroBoomin from "./pages/MetroBoomin";
+import KendrickLamar from "./pages/KendrickLamar";
 
 const queryClient = new QueryClient();
 
@@ -12,9 +15,10 @@ const App = () => (
       <Toaster />
       <BrowserRouter>
         <Routes>
-          {navItems.map(({ to, page }) => (
-            <Route key={to} path={to} element={page} />
-          ))}
+          <Route path="/" element={<Index />} />
+          <Route path="/adelaide-louise-hall" element={<AdelaideLouiseHall />} />
+          <Route path="/metro-boomin" element={<MetroBoomin />} />
+          <Route path="/kendrick-lamar" element={<KendrickLamar />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
