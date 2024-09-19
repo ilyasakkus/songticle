@@ -73,5 +73,10 @@ export const singers = [
     id: 15,
     name: "Kurt Cobain",
     bio: "Kurt Cobain, born on February 20, 1967, in Aberdeen, Washington, was the iconic frontman of Nirvana who left an indelible mark on the music world. Pioneering the grunge movement and reshaping alternative rock, Cobain's raw, emotive vocals, introspective lyrics, and explosive guitar work catapulted Nirvana to global stardom. Despite his tragic death in 1994 at the age of 27, Cobain's influence continues to resonate with musicians and fans alike.",
+  },
+  {
+    id: 16,
+    name: "Stevie Nicks",
+    bio: "Stevie Nicks, born on May 26, 1948, in Phoenix, Arizona, is the legendary \"Queen of Rock and Roll\" who has been enchanting audiences for over five decades with her mesmerizing voice and poetic lyrics. Rising to fame as a member of Fleetwood Mac before launching a successful solo career, Nicks's unique style, both musically and visually, has made her an icon in the music industry. With multiple Grammy nominations, an induction into the Rock and Roll Hall of Fame (twice!), and over 140 million records sold worldwide, Stevie Nicks has solidified her place in music history.",
   }
 ];
