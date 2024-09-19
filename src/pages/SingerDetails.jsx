@@ -38,7 +38,7 @@ const SingerDetails = () => {
                 </h3>
                 <p className="text-gray-600 mb-4">{song.description}</p>
                 {song.youtubeEmbed && (
-                  <div className="aspect-w-16 aspect-h-9 mb-4">
+                  <div className="aspect-w-16 aspect-h-9 mb-4" style={{ height: '400px' }}>
                     <iframe
                       src={`https://www.youtube.com/embed/${song.youtubeEmbed}`}
                       frameBorder="0"
