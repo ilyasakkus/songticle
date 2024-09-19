@@ -14,6 +14,15 @@ const SongItem = ({ song, index }) => {
         {index}. {song.title} ({song.year})
       </h3>
       <p className="text-gray-600 mb-4">{song.description}</p>
+      <div className="mb-4">
+        <h4 className="text-lg font-semibold mb-2">Listen to the Song:</h4>
+        <div className="aspect-w-16 aspect-h-9">
+          {/* Placeholder for YouTube embed */}
+          <div className="bg-gray-200 flex items-center justify-center">
+            <p className="text-gray-500">YouTube embed for "{song.title}" will be added here</p>
+          </div>
+        </div>
+      </div>
       <div className="flex items-center">
         <span className="mr-2">Rate this song:</span>
         {[1, 2, 3, 4, 5].map((star) => (
