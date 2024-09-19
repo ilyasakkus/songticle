@@ -168,5 +168,10 @@ export const singers = [
     id: 34,
     name: "Bandmanrill",
     bio: "Bandmanrill, the trailblazing American rapper and songwriter hailing from Newark, New Jersey, emerged as a beacon of creativity amidst the challenges of the COVID-19 pandemic. Captivating audiences with his innovative fusion of Jersey club and drill elements, Bandmanrill's rise to fame under Warner Music Group was swift. His debut opus, \"Club Godfather,\" featuring collaborations with NLE Choppa, Lay Bankz, Skaiwater, Sha EK, and DJ swill, solidified his status as a pioneer in the hip-hop scene.",
+  },
+  {
+    id: 35,
+    name: "GloRilla",
+    bio: "GloRilla, the enigmatic band that has left an indelible mark on the music scene, has gifted us with countless unforgettable songs over the years. From their early days as underground sensations to their meteoric rise to international acclaim, GloRilla's discography is a testament to their extraordinary talent and sonic innovation. Their tracks have not only resonated deeply with fans but have also become cultural touchstones, inspiring generations with their powerful lyrics, infectious melodies, and genre-defying arrangements.",
   }
 ];
