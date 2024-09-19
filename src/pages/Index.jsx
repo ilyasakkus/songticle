@@ -3,13 +3,17 @@ import { Link } from 'react-router-dom';
 import { singers } from '../data/singers';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import { Button } from "@/components/ui/button";
 
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [displayCount, setDisplayCount] = useState(18);
 
   const filteredSingers = singers.filter(singer =>
     singer.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const displayedSingers = filteredSingers.slice(0, displayCount);
 
   const getSingerPath = (singerId) => {
     switch (singerId) {
@@ -94,6 +98,10 @@ const Index = () => {
     }
   };
 
+  const handleLoadMore = () => {
+    setDisplayCount(prevCount => prevCount + 18);
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -114,7 +122,7 @@ const Index = () => {
         </div>
         <div className="container mx-auto px-4 py-12">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredSingers.map((singer) => (
+            {displayedSingers.map((singer) => (
               <Link
                 key={singer.id}
                 to={getSingerPath(singer.id)}
@@ -142,6 +150,11 @@ const Index = () => {
               <span className="text-blue-500 hover:underline">View top 20 songs</span>
             </Link>
           </div>
+          {displayCount < filteredSingers.length && (
+            <div className="mt-8 text-center">
+              <Button onClick={handleLoadMore} variant="outline">Load More</Button>
+            </div>
+          )}
         </div>
       </main>
       <Footer />
