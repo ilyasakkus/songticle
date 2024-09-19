@@ -93,5 +93,10 @@ export const singers = [
     id: 19,
     name: "Billie Holiday",
     bio: "Billie Holiday, born Eleanora Fagan in 1915, emerged as a luminous force in the realm of jazz and swing music. Nicknamed \"Lady Day\" by her friend Lester Young, her vocal style, inspired by jazz instrumentalists, redefined the art of phrasing and tempo manipulation. Despite a tumultuous life marked by legal troubles and drug abuse, Holiday's resilience and artistry shone through, leaving an enduring legacy in the form of iconic hits and posthumous accolades.",
+  },
+  {
+    id: 20,
+    name: "Kidz Bop",
+    bio: "Kidz Bop, established in 2001 by Razor & Tie co-founders Cliff Chenfeld and Craig Balsam, is a prominent children's music group and brand that specializes in creating family-friendly renditions of popular songs. The concept revolves around producing compilation albums featuring children singing sanitized versions of contemporary pop hits. Since its inception, Kidz Bop has enjoyed significant commercial success, selling over 21 million albums and accumulating more than 4.5 billion streams.",
   }
 ];
