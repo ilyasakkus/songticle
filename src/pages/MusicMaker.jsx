@@ -1,57 +1,79 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import * as Tone from 'tone';
 import { toast } from "sonner";
 import GridTimeline from '../components/music/GridTimeline';
 import ControlBar from '../components/music/ControlBar';
+import InstrumentSelector from '../components/music/InstrumentSelector';
 
 const MusicMaker = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [tempo, setTempo] = useState(120);
   const [currentStep, setCurrentStep] = useState(null);
+  const [selectedInstrument, setSelectedInstrument] = useState('synth');
   const [tracks, setTracks] = useState([
     { 
       id: 1,
       name: 'Main',
       pattern: Array(32).fill().map(() => Array(32).fill(false)),
-      color: 'blue',
+      instrument: 'synth',
       volume: 75,
       pan: 0
     }
   ]);
 
-  const notes = [
-    'C4', 'B3', 'A#3', 'A3', 'G#3', 'G3', 'F#3', 'F3', 'E3', 'D#3', 'D3', 'C#3',
-    'C3', 'B2', 'A#2', 'A2', 'G#2', 'G2', 'F#2', 'F2', 'E2', 'D#2', 'D2', 'C#2',
-    'C2', 'B1', 'A#1', 'A1', 'G#1', 'G1', 'F#1', 'F1'
-  ];
-
-  // Initialize synth and sequence
+  // Initialize instruments
   useEffect(() => {
     const synth = new Tone.PolySynth(Tone.Synth).toDestination();
+    const marimba = new Tone.Sampler({
+      urls: {
+        C4: "/sounds/marimba-c4.mp3",
+        G4: "/sounds/marimba-g4.mp3",
+      },
+      release: 1,
+    }).toDestination();
     
-    // Set up the sequence
+    return () => {
+      synth.dispose();
+      marimba.dispose();
+    };
+  }, []);
+
+  // Set up sequencer
+  useEffect(() => {
     const seq = new Tone.Sequence((time, step) => {
       setCurrentStep(step);
       
-      // Play all active notes for this step
       tracks[0].pattern.forEach((row, rowIndex) => {
         if (row[step]) {
-          synth.triggerAttackRelease(notes[rowIndex], "8n", time);
+          const note = Tone.Frequency(440 * Math.pow(2, (rowIndex - 20) / 12), "hz").toNote();
+          
+          if (selectedInstrument === 'synth') {
+            const synth = new Tone.Synth().toDestination();
+            synth.triggerAttackRelease(note, "8n", time);
+            setTimeout(() => synth.dispose(), 1000);
+          } else if (selectedInstrument === 'marimba') {
+            const marimba = new Tone.Sampler({
+              urls: {
+                C4: "/sounds/marimba-c4.mp3",
+                G4: "/sounds/marimba-g4.mp3",
+              }
+            }).toDestination();
+            marimba.triggerAttackRelease(note, "8n", time);
+            setTimeout(() => marimba.dispose(), 1000);
+          }
         }
       });
     }, Array.from({ length: 32 }, (_, i) => i), "8n");
 
-    // Set initial tempo
     Tone.Transport.bpm.value = tempo;
     seq.start(0);
 
     return () => {
       seq.dispose();
-      synth.dispose();
       Tone.Transport.stop();
       Tone.Transport.cancel();
     };
-  }, [tracks, tempo, notes]);
+  }, [tracks, tempo, selectedInstrument]);
 
   const togglePlay = async () => {
     try {
@@ -72,13 +94,13 @@ const MusicMaker = () => {
     }
   };
 
-  const handleTempoChange = ([newTempo]) => {
+  const handleTempoChange = useCallback(([newTempo]) => {
     setTempo(newTempo);
     Tone.Transport.bpm.value = newTempo;
-  };
+  }, []);
 
-  const toggleStep = (row, col) => {
-    setTracks(tracks.map(track => ({
+  const toggleStep = useCallback((row, col) => {
+    setTracks(tracks => tracks.map(track => ({
       ...track,
       pattern: track.pattern.map((r, rowIndex) => 
         rowIndex === row 
@@ -86,12 +108,16 @@ const MusicMaker = () => {
           : r
       )
     })));
-  };
+  }, []);
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
-      <header className="flex items-center justify-between px-6 py-4 bg-white border-b">
-        <h1 className="text-2xl font-bold">INSTRUMENTAL CANVAS</h1>
+    <div className="flex flex-col h-screen bg-gray-900">
+      <header className="flex items-center justify-between px-6 py-4 bg-gray-800 border-b border-gray-700">
+        <h1 className="text-2xl font-bold text-white">MUSIC LAB</h1>
+        <InstrumentSelector 
+          selectedInstrument={selectedInstrument} 
+          onSelect={setSelectedInstrument} 
+        />
       </header>
 
       <GridTimeline 
