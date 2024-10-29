@@ -1,20 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import * as Tone from 'tone';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Settings2, Music, AudioWaveform } from 'lucide-react';
 import { toast } from "sonner";
-import { Slider } from "@/components/ui/slider";
-import TransportControls from '../components/music/TransportControls';
-import MixerTrack from '../components/music/MixerTrack';
-import VoiceRecorder from '../components/music/VoiceRecorder';
+import GridTimeline from '../components/music/GridTimeline';
+import ControlBar from '../components/music/ControlBar';
 
 const MusicMaker = () => {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [tempo, setTempo] = useState(120);
   const [tracks, setTracks] = useState([
-    { id: 1, name: 'Vocals', pattern: Array(32).fill(false), volume: 75, pan: 0, effects: { reverb: 30, delay: 20 } },
-    { id: 2, name: 'Drums', pattern: Array(32).fill(false), volume: 80, pan: 0, effects: { reverb: 10, delay: 0 } },
-    { id: 3, name: 'Bass', pattern: Array(32).fill(false), volume: 70, pan: -20, effects: { reverb: 5, delay: 0 } },
-    { id: 4, name: 'Lead', pattern: Array(32).fill(false), volume: 65, pan: 20, effects: { reverb: 40, delay: 30 } },
+    { 
+      id: 1, 
+      name: 'Drums', 
+      pattern: Array(32).fill(false), 
+      color: 'yellow',
+      volume: 75, 
+      pan: 0 
+    },
+    { 
+      id: 2, 
+      name: 'Bass', 
+      pattern: Array(32).fill(false), 
+      color: 'orange',
+      volume: 80, 
+      pan: 0 
+    },
+    { 
+      id: 3, 
+      name: 'Lead', 
+      pattern: Array(32).fill(false), 
+      color: 'red',
+      volume: 70, 
+      pan: 0 
+    }
   ]);
 
   const [audioNodes, setAudioNodes] = useState({});
@@ -30,18 +47,8 @@ const MusicMaker = () => {
         pan: track.pan / 50
       }).toDestination();
       
-      const reverb = new Tone.Reverb({
-        decay: track.effects.reverb / 25,
-        wet: track.effects.reverb / 100
-      }).connect(channel);
-      
-      const delay = new Tone.FeedbackDelay({
-        delayTime: "8n",
-        feedback: track.effects.delay / 100
-      }).connect(reverb);
-
-      synth.connect(delay);
-      nodes[track.id] = { synth, channel, reverb, delay };
+      synth.connect(channel);
+      nodes[track.id] = { synth, channel };
     });
 
     setAudioNodes(nodes);
@@ -62,9 +69,6 @@ const MusicMaker = () => {
             case 'Lead':
               nodes[track.id].synth.triggerAttackRelease("C4", "8n", time);
               break;
-            case 'Vocals':
-              nodes[track.id].synth.triggerAttackRelease("E4", "8n", time);
-              break;
           }
         }
       });
@@ -77,8 +81,6 @@ const MusicMaker = () => {
       Object.values(nodes).forEach(node => {
         node.synth.dispose();
         node.channel.dispose();
-        node.reverb.dispose();
-        node.delay.dispose();
       });
       Tone.Transport.stop();
       Tone.Transport.cancel();
@@ -97,34 +99,9 @@ const MusicMaker = () => {
     setIsPlaying(!isPlaying);
   };
 
-  const stopPlayback = () => {
-    Tone.Transport.stop();
-    setIsPlaying(false);
-    toast("Playback stopped");
-  };
-
-  const updateTrackVolume = (trackId, newVolume) => {
-    setTracks(tracks.map(track => {
-      if (track.id === trackId) {
-        if (audioNodes[trackId]) {
-          audioNodes[trackId].channel.volume.value = newVolume - 75;
-        }
-        return { ...track, volume: newVolume };
-      }
-      return track;
-    }));
-  };
-
-  const updateTrackPan = (trackId, newPan) => {
-    setTracks(tracks.map(track => {
-      if (track.id === trackId) {
-        if (audioNodes[trackId]) {
-          audioNodes[trackId].channel.pan.value = newPan / 50;
-        }
-        return { ...track, pan: newPan };
-      }
-      return track;
-    }));
+  const handleTempoChange = ([newTempo]) => {
+    setTempo(newTempo);
+    Tone.Transport.bpm.value = newTempo;
   };
 
   const toggleStep = (trackId, stepIndex) => {
@@ -139,88 +116,22 @@ const MusicMaker = () => {
   };
 
   return (
-    <div className="bg-gray-900 rounded-lg p-6 shadow-xl">
-      <TransportControls 
-        isPlaying={isPlaying}
-        onPlayPause={togglePlay}
-        onStop={stopPlayback}
+    <div className="flex flex-col h-screen bg-gray-50">
+      <header className="flex items-center justify-between px-6 py-4 bg-white border-b">
+        <h1 className="text-2xl font-bold">SONG MAKER</h1>
+      </header>
+
+      <GridTimeline 
+        tracks={tracks}
+        onToggleStep={toggleStep}
       />
 
-      <VoiceRecorder />
-
-      <Tabs defaultValue="mixer" className="w-full">
-        <TabsList className="mb-4">
-          <TabsTrigger value="mixer" className="gap-2">
-            <Settings2 className="h-4 w-4" /> Mixer
-          </TabsTrigger>
-          <TabsTrigger value="timeline" className="gap-2">
-            <AudioWaveform className="h-4 w-4" /> Timeline
-          </TabsTrigger>
-          <TabsTrigger value="effects" className="gap-2">
-            <Music className="h-4 w-4" /> Effects
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="mixer" className="space-y-6">
-          {tracks.map((track) => (
-            <MixerTrack
-              key={track.id}
-              track={track}
-              onVolumeChange={updateTrackVolume}
-              onPanChange={updateTrackPan}
-            />
-          ))}
-        </TabsContent>
-
-        <TabsContent value="timeline" className="space-y-4">
-          <div className="space-y-4">
-            {tracks.map((track) => (
-              <div key={track.id} className="flex items-center gap-4 bg-gray-800 p-4 rounded-lg">
-                <div className="w-24 text-white">{track.name}</div>
-                <div className="grid grid-cols-32 gap-1 flex-grow">
-                  {track.pattern.map((isActive, index) => (
-                    <button
-                      key={index}
-                      onClick={() => toggleStep(track.id, index)}
-                      className={`w-full aspect-square rounded ${
-                        isActive ? 'bg-blue-500' : 'bg-gray-700'
-                      } hover:bg-blue-400 transition-colors`}
-                    />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="effects" className="space-y-4">
-          {tracks.map((track) => (
-            <div key={track.id} className="bg-gray-800 p-4 rounded-lg space-y-4">
-              <div className="text-white font-medium">{track.name}</div>
-              <div className="flex items-center gap-4">
-                <span className="text-white w-16">Reverb</span>
-                <Slider
-                  defaultValue={[track.effects.reverb]}
-                  max={100}
-                  step={1}
-                  className="w-48"
-                />
-                <span className="text-white">{track.effects.reverb}%</span>
-              </div>
-              <div className="flex items-center gap-4">
-                <span className="text-white w-16">Delay</span>
-                <Slider
-                  defaultValue={[track.effects.delay]}
-                  max={100}
-                  step={1}
-                  className="w-48"
-                />
-                <span className="text-white">{track.effects.delay}%</span>
-              </div>
-            </div>
-          ))}
-        </TabsContent>
-      </Tabs>
+      <ControlBar 
+        isPlaying={isPlaying}
+        onPlayPause={togglePlay}
+        tempo={tempo}
+        onTempoChange={handleTempoChange}
+      />
     </div>
   );
 };
