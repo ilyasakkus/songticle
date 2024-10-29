@@ -7,6 +7,7 @@ import ControlBar from '../components/music/ControlBar';
 const MusicMaker = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [tempo, setTempo] = useState(120);
+  const [currentStep, setCurrentStep] = useState(null);
   const [tracks, setTracks] = useState([
     { 
       id: 1, 
@@ -55,10 +56,9 @@ const MusicMaker = () => {
 
     // Set up sequencer
     const seq = new Tone.Sequence((time, step) => {
+      setCurrentStep(step);
       tracks.forEach(track => {
         if (track.pattern[step] && nodes[track.id]) {
-          // Play different notes for different tracks
-          let note;
           switch(track.name) {
             case 'Drums':
               nodes[track.id].synth.triggerAttackRelease("C2", "8n", time);
@@ -94,6 +94,7 @@ const MusicMaker = () => {
       toast("Playback started");
     } else {
       Tone.Transport.stop();
+      setCurrentStep(null);
       toast("Playback stopped");
     }
     setIsPlaying(!isPlaying);
@@ -124,6 +125,7 @@ const MusicMaker = () => {
       <GridTimeline 
         tracks={tracks}
         onToggleStep={toggleStep}
+        currentStep={currentStep}
       />
 
       <ControlBar 
