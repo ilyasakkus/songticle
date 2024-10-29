@@ -17,13 +17,17 @@ const MusicMaker = () => {
     { id: 4, name: 'Lead', pattern: Array(32).fill(false), volume: 65, pan: 20, effects: { reverb: 40, delay: 30 } },
   ]);
 
+  const [audioNodes, setAudioNodes] = useState({});
+
   // Initialize Tone.js
   useEffect(() => {
-    // Create audio nodes for each track
+    // Create synths for each track
+    const nodes = {};
     tracks.forEach(track => {
+      const synth = new Tone.Synth().toDestination();
       const channel = new Tone.Channel({
-        volume: track.volume - 75, // Convert from percentage to dB
-        pan: track.pan / 50 // Convert from -50/50 to -1/1
+        volume: track.volume - 75,
+        pan: track.pan / 50
       }).toDestination();
       
       const reverb = new Tone.Reverb({
@@ -35,9 +39,47 @@ const MusicMaker = () => {
         delayTime: "8n",
         feedback: track.effects.delay / 100
       }).connect(reverb);
+
+      synth.connect(delay);
+      nodes[track.id] = { synth, channel, reverb, delay };
     });
 
+    setAudioNodes(nodes);
+
+    // Set up sequencer
+    const seq = new Tone.Sequence((time, step) => {
+      tracks.forEach(track => {
+        if (track.pattern[step] && nodes[track.id]) {
+          // Play different notes for different tracks
+          let note;
+          switch(track.name) {
+            case 'Drums':
+              nodes[track.id].synth.triggerAttackRelease("C2", "8n", time);
+              break;
+            case 'Bass':
+              nodes[track.id].synth.triggerAttackRelease("G2", "8n", time);
+              break;
+            case 'Lead':
+              nodes[track.id].synth.triggerAttackRelease("C4", "8n", time);
+              break;
+            case 'Vocals':
+              nodes[track.id].synth.triggerAttackRelease("E4", "8n", time);
+              break;
+          }
+        }
+      });
+    }, Array.from({ length: 32 }, (_, i) => i), "8n");
+
+    seq.start(0);
+
     return () => {
+      seq.dispose();
+      Object.values(nodes).forEach(node => {
+        node.synth.dispose();
+        node.channel.dispose();
+        node.reverb.dispose();
+        node.delay.dispose();
+      });
       Tone.Transport.stop();
       Tone.Transport.cancel();
     };
@@ -64,8 +106,9 @@ const MusicMaker = () => {
   const updateTrackVolume = (trackId, newVolume) => {
     setTracks(tracks.map(track => {
       if (track.id === trackId) {
-        // Update Tone.js volume
-        Tone.getDestination().volume.value = newVolume - 75; // Convert to dB
+        if (audioNodes[trackId]) {
+          audioNodes[trackId].channel.volume.value = newVolume - 75;
+        }
         return { ...track, volume: newVolume };
       }
       return track;
@@ -75,9 +118,21 @@ const MusicMaker = () => {
   const updateTrackPan = (trackId, newPan) => {
     setTracks(tracks.map(track => {
       if (track.id === trackId) {
-        // Update Tone.js panning
-        Tone.getDestination().pan.value = newPan / 50;
+        if (audioNodes[trackId]) {
+          audioNodes[trackId].channel.pan.value = newPan / 50;
+        }
         return { ...track, pan: newPan };
+      }
+      return track;
+    }));
+  };
+
+  const toggleStep = (trackId, stepIndex) => {
+    setTracks(tracks.map(track => {
+      if (track.id === trackId) {
+        const newPattern = [...track.pattern];
+        newPattern[stepIndex] = !newPattern[stepIndex];
+        return { ...track, pattern: newPattern };
       }
       return track;
     }));
@@ -126,6 +181,7 @@ const MusicMaker = () => {
                   {track.pattern.map((isActive, index) => (
                     <button
                       key={index}
+                      onClick={() => toggleStep(track.id, index)}
                       className={`w-full aspect-square rounded ${
                         isActive ? 'bg-blue-500' : 'bg-gray-700'
                       } hover:bg-blue-400 transition-colors`}
