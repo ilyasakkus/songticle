@@ -9,7 +9,7 @@ import {
   StopCircle,
   Volume2,
   Music,
-  Waveform,
+  AudioWaveform,
   Mic,
   Settings2,
   Save,
@@ -77,7 +77,7 @@ const MusicMaker = () => {
     ));
   };
 
-  return (
+return (
     <div className="bg-gray-900 rounded-lg p-6 shadow-xl">
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-4">
@@ -107,7 +107,7 @@ const MusicMaker = () => {
             <Settings2 className="h-4 w-4" /> Mixer
           </TabsTrigger>
           <TabsTrigger value="timeline" className="gap-2">
-            <Waveform className="h-4 w-4" /> Timeline
+            <AudioWaveform className="h-4 w-4" /> Timeline
           </TabsTrigger>
           <TabsTrigger value="effects" className="gap-2">
             <Music className="h-4 w-4" /> Effects
