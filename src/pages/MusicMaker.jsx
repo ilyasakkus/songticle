@@ -28,13 +28,24 @@ const MusicMaker = () => {
       urls: {
         C4: "/sounds/marimba-c4.mp3",
         G4: "/sounds/marimba-g4.mp3",
-      },
-      release: 1,
+      }
+    }).toDestination();
+    const electronic = new Tone.Synth({
+      oscillator: { type: "square" },
+      envelope: { attack: 0.02, decay: 0.1, sustain: 0.3, release: 1 }
+    }).toDestination();
+    const piano = new Tone.Sampler({
+      urls: {
+        C4: "/sounds/piano-c4.mp3",
+        G4: "/sounds/piano-g4.mp3",
+      }
     }).toDestination();
     
     return () => {
       synth.dispose();
       marimba.dispose();
+      electronic.dispose();
+      piano.dispose();
     };
   }, []);
 
@@ -47,20 +58,34 @@ const MusicMaker = () => {
         if (row[step]) {
           const note = Tone.Frequency(440 * Math.pow(2, (rowIndex - 20) / 12), "hz").toNote();
           
-          if (selectedInstrument === 'synth') {
-            const synth = new Tone.Synth().toDestination();
-            synth.triggerAttackRelease(note, "8n", time);
-            setTimeout(() => synth.dispose(), 1000);
-          } else if (selectedInstrument === 'marimba') {
-            const marimba = new Tone.Sampler({
-              urls: {
-                C4: "/sounds/marimba-c4.mp3",
-                G4: "/sounds/marimba-g4.mp3",
-              }
-            }).toDestination();
-            marimba.triggerAttackRelease(note, "8n", time);
-            setTimeout(() => marimba.dispose(), 1000);
+          let instrument;
+          switch (selectedInstrument) {
+            case 'synth':
+              instrument = new Tone.Synth();
+              break;
+            case 'marimba':
+              instrument = new Tone.Sampler({
+                urls: { C4: "/sounds/marimba-c4.mp3", G4: "/sounds/marimba-g4.mp3" }
+              });
+              break;
+            case 'electronic':
+              instrument = new Tone.Synth({
+                oscillator: { type: "square" },
+                envelope: { attack: 0.02, decay: 0.1, sustain: 0.3, release: 1 }
+              });
+              break;
+            case 'piano':
+              instrument = new Tone.Sampler({
+                urls: { C4: "/sounds/piano-c4.mp3", G4: "/sounds/piano-g4.mp3" }
+              });
+              break;
+            default:
+              instrument = new Tone.Synth();
           }
+          
+          instrument.toDestination();
+          instrument.triggerAttackRelease(note, "8n", time);
+          setTimeout(() => instrument.dispose(), 1000);
         }
       });
     }, Array.from({ length: 32 }, (_, i) => i), "8n");
@@ -110,6 +135,22 @@ const MusicMaker = () => {
     })));
   }, []);
 
+  const handleReset = useCallback(() => {
+    setTracks([{ 
+      id: 1,
+      name: 'Main',
+      pattern: Array(32).fill().map(() => Array(32).fill(false)),
+      instrument: selectedInstrument,
+      volume: 75,
+      pan: 0
+    }]);
+    setCurrentStep(null);
+    if (isPlaying) {
+      Tone.Transport.stop();
+      setIsPlaying(false);
+    }
+  }, [selectedInstrument, isPlaying]);
+
   return (
     <div className="flex flex-col h-screen bg-gray-900">
       <header className="flex items-center justify-between px-6 py-4 bg-gray-800 border-b border-gray-700">
@@ -131,6 +172,7 @@ const MusicMaker = () => {
         onPlayPause={togglePlay}
         tempo={tempo}
         onTempoChange={handleTempoChange}
+        onReset={handleReset}
       />
     </div>
   );
