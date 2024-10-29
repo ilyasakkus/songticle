@@ -26,7 +26,7 @@ const GridTimeline = ({ tracks, onToggleStep, currentStep }) => {
 
   return (
     <div className="flex-1 overflow-auto bg-white p-4">
-      <div className="relative">
+      <div className="relative w-fit mx-auto">
         {currentStep !== null && (
           <div 
             className="absolute top-0 bottom-0 w-[3px] bg-blue-500 transition-all duration-100"
@@ -37,14 +37,14 @@ const GridTimeline = ({ tracks, onToggleStep, currentStep }) => {
           />
         )}
         
-        <div className="grid grid-cols-32 gap-[1px] w-full" style={{ aspectRatio: '1/1' }}>
+        <div className="grid grid-cols-32 gap-0 border-2 border-gray-300">
           {Array.from({ length: 32 }, (_, row) => (
             Array.from({ length: 32 }, (_, col) => (
               <button
                 key={`${row}-${col}`}
                 onClick={() => handleStepClick(row, col)}
                 className={`
-                  w-[48px] h-[48px] border border-gray-100 transition-colors
+                  w-[32px] h-[32px] border-2 border-gray-200 transition-colors
                   ${tracks[0].pattern[row]?.[col] ? 'bg-blue-500' : 'bg-gray-50 hover:bg-gray-100'}
                   ${currentStep === col ? 'ring-2 ring-blue-500' : ''}
                 `}
