@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Play, Pause, StopCircle, Save, Download } from 'lucide-react';
 import { toast } from "sonner";
@@ -42,9 +43,9 @@ const TransportControls = ({ isPlaying, onPlayPause, onStop }) => {
   return (
     <div className="flex justify-between items-center mb-6">
       <div className="flex items-center gap-4">
-        <a href="/" className="text-3xl font-bold text-white hover:text-gray-200 transition-colors">
+        <Link to="/" className="text-3xl font-bold text-white hover:text-gray-200 transition-colors">
           Music Lab
-        </a>
+        </Link>
         <div className="flex gap-2">
           <Button variant="outline" size="icon" className="w-8 h-8" onClick={handleSave}>
             <Save className="h-4 w-4" />
