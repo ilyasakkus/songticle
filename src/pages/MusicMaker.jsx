@@ -10,66 +10,32 @@ const MusicMaker = () => {
   const [currentStep, setCurrentStep] = useState(null);
   const [tracks, setTracks] = useState([
     { 
-      id: 1, 
-      name: 'Drums', 
-      pattern: Array(32).fill(false), 
-      color: 'yellow',
-      volume: 75, 
-      pan: 0 
-    },
-    { 
-      id: 2, 
-      name: 'Bass', 
-      pattern: Array(32).fill(false), 
-      color: 'orange',
-      volume: 80, 
-      pan: 0 
-    },
-    { 
-      id: 3, 
-      name: 'Lead', 
-      pattern: Array(32).fill(false), 
-      color: 'red',
-      volume: 70, 
-      pan: 0 
+      id: 1,
+      name: 'Main',
+      pattern: Array(32).fill().map(() => Array(32).fill(false)),
+      color: 'blue',
+      volume: 75,
+      pan: 0
     }
   ]);
 
   const [audioNodes, setAudioNodes] = useState({});
 
-  // Initialize Tone.js
+  const notes = [
+    'C4', 'B3', 'A#3', 'A3', 'G#3', 'G3', 'F#3', 'F3', 'E3', 'D#3', 'D3', 'C#3',
+    'C3', 'B2', 'A#2', 'A2', 'G#2', 'G2', 'F#2', 'F2', 'E2', 'D#2', 'D2', 'C#2',
+    'C2', 'B1', 'A#1', 'A1', 'G#1', 'G1', 'F#1', 'F1'
+  ];
+
   useEffect(() => {
-    // Create synths for each track
-    const nodes = {};
-    tracks.forEach(track => {
-      const synth = new Tone.Synth().toDestination();
-      const channel = new Tone.Channel({
-        volume: track.volume - 75,
-        pan: track.pan / 50
-      }).toDestination();
-      
-      synth.connect(channel);
-      nodes[track.id] = { synth, channel };
-    });
+    const synth = new Tone.PolySynth(Tone.Synth).toDestination();
+    setAudioNodes({ synth });
 
-    setAudioNodes(nodes);
-
-    // Set up sequencer
     const seq = new Tone.Sequence((time, step) => {
       setCurrentStep(step);
-      tracks.forEach(track => {
-        if (track.pattern[step] && nodes[track.id]) {
-          switch(track.name) {
-            case 'Drums':
-              nodes[track.id].synth.triggerAttackRelease("C2", "8n", time);
-              break;
-            case 'Bass':
-              nodes[track.id].synth.triggerAttackRelease("G2", "8n", time);
-              break;
-            case 'Lead':
-              nodes[track.id].synth.triggerAttackRelease("C4", "8n", time);
-              break;
-          }
+      tracks[0].pattern.forEach((row, rowIndex) => {
+        if (row[step]) {
+          synth.triggerAttackRelease(notes[rowIndex], "8n", time);
         }
       });
     }, Array.from({ length: 32 }, (_, i) => i), "8n");
@@ -78,10 +44,7 @@ const MusicMaker = () => {
 
     return () => {
       seq.dispose();
-      Object.values(nodes).forEach(node => {
-        node.synth.dispose();
-        node.channel.dispose();
-      });
+      synth.dispose();
       Tone.Transport.stop();
       Tone.Transport.cancel();
     };
@@ -105,21 +68,21 @@ const MusicMaker = () => {
     Tone.Transport.bpm.value = newTempo;
   };
 
-  const toggleStep = (trackId, stepIndex) => {
-    setTracks(tracks.map(track => {
-      if (track.id === trackId) {
-        const newPattern = [...track.pattern];
-        newPattern[stepIndex] = !newPattern[stepIndex];
-        return { ...track, pattern: newPattern };
-      }
-      return track;
-    }));
+  const toggleStep = (row, col) => {
+    setTracks(tracks.map(track => ({
+      ...track,
+      pattern: track.pattern.map((r, rowIndex) => 
+        rowIndex === row 
+          ? r.map((cell, colIndex) => colIndex === col ? !cell : cell)
+          : r
+      )
+    })));
   };
 
   return (
     <div className="flex flex-col h-screen bg-gray-50">
       <header className="flex items-center justify-between px-6 py-4 bg-white border-b">
-        <h1 className="text-2xl font-bold">SONG MAKER</h1>
+        <h1 className="text-2xl font-bold">INSTRUMENTAL CANVAS</h1>
       </header>
 
       <GridTimeline 
