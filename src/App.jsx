@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import MusicMaker from "./pages/MusicMaker";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import AdelaideLouiseHall from "./pages/AdelaideLouiseHall";
 import MetroBoomin from "./pages/MetroBoomin";
@@ -56,6 +57,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/music-maker" element={<MusicMaker />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
