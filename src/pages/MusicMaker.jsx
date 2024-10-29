@@ -24,21 +24,17 @@ const MusicMaker = () => {
   // Initialize instruments
   useEffect(() => {
     const synth = new Tone.PolySynth(Tone.Synth).toDestination();
-    const marimba = new Tone.Sampler({
-      urls: {
-        C4: "/sounds/marimba-c4.mp3",
-        G4: "/sounds/marimba-g4.mp3",
-      }
+    const marimba = new Tone.PolySynth(Tone.Synth, {
+      oscillator: { type: "triangle" },
+      envelope: { attack: 0.02, decay: 0.1, sustain: 0.2, release: 0.3 }
     }).toDestination();
     const electronic = new Tone.Synth({
       oscillator: { type: "square" },
       envelope: { attack: 0.02, decay: 0.1, sustain: 0.3, release: 1 }
     }).toDestination();
-    const piano = new Tone.Sampler({
-      urls: {
-        C4: "/sounds/piano-c4.mp3",
-        G4: "/sounds/piano-g4.mp3",
-      }
+    const piano = new Tone.PolySynth(Tone.Synth, {
+      oscillator: { type: "sine" },
+      envelope: { attack: 0.02, decay: 0.1, sustain: 0.4, release: 0.8 }
     }).toDestination();
     
     return () => {
@@ -64,8 +60,9 @@ const MusicMaker = () => {
               instrument = new Tone.Synth();
               break;
             case 'marimba':
-              instrument = new Tone.Sampler({
-                urls: { C4: "/sounds/marimba-c4.mp3", G4: "/sounds/marimba-g4.mp3" }
+              instrument = new Tone.Synth({
+                oscillator: { type: "triangle" },
+                envelope: { attack: 0.02, decay: 0.1, sustain: 0.2, release: 0.3 }
               });
               break;
             case 'electronic':
@@ -75,8 +72,9 @@ const MusicMaker = () => {
               });
               break;
             case 'piano':
-              instrument = new Tone.Sampler({
-                urls: { C4: "/sounds/piano-c4.mp3", G4: "/sounds/piano-g4.mp3" }
+              instrument = new Tone.Synth({
+                oscillator: { type: "sine" },
+                envelope: { attack: 0.02, decay: 0.1, sustain: 0.4, release: 0.8 }
               });
               break;
             default:
