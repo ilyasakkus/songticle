@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import * as Tone from 'tone';
 import { toast } from "sonner";
 import GridTimeline from '../components/music/GridTimeline';
@@ -152,7 +153,14 @@ const MusicMaker = () => {
   return (
     <div className="flex flex-col h-screen bg-gray-900">
       <header className="flex items-center justify-between px-6 py-4 bg-gray-800 border-b border-gray-700">
-        <h1 className="text-2xl font-bold text-white">MUSIC LAB</h1>
+        <div className="flex items-center gap-4">
+          <Link to="/" className="text-2xl font-bold text-white hover:text-gray-200 transition-colors">
+            Music Maker Online
+          </Link>
+          <nav className="text-gray-300 text-sm">
+            <Link to="/" className="hover:text-white transition-colors">Home</Link>
+          </nav>
+        </div>
         <InstrumentSelector 
           selectedInstrument={selectedInstrument} 
           onSelect={setSelectedInstrument} 
