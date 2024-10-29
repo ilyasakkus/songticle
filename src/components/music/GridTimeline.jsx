@@ -8,7 +8,8 @@ const GridTimeline = ({ tracks, onToggleStep, currentStep }) => {
     'C2', 'B1', 'A#1', 'A1', 'G#1', 'G1', 'F#1', 'F1'
   ];
 
-  const playPreviewSound = (note) => {
+  const playPreviewSound = async (note) => {
+    await Tone.start();
     const synth = new Tone.Synth().toDestination();
     synth.triggerAttackRelease(note, "8n");
   };
@@ -40,7 +41,7 @@ const GridTimeline = ({ tracks, onToggleStep, currentStep }) => {
                 key={`${row}-${col}`}
                 onClick={() => handleStepClick(row, col)}
                 className={`
-                  w-full h-full border border-gray-100 transition-colors
+                  w-12 h-12 border border-gray-100 transition-colors
                   ${tracks[0].pattern[row]?.[col] ? 'bg-blue-500' : 'bg-gray-50 hover:bg-gray-100'}
                   ${currentStep === col ? 'ring-2 ring-blue-500' : ''}
                 `}
