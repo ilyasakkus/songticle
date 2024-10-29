@@ -8,12 +8,23 @@ const GridTimeline = ({ tracks, onToggleStep, currentStep }) => {
     'C2', 'B1', 'A#1', 'A1', 'G#1', 'G1', 'F#1', 'F1'
   ];
 
+  // Soft colors array for different rows
+  const softColors = [
+    'bg-rose-200', 'bg-pink-200', 'bg-fuchsia-200', 'bg-purple-200', 'bg-violet-200',
+    'bg-indigo-200', 'bg-blue-200', 'bg-sky-200', 'bg-cyan-200', 'bg-teal-200',
+    'bg-emerald-200', 'bg-green-200', 'bg-lime-200', 'bg-yellow-200', 'bg-amber-200',
+    'bg-orange-200', 'bg-red-200', 'bg-slate-200', 'bg-gray-200', 'bg-zinc-200',
+    'bg-neutral-200', 'bg-stone-200', 'bg-red-100', 'bg-orange-100', 'bg-amber-100',
+    'bg-yellow-100', 'bg-lime-100', 'bg-green-100', 'bg-emerald-100', 'bg-teal-100',
+    'bg-cyan-100', 'bg-sky-100'
+  ];
+
   const playPreviewSound = async (note) => {
     try {
       await Tone.start();
       const synth = new Tone.Synth().toDestination();
       synth.triggerAttackRelease(note, "8n");
-      setTimeout(() => synth.dispose(), 1000); // Clean up synth after sound plays
+      setTimeout(() => synth.dispose(), 1000);
     } catch (error) {
       console.error('Failed to play preview sound:', error);
     }
@@ -29,10 +40,11 @@ const GridTimeline = ({ tracks, onToggleStep, currentStep }) => {
       <div className="relative w-fit mx-auto">
         {currentStep !== null && (
           <div 
-            className="absolute top-0 bottom-0 w-[3px] bg-blue-500 transition-all duration-100"
+            className="absolute top-0 bottom-0 w-[2px] bg-blue-500 transition-transform duration-100 ease-linear"
             style={{ 
-              left: `${(currentStep / 32) * 100}%`,
-              transform: 'translateX(-50%)'
+              left: `${(currentStep * 32) + 16}px`,
+              transform: 'translateX(-50%)',
+              zIndex: 10
             }}
           />
         )}
@@ -45,8 +57,8 @@ const GridTimeline = ({ tracks, onToggleStep, currentStep }) => {
                 onClick={() => handleStepClick(row, col)}
                 className={`
                   w-[32px] h-[32px] border-2 border-gray-200 transition-colors
-                  ${tracks[0].pattern[row]?.[col] ? 'bg-blue-500' : 'bg-gray-50 hover:bg-gray-100'}
-                  ${currentStep === col ? 'ring-2 ring-blue-500' : ''}
+                  ${tracks[0].pattern[row]?.[col] ? softColors[row] : 'bg-gray-50 hover:bg-gray-100'}
+                  ${currentStep === col ? 'relative' : ''}
                 `}
               />
             ))
