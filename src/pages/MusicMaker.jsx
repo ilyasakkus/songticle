@@ -3,6 +3,7 @@ import * as Tone from 'tone';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Settings2, Music, AudioWaveform } from 'lucide-react';
 import { toast } from "sonner";
+import { Slider } from "@/components/ui/slider";
 import TransportControls from '../components/music/TransportControls';
 import MixerTrack from '../components/music/MixerTrack';
 import VoiceRecorder from '../components/music/VoiceRecorder';
