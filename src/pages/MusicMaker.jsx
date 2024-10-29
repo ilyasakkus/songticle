@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import * as Tone from 'tone';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Settings2, Music, AudioWaveform } from 'lucide-react';
@@ -17,9 +17,35 @@ const MusicMaker = () => {
     { id: 4, name: 'Lead', pattern: Array(32).fill(false), volume: 65, pan: 20, effects: { reverb: 40, delay: 30 } },
   ]);
 
+  // Initialize Tone.js
+  useEffect(() => {
+    // Create audio nodes for each track
+    tracks.forEach(track => {
+      const channel = new Tone.Channel({
+        volume: track.volume - 75, // Convert from percentage to dB
+        pan: track.pan / 50 // Convert from -50/50 to -1/1
+      }).toDestination();
+      
+      const reverb = new Tone.Reverb({
+        decay: track.effects.reverb / 25,
+        wet: track.effects.reverb / 100
+      }).connect(channel);
+      
+      const delay = new Tone.FeedbackDelay({
+        delayTime: "8n",
+        feedback: track.effects.delay / 100
+      }).connect(reverb);
+    });
+
+    return () => {
+      Tone.Transport.stop();
+      Tone.Transport.cancel();
+    };
+  }, []);
+
   const togglePlay = async () => {
+    await Tone.start();
     if (!isPlaying) {
-      await Tone.start();
       Tone.Transport.start();
       toast("Playback started");
     } else {
@@ -36,15 +62,25 @@ const MusicMaker = () => {
   };
 
   const updateTrackVolume = (trackId, newVolume) => {
-    setTracks(tracks.map(track => 
-      track.id === trackId ? { ...track, volume: newVolume } : track
-    ));
+    setTracks(tracks.map(track => {
+      if (track.id === trackId) {
+        // Update Tone.js volume
+        Tone.getDestination().volume.value = newVolume - 75; // Convert to dB
+        return { ...track, volume: newVolume };
+      }
+      return track;
+    }));
   };
 
   const updateTrackPan = (trackId, newPan) => {
-    setTracks(tracks.map(track => 
-      track.id === trackId ? { ...track, pan: newPan } : track
-    ));
+    setTracks(tracks.map(track => {
+      if (track.id === trackId) {
+        // Update Tone.js panning
+        Tone.getDestination().pan.value = newPan / 50;
+        return { ...track, pan: newPan };
+      }
+      return track;
+    }));
   };
 
   return (

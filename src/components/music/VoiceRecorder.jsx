@@ -1,43 +1,57 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Mic } from 'lucide-react';
 import { toast } from "sonner";
+import * as Tone from 'tone';
 
 const VoiceRecorder = () => {
   const [isRecording, setIsRecording] = useState(false);
   const mediaRecorder = useRef(null);
   const audioChunks = useRef([]);
+  const recorder = useRef(null);
+
+  useEffect(() => {
+    // Initialize Tone.js recorder
+    recorder.current = new Tone.Recorder();
+    const mic = new Tone.UserMedia();
+    
+    mic.open().then(() => {
+      mic.connect(recorder.current);
+    }).catch(e => {
+      console.error('Error accessing microphone:', e);
+      toast.error("Could not access microphone");
+    });
+
+    return () => {
+      if (recorder.current) {
+        recorder.current.dispose();
+      }
+    };
+  }, []);
 
   const startRecording = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaRecorder.current = new MediaRecorder(stream);
-      
-      mediaRecorder.current.ondataavailable = (event) => {
-        audioChunks.current.push(event.data);
-      };
-
-      mediaRecorder.current.onstop = () => {
-        const audioBlob = new Blob(audioChunks.current, { type: 'audio/wav' });
-        const audioUrl = URL.createObjectURL(audioBlob);
-        // Here you would typically send the audio data for processing
-        toast("Recording completed!");
-        audioChunks.current = [];
-      };
-
-      mediaRecorder.current.start();
+      await Tone.start();
+      recorder.current.start();
       setIsRecording(true);
       toast("Recording started...");
     } catch (error) {
-      toast.error("Could not access microphone");
+      toast.error("Could not start recording");
       console.error(error);
     }
   };
 
-  const stopRecording = () => {
-    if (mediaRecorder.current && isRecording) {
-      mediaRecorder.current.stop();
+  const stopRecording = async () => {
+    if (isRecording) {
+      const recording = await recorder.current.stop();
+      const url = URL.createObjectURL(recording);
+      
+      // Create audio element to play back recording
+      const audio = new Audio(url);
+      audio.play();
+      
       setIsRecording(false);
+      toast("Recording completed!");
     }
   };
 
