@@ -8,7 +8,7 @@ import { Select } from "@/components/ui/select";
 import {
   Play,
   Pause,
-  Stop,
+  StopCircle,
   Volume2,
   Settings,
   Music,
@@ -86,7 +86,7 @@ const MusicMaker = () => {
                 onClick={stopPlayback}
                 className="w-12 h-12"
               >
-                <Stop className="h-6 w-6" />
+                <StopCircle className="h-6 w-6" />
               </Button>
             </div>
           </div>
