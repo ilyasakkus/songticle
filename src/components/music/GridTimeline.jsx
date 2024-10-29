@@ -9,9 +9,14 @@ const GridTimeline = ({ tracks, onToggleStep, currentStep }) => {
   ];
 
   const playPreviewSound = async (note) => {
-    await Tone.start();
-    const synth = new Tone.Synth().toDestination();
-    synth.triggerAttackRelease(note, "8n");
+    try {
+      await Tone.start();
+      const synth = new Tone.Synth().toDestination();
+      synth.triggerAttackRelease(note, "8n");
+      setTimeout(() => synth.dispose(), 1000); // Clean up synth after sound plays
+    } catch (error) {
+      console.error('Failed to play preview sound:', error);
+    }
   };
 
   const handleStepClick = (row, col) => {
@@ -22,7 +27,6 @@ const GridTimeline = ({ tracks, onToggleStep, currentStep }) => {
   return (
     <div className="flex-1 overflow-auto bg-white p-4">
       <div className="relative">
-        {/* Playhead */}
         {currentStep !== null && (
           <div 
             className="absolute top-0 bottom-0 w-[3px] bg-blue-500 transition-all duration-100"
@@ -33,7 +37,6 @@ const GridTimeline = ({ tracks, onToggleStep, currentStep }) => {
           />
         )}
         
-        {/* 32x32 Grid */}
         <div className="grid grid-cols-32 gap-[1px] w-full" style={{ aspectRatio: '1/1' }}>
           {Array.from({ length: 32 }, (_, row) => (
             Array.from({ length: 32 }, (_, col) => (
@@ -41,7 +44,7 @@ const GridTimeline = ({ tracks, onToggleStep, currentStep }) => {
                 key={`${row}-${col}`}
                 onClick={() => handleStepClick(row, col)}
                 className={`
-                  w-12 h-12 border border-gray-100 transition-colors
+                  w-[48px] h-[48px] border border-gray-100 transition-colors
                   ${tracks[0].pattern[row]?.[col] ? 'bg-blue-500' : 'bg-gray-50 hover:bg-gray-100'}
                   ${currentStep === col ? 'ring-2 ring-blue-500' : ''}
                 `}

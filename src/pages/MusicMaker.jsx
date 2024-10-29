@@ -19,20 +19,21 @@ const MusicMaker = () => {
     }
   ]);
 
-  const [audioNodes, setAudioNodes] = useState({});
-
   const notes = [
     'C4', 'B3', 'A#3', 'A3', 'G#3', 'G3', 'F#3', 'F3', 'E3', 'D#3', 'D3', 'C#3',
     'C3', 'B2', 'A#2', 'A2', 'G#2', 'G2', 'F#2', 'F2', 'E2', 'D#2', 'D2', 'C#2',
     'C2', 'B1', 'A#1', 'A1', 'G#1', 'G1', 'F#1', 'F1'
   ];
 
+  // Initialize synth and sequence
   useEffect(() => {
     const synth = new Tone.PolySynth(Tone.Synth).toDestination();
-    setAudioNodes({ synth });
-
+    
+    // Set up the sequence
     const seq = new Tone.Sequence((time, step) => {
       setCurrentStep(step);
+      
+      // Play all active notes for this step
       tracks[0].pattern.forEach((row, rowIndex) => {
         if (row[step]) {
           synth.triggerAttackRelease(notes[rowIndex], "8n", time);
@@ -40,6 +41,8 @@ const MusicMaker = () => {
       });
     }, Array.from({ length: 32 }, (_, i) => i), "8n");
 
+    // Set initial tempo
+    Tone.Transport.bpm.value = tempo;
     seq.start(0);
 
     return () => {
@@ -48,19 +51,25 @@ const MusicMaker = () => {
       Tone.Transport.stop();
       Tone.Transport.cancel();
     };
-  }, []);
+  }, [tracks, tempo, notes]);
 
   const togglePlay = async () => {
-    await Tone.start();
-    if (!isPlaying) {
-      Tone.Transport.start();
-      toast("Playback started");
-    } else {
-      Tone.Transport.stop();
-      setCurrentStep(null);
-      toast("Playback stopped");
+    try {
+      await Tone.start();
+      
+      if (!isPlaying) {
+        Tone.Transport.start();
+        toast.success("Playback started");
+      } else {
+        Tone.Transport.stop();
+        setCurrentStep(null);
+        toast.info("Playback stopped");
+      }
+      setIsPlaying(!isPlaying);
+    } catch (error) {
+      toast.error("Failed to start audio playback");
+      console.error(error);
     }
-    setIsPlaying(!isPlaying);
   };
 
   const handleTempoChange = ([newTempo]) => {
