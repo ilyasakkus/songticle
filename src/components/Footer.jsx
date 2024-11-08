@@ -8,7 +8,7 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="mb-4 md:mb-0">
             <h3 className="text-xl font-bold">Songticle</h3>
-            <p className="text-sm">Discover and explore the best songs of legendary artists</p>
+            <p className="text-sm">Create your own music with our AI-powered Music Maker. Record, mix, and produce songs with ease.</p>
           </div>
           <div className="flex space-x-4">
             <Link to="/about" className="hover:text-blue-400">About</Link>
