@@ -53,16 +53,16 @@ const GridTimeline = ({ tracks, onToggleStep, currentStep }) => {
 
   return (
     <div 
-      className="flex-1 overflow-auto bg-white p-4"
+      className="flex-1 overflow-auto bg-white p-2 sm:p-4"
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
     >
-      <div className="relative w-fit mx-auto">
+      <div className="relative w-fit mx-auto min-w-full sm:min-w-0">
         {currentStep !== null && (
           <div 
             className="absolute top-0 bottom-0 w-[2px] bg-blue-500 transition-transform duration-100 ease-linear"
             style={{ 
-              left: `${(currentStep * 32) + 16}px`,
+              left: `${(currentStep * 24) + 12}px`,
               transform: 'translateX(-50%)',
               zIndex: 10
             }}
@@ -77,7 +77,7 @@ const GridTimeline = ({ tracks, onToggleStep, currentStep }) => {
                 onMouseDown={() => handleMouseDown(row, col)}
                 onMouseEnter={() => handleMouseEnter(row, col)}
                 className={`
-                  w-[32px] h-[32px] border-2 border-gray-200 transition-colors
+                  w-[24px] h-[24px] sm:w-[32px] sm:h-[32px] border border-gray-200 transition-colors
                   ${tracks[0].pattern[row]?.[col] ? softColors[row] : 'bg-gray-50 hover:bg-gray-100'}
                   ${currentStep === col ? 'relative' : ''}
                 `}

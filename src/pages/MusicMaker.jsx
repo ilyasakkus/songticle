@@ -151,35 +151,41 @@ const MusicMaker = () => {
   }, [selectedInstrument, isPlaying]);
 
   return (
-    <div className="flex flex-col h-screen bg-gray-900">
-      <header className="flex items-center justify-between px-6 py-4 bg-gray-800 border-b border-gray-700">
-        <div className="flex items-center gap-4">
-          <Link to="/" className="text-2xl font-bold text-white hover:text-gray-200 transition-colors">
+    <div className="flex flex-col min-h-screen bg-gray-900 overflow-hidden">
+      <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-4 sm:px-6 py-4 bg-gray-800 border-b border-gray-700 gap-4">
+        <div className="flex items-center gap-4 w-full sm:w-auto">
+          <Link to="/" className="text-xl sm:text-2xl font-bold text-white hover:text-gray-200 transition-colors">
             Music Maker Online
           </Link>
           <nav className="text-gray-300 text-sm">
             <Link to="/" className="hover:text-white transition-colors">Home</Link>
           </nav>
         </div>
-        <InstrumentSelector 
-          selectedInstrument={selectedInstrument} 
-          onSelect={setSelectedInstrument} 
-        />
+        <div className="w-full sm:w-auto">
+          <InstrumentSelector 
+            selectedInstrument={selectedInstrument} 
+            onSelect={setSelectedInstrument} 
+          />
+        </div>
       </header>
 
-      <GridTimeline 
-        tracks={tracks}
-        onToggleStep={toggleStep}
-        currentStep={currentStep}
-      />
+      <div className="flex-1 w-full overflow-x-auto">
+        <GridTimeline 
+          tracks={tracks}
+          onToggleStep={toggleStep}
+          currentStep={currentStep}
+        />
+      </div>
 
-      <ControlBar 
-        isPlaying={isPlaying}
-        onPlayPause={togglePlay}
-        tempo={tempo}
-        onTempoChange={handleTempoChange}
-        onReset={handleReset}
-      />
+      <div className="sticky bottom-0 w-full bg-gray-800 border-t border-gray-700">
+        <ControlBar 
+          isPlaying={isPlaying}
+          onPlayPause={togglePlay}
+          tempo={tempo}
+          onTempoChange={handleTempoChange}
+          onReset={handleReset}
+        />
+      </div>
     </div>
   );
 };
