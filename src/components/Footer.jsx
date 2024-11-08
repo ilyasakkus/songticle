@@ -17,7 +17,10 @@ const Footer = () => {
           </div>
         </div>
         <div className="mt-8 text-center text-sm">
-          © {new Date().getFullYear()} Songticle. All rights reserved.
+          <div>© {new Date().getFullYear()} Songticle. All rights reserved.</div>
+          <div className="mt-2">
+            Built by <a href="https://vayns.com" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">Vayns Software</a>
+          </div>
         </div>
       </div>
     </footer>
