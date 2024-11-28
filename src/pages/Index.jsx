@@ -1,13 +1,93 @@
-import React from 'react';
-import MusicMaker from './MusicMaker';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Search } from 'lucide-react';
+import { Input } from "@/components/ui/input";
 import Footer from '../components/Footer';
+import Header from '../components/Header';
+
+const musicCategories = [
+  { title: 'Walk Up Songs', link: '/walk-up-songs', image: '/placeholder.svg' },
+  { title: 'Greatest Jazz Songs', link: '/greatest-jazz-songs', image: '/placeholder.svg' },
+  { title: 'Pop Music', link: '#', image: '/placeholder.svg' },
+  { title: 'Rock Classics', link: '#', image: '/placeholder.svg' },
+  { title: 'Hip Hop', link: '#', image: '/placeholder.svg' },
+  { title: 'Electronic', link: '#', image: '/placeholder.svg' },
+];
 
 const Index = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+
   return (
     <div className="min-h-screen flex flex-col">
-      <div className="flex-grow">
-        <MusicMaker />
-      </div>
+      <Header />
+      
+      {/* Hero Section */}
+      <section className="relative bg-gradient-to-r from-purple-600 via-pink-500 to-blue-600 text-white py-20">
+        <div className="container mx-auto px-4">
+          <div className="max-w-3xl mx-auto text-center">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6">
+              Create Music Online
+            </h1>
+            <p className="text-xl mb-8">
+              Discover, create, and share music with our free online tools
+            </p>
+            <Link
+              to="/music-maker-free"
+              className="bg-white text-purple-600 px-8 py-3 rounded-full font-semibold hover:bg-opacity-90 transition-colors"
+            >
+              Try Music Maker Free
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Search Section */}
+      <section className="py-12 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="max-w-2xl mx-auto">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+              <Input
+                type="text"
+                placeholder="Search for songs, artists, or genres..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 w-full"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Music Directory Grid */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-12">Music Directory</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {musicCategories.map((category, index) => (
+              <Link
+                key={index}
+                to={category.link}
+                className="group block bg-gray-100 rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
+              >
+                <div className="aspect-w-16 aspect-h-9">
+                  <img
+                    src={category.image}
+                    alt={category.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="p-4">
+                  <h3 className="text-xl font-semibold group-hover:text-purple-600 transition-colors">
+                    {category.title}
+                  </h3>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <Footer />
     </div>
   );
