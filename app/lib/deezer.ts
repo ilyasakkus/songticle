@@ -56,7 +56,8 @@ export async function searchDeezerArtist(query: string): Promise<{ artist: Artis
     const artist: Artist = {
       id: firstResult.artist.id,
       name: firstResult.artist.name,
-      picture: firstResult.artist.picture_medium
+      picture_small: firstResult.artist.picture_small,
+      picture_medium: firstResult.artist.picture_medium
     };
 
     // Transform all tracks to our Song type
