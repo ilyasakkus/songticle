@@ -32,51 +32,132 @@ export function AddSongStoryForm() {
   const [songs, setSongs] = useState<Song[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchValue, setSearchValue] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      songId: "",
+      title: "",
+      content: ""
+    }
   });
 
-  // Load initial songs when component mounts
+  // Debug function to check table existence and structure
+  const checkDatabase = async () => {
+    try {
+      // Check songs table
+      const { data: songsData, error: songsError } = await supabase
+        .from('songs')
+        .select('*')
+        .limit(1);
+
+      console.log('Songs table check:', { data: songsData, error: songsError });
+
+      // Check albums table
+      const { data: albumsData, error: albumsError } = await supabase
+        .from('albums')
+        .select('*')
+        .limit(1);
+
+      console.log('Albums table check:', { data: albumsData, error: albumsError });
+
+      // Check artists table
+      const { data: artistsData, error: artistsError } = await supabase
+        .from('artists')
+        .select('*')
+        .limit(1);
+
+      console.log('Artists table check:', { data: artistsData, error: artistsError });
+
+      if (songsError) setError('Error accessing songs table: ' + songsError.message);
+      if (albumsError) setError('Error accessing albums table: ' + albumsError.message);
+      if (artistsError) setError('Error accessing artists table: ' + artistsError.message);
+    } catch (error) {
+      console.error('Database check error:', error);
+      setError('Failed to check database structure');
+    }
+  };
+
+  // Run database check on mount
   useEffect(() => {
-    searchSongs("");
+    checkDatabase();
   }, []);
 
   const searchSongs = async (value: string) => {
     setLoading(true);
+    setError(null);
     try {
+      // Simple query first
       const { data: songsData, error: songsError } = await supabase
         .from('songs')
-        .select(`
-          id,
-          title,
-          album:album_id (
-            id,
-            title,
-            artist:artist_id (
-              id,
-              name
-            )
-          )
-        `)
-        .ilike('title', `%${value}%`)
-        .limit(20);
+        .select('id, title, album_id');
+
+      console.log('Songs query result:', { data: songsData, error: songsError });
 
       if (songsError) {
-        console.error('Error fetching songs:', songsError);
+        setError('Error fetching songs: ' + songsError.message);
         return;
       }
 
-      const formattedSongs = songsData.map(song => ({
-        id: song.id,
-        title: song.title,
-        album_title: song.album?.title || 'Unknown Album',
-        artist_name: song.album?.artist?.name || 'Unknown Artist',
-      }));
+      if (!songsData || songsData.length === 0) {
+        setSongs([]);
+        return;
+      }
+
+      // Get unique album IDs
+      const albumIds = [...new Set(songsData.map(song => song.album_id))];
+      
+      const { data: albumsData, error: albumsError } = await supabase
+        .from('albums')
+        .select('id, title, artist_id')
+        .in('id', albumIds);
+
+      console.log('Albums query result:', { data: albumsData, error: albumsError });
+
+      if (albumsError) {
+        setError('Error fetching albums: ' + albumsError.message);
+        return;
+      }
+
+      // Get unique artist IDs
+      const artistIds = [...new Set(albumsData?.map(album => album.artist_id) || [])];
+
+      const { data: artistsData, error: artistsError } = await supabase
+        .from('artists')
+        .select('id, name')
+        .in('id', artistIds);
+
+      console.log('Artists query result:', { data: artistsData, error: artistsError });
+
+      if (artistsError) {
+        setError('Error fetching artists: ' + artistsError.message);
+        return;
+      }
+
+      // Create lookup maps
+      const albumMap = new Map(albumsData?.map(album => [album.id, album]) || []);
+      const artistMap = new Map(artistsData?.map(artist => [artist.id, artist]) || []);
+
+      // Format songs
+      const formattedSongs = songsData
+        .filter(song => !value || song.title.toLowerCase().includes(value.toLowerCase()))
+        .map(song => {
+          const album = albumMap.get(song.album_id);
+          const artist = album ? artistMap.get(album.artist_id) : null;
+          return {
+            id: song.id,
+            title: song.title,
+            album_title: album?.title || 'Unknown Album',
+            artist_name: artist?.name || 'Unknown Artist',
+          };
+        })
+        .slice(0, 20);
 
       setSongs(formattedSongs);
     } catch (error) {
       console.error('Error searching songs:', error);
+      setError('Unexpected error while searching songs');
     } finally {
       setLoading(false);
     }
@@ -98,13 +179,12 @@ export function AddSongStoryForm() {
 
       if (error) throw error;
 
-      // Reset form and show success message
       form.reset();
       setSearchValue("");
-      // You might want to add a toast notification here
+      setOpen(false);
     } catch (error) {
       console.error('Error creating story:', error);
-      // You might want to add an error toast notification here
+      setError('Failed to create story');
     }
   };
 
@@ -112,6 +192,12 @@ export function AddSongStoryForm() {
     <div className="max-w-2xl mx-auto p-6 bg-base-100 rounded-lg shadow-lg">
       <h2 className="text-2xl font-serif font-bold mb-6 text-primary">Add Song Story</h2>
       
+      {error && (
+        <div className="alert alert-error mb-4">
+          <span>{error}</span>
+        </div>
+      )}
+
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <div className="form-control w-full">
           <label className="label">
@@ -191,6 +277,7 @@ export function AddSongStoryForm() {
             <span className="label-text">Title</span>
           </label>
           <input
+            type="text"
             {...form.register("title")}
             placeholder="Enter your story title"
             className="input input-bordered w-full"
