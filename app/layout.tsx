@@ -1,5 +1,5 @@
-import { Navbar } from '@/components/Navbar'
-import { Sidebar } from '@/components/Sidebar'
+import { Navbar } from './components/Navbar'
+import { Sidebar } from './components/Sidebar'
 import './globals.css'
 import { Inter } from 'next/font/google'
 import { ThemeProvider } from './components/ThemeProvider'
