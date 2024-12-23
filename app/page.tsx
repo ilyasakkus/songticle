@@ -1,4 +1,5 @@
 import { artists, stories } from './data/sampleData';
+import { ThemeSwitcher } from './components/ThemeSwitcher';
 
 export default function Home() {
   return (
@@ -6,10 +7,17 @@ export default function Home() {
       {/* Header */}
       <div className="navbar bg-base-100 shadow-lg px-4">
         <div className="flex-1">
-          <a className="btn btn-ghost normal-case text-xl">Songticle</a>
+          <a className="btn btn-ghost normal-case text-xl gap-2">
+            <span className="material-icons">music_note</span>
+            Songticle
+          </a>
         </div>
         <div className="flex-none gap-2">
-          <button className="btn btn-primary">Add Story</button>
+          <ThemeSwitcher />
+          <button className="btn btn-primary gap-2">
+            <span className="material-icons">add_circle</span>
+            Add Story
+          </button>
           <div className="dropdown dropdown-end">
             <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
               <div className="w-10 rounded-full">
@@ -17,9 +25,24 @@ export default function Home() {
               </div>
             </label>
             <ul tabIndex={0} className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52">
-              <li><a>Profile</a></li>
-              <li><a>Settings</a></li>
-              <li><a>Sign out</a></li>
+              <li>
+                <a className="gap-2">
+                  <span className="material-icons">person</span>
+                  Profile
+                </a>
+              </li>
+              <li>
+                <a className="gap-2">
+                  <span className="material-icons">settings</span>
+                  Settings
+                </a>
+              </li>
+              <li>
+                <a className="gap-2">
+                  <span className="material-icons">logout</span>
+                  Sign out
+                </a>
+              </li>
             </ul>
           </div>
         </div>
@@ -28,12 +51,16 @@ export default function Home() {
       <div className="flex">
         {/* Sidebar */}
         <aside className="w-[300px] bg-base-100 min-h-[calc(100vh-64px)] p-4 shadow-lg">
-          <h2 className="text-xl font-bold mb-4">Music Library</h2>
+          <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+            <span className="material-icons">library_music</span>
+            Music Library
+          </h2>
           <div className="space-y-4">
             {artists.map((artist) => (
               <div key={artist.id} className="collapse collapse-arrow bg-base-200">
                 <input type="checkbox" /> 
-                <div className="collapse-title font-medium">
+                <div className="collapse-title font-medium flex items-center gap-2">
+                  <span className="material-icons text-xl">person</span>
                   {artist.name}
                 </div>
                 <div className="collapse-content">
@@ -41,14 +68,18 @@ export default function Home() {
                     <div key={album.id} className="ml-4 mb-2">
                       <div className="collapse collapse-arrow bg-base-100">
                         <input type="checkbox" />
-                        <div className="collapse-title text-sm">
+                        <div className="collapse-title text-sm flex items-center gap-2">
+                          <span className="material-icons text-sm">album</span>
                           {album.title} ({album.year})
                         </div>
                         <div className="collapse-content">
                           <ul className="menu menu-sm">
                             {album.songs.map((song) => (
                               <li key={song.id}>
-                                <a className="text-sm">{song.title}</a>
+                                <a className="text-sm flex items-center gap-2">
+                                  <span className="material-icons text-sm">music_note</span>
+                                  {song.title}
+                                </a>
                               </li>
                             ))}
                           </ul>
@@ -80,7 +111,10 @@ export default function Home() {
                     </div>
                   </div>
                   <div className="mb-4">
-                    <h4 className="font-semibold text-lg">{story.songTitle}</h4>
+                    <h4 className="font-semibold text-lg flex items-center gap-2">
+                      <span className="material-icons">music_note</span>
+                      {story.songTitle}
+                    </h4>
                     <p className="text-sm text-base-content/70">
                       {story.artist} • {story.album}
                     </p>
@@ -89,19 +123,18 @@ export default function Home() {
                   <div className="card-actions justify-between items-center mt-4">
                     <div className="flex gap-4">
                       <button className="btn btn-ghost btn-sm gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                        </svg>
+                        <span className="material-icons">favorite_border</span>
                         {story.likes}
                       </button>
                       <button className="btn btn-ghost btn-sm gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                        </svg>
+                        <span className="material-icons">chat_bubble_outline</span>
                         {story.comments}
                       </button>
                     </div>
-                    <button className="btn btn-ghost btn-sm">Share</button>
+                    <button className="btn btn-ghost btn-sm gap-2">
+                      <span className="material-icons">share</span>
+                      Share
+                    </button>
                   </div>
                 </div>
               </div>
