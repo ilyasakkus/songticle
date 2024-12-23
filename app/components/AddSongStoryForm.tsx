@@ -1,16 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from './ui/command';
-import { Input } from './ui/input';
-import { Textarea } from './ui/textarea';
+import { Command } from './ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { cn } from '../lib/utils';
-import { Check, ChevronsUpDown } from 'lucide-react';
+import { Check, ChevronsUpDown, Search } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { useArtistHierarchy } from '../hooks/useArtistHierarchy';
 
 const formSchema = z.object({
   songId: z.string({
@@ -18,6 +17,7 @@ const formSchema = z.object({
   }),
   title: z.string().min(1, "Title is required"),
   content: z.string().min(10, "Story must be at least 10 characters long"),
+  author_name: z.string().min(1, "Name is required").max(50, "Name is too long"),
 });
 
 type Song = {
@@ -29,144 +29,47 @@ type Song = {
 
 export function AddSongStoryForm() {
   const [open, setOpen] = useState(false);
-  const [songs, setSongs] = useState<Song[]>([]);
-  const [loading, setLoading] = useState(false);
   const [searchValue, setSearchValue] = useState("");
+  const { artists, loading, error: artistError } = useArtistHierarchy();
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       songId: "",
       title: "",
-      content: ""
+      content: "",
+      author_name: ""
     }
   });
 
-  // Debug function to check table existence and structure
-  const checkDatabase = async () => {
-    try {
-      // Check songs table
-      const { data: songsData, error: songsError } = await supabase
-        .from('songs')
-        .select('*')
-        .limit(1);
+  // Flatten the artist hierarchy into a list of songs with artist and album info
+  const songs: Song[] = artists.flatMap(artist =>
+    artist.albums?.flatMap(album =>
+      album.songs?.map(song => ({
+        id: song.id,
+        title: song.title,
+        artist_name: artist.name,
+        album_title: album.title
+      })) || []
+    ) || []
+  );
 
-      console.log('Songs table check:', { data: songsData, error: songsError });
-
-      // Check albums table
-      const { data: albumsData, error: albumsError } = await supabase
-        .from('albums')
-        .select('*')
-        .limit(1);
-
-      console.log('Albums table check:', { data: albumsData, error: albumsError });
-
-      // Check artists table
-      const { data: artistsData, error: artistsError } = await supabase
-        .from('artists')
-        .select('*')
-        .limit(1);
-
-      console.log('Artists table check:', { data: artistsData, error: artistsError });
-
-      if (songsError) setError('Error accessing songs table: ' + songsError.message);
-      if (albumsError) setError('Error accessing albums table: ' + albumsError.message);
-      if (artistsError) setError('Error accessing artists table: ' + artistsError.message);
-    } catch (error) {
-      console.error('Database check error:', error);
-      setError('Failed to check database structure');
-    }
-  };
-
-  // Run database check on mount
-  useEffect(() => {
-    checkDatabase();
-  }, []);
-
-  const searchSongs = async (value: string) => {
-    setLoading(true);
-    setError(null);
-    try {
-      // Simple query first
-      const { data: songsData, error: songsError } = await supabase
-        .from('songs')
-        .select('id, title, album_id');
-
-      console.log('Songs query result:', { data: songsData, error: songsError });
-
-      if (songsError) {
-        setError('Error fetching songs: ' + songsError.message);
-        return;
-      }
-
-      if (!songsData || songsData.length === 0) {
-        setSongs([]);
-        return;
-      }
-
-      // Get unique album IDs
-      const albumIds = [...new Set(songsData.map(song => song.album_id))];
-      
-      const { data: albumsData, error: albumsError } = await supabase
-        .from('albums')
-        .select('id, title, artist_id')
-        .in('id', albumIds);
-
-      console.log('Albums query result:', { data: albumsData, error: albumsError });
-
-      if (albumsError) {
-        setError('Error fetching albums: ' + albumsError.message);
-        return;
-      }
-
-      // Get unique artist IDs
-      const artistIds = [...new Set(albumsData?.map(album => album.artist_id) || [])];
-
-      const { data: artistsData, error: artistsError } = await supabase
-        .from('artists')
-        .select('id, name')
-        .in('id', artistIds);
-
-      console.log('Artists query result:', { data: artistsData, error: artistsError });
-
-      if (artistsError) {
-        setError('Error fetching artists: ' + artistsError.message);
-        return;
-      }
-
-      // Create lookup maps
-      const albumMap = new Map(albumsData?.map(album => [album.id, album]) || []);
-      const artistMap = new Map(artistsData?.map(artist => [artist.id, artist]) || []);
-
-      // Format songs
-      const formattedSongs = songsData
-        .filter(song => !value || song.title.toLowerCase().includes(value.toLowerCase()))
-        .map(song => {
-          const album = albumMap.get(song.album_id);
-          const artist = album ? artistMap.get(album.artist_id) : null;
-          return {
-            id: song.id,
-            title: song.title,
-            album_title: album?.title || 'Unknown Album',
-            artist_name: artist?.name || 'Unknown Artist',
-          };
-        })
-        .slice(0, 20);
-
-      setSongs(formattedSongs);
-    } catch (error) {
-      console.error('Error searching songs:', error);
-      setError('Unexpected error while searching songs');
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Filter songs based on search value
+  const filteredSongs = songs.filter(song => {
+    const searchLower = searchValue.toLowerCase();
+    return (
+      song.title.toLowerCase().includes(searchLower) ||
+      song.artist_name.toLowerCase().includes(searchLower) ||
+      song.album_title.toLowerCase().includes(searchLower)
+    );
+  }).slice(0, 20); // Limit to 20 results
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      setError(null);
+      setSuccess(null);
 
       const { error } = await supabase
         .from('stories')
@@ -174,17 +77,22 @@ export function AddSongStoryForm() {
           title: values.title,
           content: values.content,
           song_id: parseInt(values.songId),
-          user_id: user.id,
+          author_name: values.author_name,
+          is_anonymous: true
         });
 
       if (error) throw error;
 
+      // Show success message
+      setSuccess('Your story has been posted successfully!');
+      
+      // Reset form
       form.reset();
       setSearchValue("");
       setOpen(false);
     } catch (error) {
       console.error('Error creating story:', error);
-      setError('Failed to create story');
+      setError('Failed to create story. Please try again.');
     }
   };
 
@@ -198,7 +106,30 @@ export function AddSongStoryForm() {
         </div>
       )}
 
+      {success && (
+        <div className="alert alert-success mb-4">
+          <span>{success}</span>
+        </div>
+      )}
+
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <div className="form-control w-full">
+          <label className="label">
+            <span className="label-text">Your Name</span>
+          </label>
+          <input
+            type="text"
+            {...form.register("author_name")}
+            placeholder="Enter your name"
+            className="input input-bordered w-full"
+          />
+          {form.formState.errors.author_name && (
+            <label className="label">
+              <span className="label-text-alt text-error">{form.formState.errors.author_name.message}</span>
+            </label>
+          )}
+        </div>
+
         <div className="form-control w-full">
           <label className="label">
             <span className="label-text">Song</span>
@@ -220,35 +151,37 @@ export function AddSongStoryForm() {
             </PopoverTrigger>
             <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
               <Command>
-                <CommandInput 
-                  placeholder="Search songs..." 
-                  value={searchValue}
-                  onValueChange={(value) => {
-                    setSearchValue(value);
-                    searchSongs(value);
-                  }}
-                  className="input input-bordered"
-                />
-                <CommandEmpty>No songs found.</CommandEmpty>
-                <CommandGroup className="max-h-[300px] overflow-y-auto">
-                  {loading ? (
-                    <div className="p-4 text-center">
-                      <span className="loading loading-spinner loading-md"></span>
-                    </div>
-                  ) : (
-                    songs.map((song) => (
-                      <CommandItem
+                <div className="flex items-center px-3 border-b border-base-300">
+                  <Search className="w-4 h-4 mr-2 opacity-50" />
+                  <input
+                    placeholder="Search songs..."
+                    value={searchValue}
+                    onChange={(e) => setSearchValue(e.target.value)}
+                    className="flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                  />
+                </div>
+                {loading ? (
+                  <div className="p-4 text-center">
+                    <span className="loading loading-spinner loading-md"></span>
+                  </div>
+                ) : filteredSongs.length === 0 ? (
+                  <div className="py-6 text-center text-sm">
+                    {searchValue ? "No songs found." : "Type to search songs..."}
+                  </div>
+                ) : (
+                  <div className="max-h-[300px] overflow-y-auto">
+                    {filteredSongs.map((song) => (
+                      <div
                         key={song.id}
-                        value={song.id.toString()}
-                        onSelect={(value) => {
-                          form.setValue("songId", value);
+                        onClick={() => {
+                          form.setValue("songId", song.id.toString());
                           setOpen(false);
                         }}
-                        className="hover:bg-base-200"
+                        className="flex items-center gap-2 px-3 py-2 hover:bg-base-200 cursor-pointer"
                       >
                         <Check
                           className={cn(
-                            "mr-2 h-4 w-4",
+                            "w-4 h-4",
                             form.watch("songId") === song.id.toString() ? "opacity-100" : "opacity-0"
                           )}
                         />
@@ -258,10 +191,10 @@ export function AddSongStoryForm() {
                             {song.artist_name} • {song.album_title}
                           </div>
                         </div>
-                      </CommandItem>
-                    ))
-                  )}
-                </CommandGroup>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </Command>
             </PopoverContent>
           </Popover>

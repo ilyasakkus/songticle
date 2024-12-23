@@ -2,6 +2,7 @@
 
 import { PlusCircle } from 'lucide-react';
 import Link from 'next/link';
+import { AuthButtons } from './auth/AuthButtons';
 
 export function Header() {
   return (
@@ -16,13 +17,14 @@ export function Header() {
               Songticle
             </Link>
           </div>
-          <div className="flex-none">
+          <div className="flex-none gap-4">
             <Link href="/add">
               <button className="btn btn-primary">
                 <PlusCircle className="w-4 h-4 mr-2" />
                 Add Song Story
               </button>
             </Link>
+            <AuthButtons />
           </div>
         </div>
       </div>
