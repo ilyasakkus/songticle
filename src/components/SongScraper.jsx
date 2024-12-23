@@ -2,38 +2,45 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const SongScraper = () => {
-  const [songs, setSongs] = useState([]);
+  const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const PROXY_URL = 'https://api.codetabs.com/v1/proxy/?quest=';
-  // Example: Using genius.com as the target
-  const TARGET_URL = 'https://genius.com/tags/pop';
+  const TARGET_URL = 'https://www.udiscovermusic.com/music/playlists/';
 
   useEffect(() => {
-    fetchSongs();
+    fetchArticles();
   }, []);
 
-  const fetchSongs = async () => {
+  const fetchArticles = async () => {
     setLoading(true);
     try {
       const response = await axios.get(`${PROXY_URL}${encodeURIComponent(TARGET_URL)}`);
       const parser = new DOMParser();
       const doc = parser.parseFromString(response.data, 'text/html');
       
-      const songElements = doc.querySelectorAll('div.chart_row');
-      const extractedSongs = Array.from(songElements).map(element => {
+      // Select all article elements
+      const articleElements = doc.querySelectorAll('article.article-preview');
+      const extractedArticles = Array.from(articleElements).map(element => {
+        const imageElement = element.querySelector('img');
+        const titleElement = element.querySelector('.article-preview__title');
+        const excerptElement = element.querySelector('.article-preview__excerpt');
+        const linkElement = element.querySelector('a');
+        
         return {
-          title: element.querySelector('.chart_row-content-title')?.textContent?.trim() || '',
-          artist: element.querySelector('.chart_row-artist')?.textContent?.trim() || '',
-          link: element.querySelector('a')?.href || ''
+          title: titleElement?.textContent?.trim() || '',
+          excerpt: excerptElement?.textContent?.trim() || '',
+          image: imageElement?.src || '',
+          link: linkElement?.href || '',
+          date: element.querySelector('.article-preview__date')?.textContent?.trim() || ''
         };
-      }).filter(song => song.title && song.artist);
+      }).filter(article => article.title && article.link);
 
-      setSongs(extractedSongs);
+      setArticles(extractedArticles);
     } catch (err) {
-      setError('Failed to fetch songs');
-      console.error('Error fetching songs:', err);
+      setError('Failed to fetch articles');
+      console.error('Error fetching articles:', err);
     } finally {
       setLoading(false);
     }
@@ -41,36 +48,73 @@ const SongScraper = () => {
 
   return (
     <div className="p-4">
-      <h2 className="text-2xl font-bold mb-4">Popular Songs</h2>
+      {loading && (
+        <div className="flex justify-center items-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+        </div>
+      )}
       
-      {loading && <p className="text-gray-600">Loading songs...</p>}
-      {error && <p className="text-red-500">{error}</p>}
+      {error && (
+        <div className="text-red-500 text-center py-4">
+          {error}
+        </div>
+      )}
       
-      <div className="grid gap-4">
-        {songs.map((song, index) => (
-          <div key={index} className="border p-4 rounded-lg shadow hover:shadow-md transition-shadow">
-            <h3 className="font-semibold text-lg">{song.title}</h3>
-            <p className="text-gray-600">{song.artist}</p>
-            {song.link && (
-              <a 
-                href={song.link} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-blue-500 hover:text-blue-700 text-sm mt-2 inline-block"
-              >
-                View on Genius
-              </a>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {articles.map((article, index) => (
+          <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300">
+            {article.image && (
+              <div className="aspect-w-16 aspect-h-9">
+                <img 
+                  src={article.image} 
+                  alt={article.title}
+                  className="w-full h-48 object-cover"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = 'https://via.placeholder.com/400x300?text=No+Image';
+                  }}
+                />
+              </div>
             )}
+            
+            <div className="p-4">
+              <h3 className="text-xl font-semibold mb-2 line-clamp-2 hover:text-blue-600">
+                {article.title}
+              </h3>
+              
+              {article.date && (
+                <p className="text-sm text-gray-500 mb-2">
+                  {article.date}
+                </p>
+              )}
+              
+              {article.excerpt && (
+                <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+                  {article.excerpt}
+                </p>
+              )}
+              
+              <a 
+                href={article.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors text-sm"
+              >
+                Read More
+              </a>
+            </div>
           </div>
         ))}
       </div>
       
-      <button 
-        onClick={fetchSongs}
-        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-      >
-        Refresh Songs
-      </button>
+      <div className="text-center mt-6">
+        <button 
+          onClick={fetchArticles}
+          className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 transition-colors"
+        >
+          Refresh Articles
+        </button>
+      </div>
     </div>
   );
 };
