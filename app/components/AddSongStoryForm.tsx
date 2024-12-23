@@ -22,9 +22,10 @@ const formSchema = z.object({
 });
 
 type Song = {
-  id: string;
+  id: number;
   title: string;
   artist_name: string;
+  album_title: string;
 };
 
 export function AddSongStoryForm() {
@@ -42,26 +43,59 @@ export function AddSongStoryForm() {
     
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      // Get all songs matching the search term
+      const { data: songsData, error: songsError } = await supabase
         .from('songs')
-        .select(`
-          id,
-          title,
-          artist:artists(name)
-        `)
-        .ilike('title', `%${value}%`)
-        .limit(5);
+        .select('id, title, album_id');
 
-      if (error) throw error;
-
-      if (data) {
-        const formattedSongs = data.map(song => ({
-          id: song.id,
-          title: song.title,
-          artist_name: song.artist?.name || 'Unknown Artist'
-        }));
-        setSongs(formattedSongs);
+      if (songsError) {
+        console.error('Error fetching songs:', songsError);
+        return;
       }
+
+      // Get all albums for the matching songs
+      const albumIds = songsData.map(song => song.album_id);
+      const { data: albumsData, error: albumsError } = await supabase
+        .from('albums')
+        .select('id, title, artist_id')
+        .in('id', albumIds);
+
+      if (albumsError) {
+        console.error('Error fetching albums:', albumsError);
+        return;
+      }
+
+      // Get all artists for the albums
+      const artistIds = albumsData.map(album => album.artist_id);
+      const { data: artistsData, error: artistsError } = await supabase
+        .from('artists')
+        .select('id, name')
+        .in('id', artistIds);
+
+      if (artistsError) {
+        console.error('Error fetching artists:', artistsError);
+        return;
+      }
+
+      // Create a map for quick lookups
+      const albumMap = new Map(albumsData.map(album => [album.id, album]));
+      const artistMap = new Map(artistsData.map(artist => [artist.id, artist]));
+
+      // Format the songs with album and artist information
+      const formattedSongs = songsData
+        .filter(song => song.title.toLowerCase().includes(value.toLowerCase()))
+        .map(song => {
+          const album = albumMap.get(song.album_id);
+          const artist = album ? artistMap.get(album.artist_id) : null;
+          return {
+            id: song.id,
+            title: song.title,
+            album_title: album?.title || 'Unknown Album',
+            artist_name: artist?.name || 'Unknown Artist',
+          };
+        });
+
+      setSongs(formattedSongs);
     } catch (error) {
       console.error('Error searching songs:', error);
     } finally {
@@ -112,7 +146,7 @@ export function AddSongStoryForm() {
                 className="w-full justify-between"
               >
                 {form.watch("songId") 
-                  ? songs.find((song) => song.id === form.watch("songId"))?.title
+                  ? songs.find((song) => song.id === parseInt(form.watch("songId")))?.title
                   : "Select song..."}
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
@@ -136,7 +170,7 @@ export function AddSongStoryForm() {
                     {songs.map((song) => (
                       <CommandItem
                         key={song.id}
-                        value={song.id}
+                        value={song.id.toString()}
                         onSelect={(value) => {
                           form.setValue("songId", value);
                           setOpen(false);
@@ -145,7 +179,7 @@ export function AddSongStoryForm() {
                         <Check
                           className={cn(
                             "mr-2 h-4 w-4",
-                            form.watch("songId") === song.id ? "opacity-100" : "opacity-0"
+                            form.watch("songId") === song.id.toString() ? "opacity-100" : "opacity-0"
                           )}
                         />
                         {song.title} - {song.artist_name}

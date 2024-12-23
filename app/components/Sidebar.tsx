@@ -1,14 +1,15 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useArtistHierarchy } from '../hooks/useArtistHierarchy';
-import { ChevronDown, ChevronRight, Music, Disc, User } from 'lucide-react';
+import { ChevronDown, ChevronRight, Music, Disc, User, Search } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 export function Sidebar() {
   const { artists, loading, error } = useArtistHierarchy();
   const [expandedArtists, setExpandedArtists] = React.useState<Record<number, boolean>>({});
   const [expandedAlbums, setExpandedAlbums] = React.useState<Record<number, boolean>>({});
+  const [searchTerm, setSearchTerm] = useState('');
 
   const toggleArtist = (artistId: number) => {
     setExpandedArtists(prev => ({
@@ -24,13 +25,27 @@ export function Sidebar() {
     }));
   };
 
+  const filteredArtists = React.useMemo(() => {
+    if (!searchTerm) return artists;
+    
+    return artists.filter(artist => 
+      artist.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      artist.albums?.some(album => 
+        album.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        album.songs?.some(song => 
+          song.title.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      )
+    );
+  }, [artists, searchTerm]);
+
   if (loading) {
     return (
-      <aside className="w-60 h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 p-4">
+      <aside className="w-60 h-full bg-base-100 border-r border-base-300 p-4">
         <div className="animate-pulse space-y-4">
-          <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-3/4"></div>
-          <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-1/2"></div>
-          <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-2/3"></div>
+          <div className="h-4 bg-base-300 rounded w-3/4"></div>
+          <div className="h-4 bg-base-300 rounded w-1/2"></div>
+          <div className="h-4 bg-base-300 rounded w-2/3"></div>
         </div>
       </aside>
     );
@@ -38,57 +53,64 @@ export function Sidebar() {
 
   if (error) {
     return (
-      <aside className="w-60 h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 p-4">
-        <div className="text-red-500 dark:text-red-400">Error loading artists: {error}</div>
+      <aside className="w-60 h-full bg-base-100 border-r border-base-300 p-4">
+        <div className="text-error">Error loading artists: {error}</div>
       </aside>
     );
   }
 
   return (
-    <aside className="w-60 h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 p-4">
-      <div className="space-y-2">
-        {artists.map(artist => (
-          <div key={artist.id} className="space-y-1">
-            <div
-              className={cn(
-                "flex items-center space-x-2 cursor-pointer rounded-md p-2",
-                "hover:bg-gray-100 dark:hover:bg-gray-800",
-                "text-gray-900 dark:text-gray-100"
-              )}
-              onClick={() => toggleArtist(artist.id)}
-            >
-              {expandedArtists[artist.id] ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+    <aside className="w-60 h-full bg-base-100 border-r border-base-300 p-4">
+      <div className="space-y-4 mb-4">
+        <div className="form-control">
+          <div className="input-group">
+            <span className="btn btn-square btn-ghost">
+              <Search className="h-4 w-4" />
+            </span>
+            <input
+              type="search"
+              placeholder="Search artists, albums, songs..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="input input-bordered w-full"
+            />
+          </div>
+        </div>
+      </div>
+      
+      <div className="space-y-2 overflow-y-auto max-h-[calc(100vh-200px)]">
+        {filteredArtists.map(artist => (
+          <div key={artist.id} className="collapse collapse-arrow bg-base-200">
+            <input 
+              type="checkbox" 
+              checked={expandedArtists[artist.id]}
+              onChange={() => toggleArtist(artist.id)}
+            />
+            <div className="collapse-title flex items-center gap-2 text-sm">
               <User size={16} />
-              <span className="text-sm truncate">{artist.name}</span>
+              <span className="truncate">{artist.name}</span>
             </div>
             
             {expandedArtists[artist.id] && artist.albums && (
-              <div className="ml-6 space-y-1">
+              <div className="collapse-content">
                 {artist.albums.map(album => (
-                  <div key={album.id}>
-                    <div
-                      className={cn(
-                        "flex items-center space-x-2 cursor-pointer rounded-md p-2",
-                        "hover:bg-gray-100 dark:hover:bg-gray-800",
-                        "text-gray-900 dark:text-gray-100"
-                      )}
-                      onClick={() => toggleAlbum(album.id)}
-                    >
-                      {expandedAlbums[album.id] ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                  <div key={album.id} className="collapse collapse-arrow bg-base-100 my-1">
+                    <input 
+                      type="checkbox" 
+                      checked={expandedAlbums[album.id]}
+                      onChange={() => toggleAlbum(album.id)}
+                    />
+                    <div className="collapse-title flex items-center gap-2 text-sm py-2">
                       <Disc size={16} />
-                      <span className="text-sm truncate">{album.title}</span>
+                      <span className="truncate">{album.title}</span>
                     </div>
                     
                     {expandedAlbums[album.id] && album.songs && (
-                      <div className="ml-6 space-y-1">
+                      <div className="collapse-content">
                         {album.songs.map(song => (
                           <div
                             key={song.id}
-                            className={cn(
-                              "flex items-center space-x-2 rounded-md p-2",
-                              "hover:bg-gray-100 dark:hover:bg-gray-800",
-                              "text-gray-900 dark:text-gray-100"
-                            )}
+                            className="flex items-center gap-2 p-2 hover:bg-base-200 rounded-btn cursor-pointer"
                           >
                             <Music size={16} />
                             <span className="text-sm truncate">{song.title}</span>
