@@ -4,6 +4,17 @@ import https from 'https';
 const RAPID_API_KEY = 'd0ae159158msh252d03370e660d8p125f2djsn4ba29578ca04';
 const RAPID_API_HOST = 'deezerdevs-deezer.p.rapidapi.com';
 
+interface DeezerError {
+  type: string;
+  message: string;
+  code: number;
+}
+
+interface DeezerResponse<T> {
+  data?: T;
+  error?: DeezerError;
+}
+
 function makeRequest(path: string): Promise<any> {
   return new Promise((resolve, reject) => {
     const options = {
@@ -43,12 +54,12 @@ function makeRequest(path: string): Promise<any> {
   });
 }
 
-export async function searchDeezerArtist(query: string): Promise<{ artist: Artist, songs: Song[] }> {
+export async function searchDeezerArtist(query: string): Promise<DeezerResponse<{ artist: Artist, songs: Song[] }>> {
   try {
     const data = await makeRequest(`/search?q=${encodeURIComponent(query)}`);
     
     if (!data || !data.data || data.data.length === 0) {
-      return { artist: null, songs: [] };
+      return { data: { artist: null, songs: [] } };
     }
 
     // Get the first result's artist
@@ -86,9 +97,23 @@ export async function searchDeezerArtist(query: string): Promise<{ artist: Artis
 
     console.log('Processed songs:', songs[0]); // Debug log
 
-    return { artist, songs };
-  } catch (error) {
-    console.error('Error searching Deezer:', error);
-    throw new Error('Failed to search for artist and songs');
+    return { data: { artist, songs } };
+  } catch (err) {
+    if (err instanceof Error) {
+      return { 
+        error: {
+          type: 'API_ERROR',
+          message: err.message,
+          code: 500
+        }
+      };
+    }
+    return { 
+      error: {
+        type: 'UNKNOWN_ERROR',
+        message: 'An unknown error occurred',
+        code: 500
+      }
+    };
   }
 }

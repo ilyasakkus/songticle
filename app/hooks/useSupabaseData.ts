@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { searchDeezerArtist } from '../lib/deezer';
-import { Artist, Song } from '../types/database.types';
+import { Database } from '../types/database.types';
 
 export function useArtistSearch() {
   const [isLoading, setIsLoading] = useState(false);

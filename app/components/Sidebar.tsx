@@ -2,8 +2,7 @@
 
 import React, { useState } from 'react';
 import { useArtistHierarchy } from '../hooks/useArtistHierarchy';
-import { ChevronDown, ChevronRight, Music, Disc, User, Search } from 'lucide-react';
-import { cn } from '../lib/utils';
+import { Music, Disc, User, Search } from 'lucide-react';
 
 export function Sidebar() {
   const { artists, loading, error } = useArtistHierarchy();

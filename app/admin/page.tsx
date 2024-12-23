@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { useArtistSearch } from '../hooks/useSupabaseData';
 import { Artist, Song } from '../types/database.types';
+import Link from 'next/link';
+import Image from 'next/image';
 
 export default function AdminPage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -36,10 +38,10 @@ export default function AdminPage() {
       {/* Header */}
       <div className="navbar bg-base-100 shadow-lg px-4">
         <div className="flex-1">
-          <a href="/" className="btn btn-ghost normal-case text-xl gap-2 text-base-content">
+          <Link href="/" className="btn btn-ghost normal-case text-xl gap-2 text-base-content">
             <span className="material-icons">arrow_back</span>
             Back to Home
-          </a>
+          </Link>
         </div>
       </div>
 
@@ -89,9 +91,11 @@ export default function AdminPage() {
           <div className="card bg-base-100 shadow-xl mb-8">
             <div className="card-body">
               <div className="flex items-center gap-6 mb-6">
-                <img
+                <Image
                   src={searchResults.artist.picture_medium}
                   alt={searchResults.artist.name}
+                  width={128}
+                  height={128}
                   className="w-32 h-32 rounded-lg object-cover"
                 />
                 <div>
@@ -121,9 +125,11 @@ export default function AdminPage() {
                     {searchResults.songs.map((song) => (
                       <tr key={song.id}>
                         <td>
-                          <img
+                          <Image
                             src={song.cover_image}
                             alt={song.title}
+                            width={48}
+                            height={48}
                             className="w-12 h-12 rounded object-cover"
                           />
                         </td>
