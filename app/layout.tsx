@@ -1,10 +1,10 @@
-import { Navbar } from './components/Navbar'
-import { Sidebar } from './components/Sidebar'
-import './globals.css'
-import { Inter } from 'next/font/google'
-import { ThemeProvider } from './components/ThemeProvider'
+import './globals.css';
+import { Inter } from 'next/font/google';
+import { ThemeProvider } from './components/ThemeProvider';
+import { Sidebar } from './components/Sidebar';
+import { Header } from './components/Header';
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
   title: 'Songticle',
@@ -14,23 +14,25 @@ export const metadata = {
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <ThemeProvider>
-          <div className="flex h-screen">
-            <Sidebar />
-            <div className="flex-1 flex flex-col">
-              <Navbar />
-              <main className="flex-1 overflow-y-auto">
-                {children}
-              </main>
+          <div className="min-h-screen bg-background">
+            <Header />
+            <div className="container mx-auto px-4">
+              <div className="flex gap-6 pt-6">
+                <Sidebar />
+                <main className="flex-1">
+                  {children}
+                </main>
+              </div>
             </div>
           </div>
         </ThemeProvider>
       </body>
     </html>
-  )
+  );
 }
