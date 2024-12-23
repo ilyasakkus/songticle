@@ -4,98 +4,85 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Command } from './ui/command';
-import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
-import { cn } from '../lib/utils';
-import { Check, ChevronsUpDown, Search } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { useArtistHierarchy } from '../hooks/useArtistHierarchy';
+import { useSupabaseData } from '../hooks/useSupabaseData';
+import type { Song } from '../types/database.types';
+import Image from 'next/image';
 
 const formSchema = z.object({
-  songId: z.string({
-    required_error: "Please select a song.",
-  }),
-  title: z.string().min(1, "Title is required"),
-  content: z.string().min(10, "Story must be at least 10 characters long"),
-  author_name: z.string().min(1, "Name is required").max(50, "Name is too long"),
+  songId: z.number(),
+  content: z.string().min(10, 'Story must be at least 10 characters'),
+  authorName: z.string().optional(),
 });
 
-type Song = {
-  id: number;
-  title: string;
-  artist_name: string;
-  album_title: string;
-};
+type FormData = z.infer<typeof formSchema>;
 
 export function AddSongStoryForm() {
-  const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [loading, setLoading] = useState(false);
-  const { artists, error: artistError } = useArtistHierarchy();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [selectedSong, setSelectedSong] = useState<Song | null>(null);
+  const { data: songs, isLoading: songsLoading } = useSupabaseData<Song>('songs');
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      songId: "",
-      title: "",
-      content: "",
-      author_name: ""
-    }
+      songId: undefined,
+      content: '',
+      authorName: '',
+    },
   });
 
-  // Flatten the artist hierarchy into a list of songs with artist and album info
-  const songs: Song[] = artists.flatMap(artist =>
-    artist.albums?.flatMap(album =>
-      album.songs?.map(song => ({
-        id: song.id,
-        title: song.title,
-        artist_name: artist.name,
-        album_title: album.title
-      })) || []
-    ) || []
-  );
+  const { register, handleSubmit, formState: { errors }, setValue } = form;
 
-  // Filter songs based on search value
-  const filteredSongs = songs.filter(song => {
-    const searchLower = searchValue.toLowerCase();
-    return (
-      song.title.toLowerCase().includes(searchLower) ||
-      song.artist_name.toLowerCase().includes(searchLower) ||
-      song.album_title.toLowerCase().includes(searchLower)
-    );
-  }).slice(0, 20); // Limit to 20 results
+  const filteredSongs = searchValue
+    ? songs?.filter((song) =>
+        song.title.toLowerCase().includes(searchValue.toLowerCase()) ||
+        (song.artist_name || '').toLowerCase().includes(searchValue.toLowerCase())
+      )
+    : [];
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: FormData) => {
     try {
-      setError(null);
       setLoading(true);
+      setError(null);
+      setSuccess(null);
 
-      const { data: { session } } = await supabase.auth.getSession();
-      const userId = session?.user?.id;
+      const { data: sessionData } = await supabase.auth.getSession();
+      const session = sessionData.session;
 
-      const { error: storyError } = await supabase.from('stories').insert([
-        {
-          song_id: parseInt(values.songId),
-          content: values.content,
-          author_name: userId ? undefined : values.author_name,
-          user_id: userId,
-        },
-      ]);
+      if (!values.songId) {
+        throw new Error('Please select a song first');
+      }
 
-      if (storyError) throw storyError;
+      const storyData = {
+        song_id: values.songId,
+        content: values.content,
+        // Eğer kullanıcı giriş yapmışsa user_id'sini kullan, yapmamışsa null
+        user_id: session?.user?.id || null,
+        // Eğer kullanıcı giriş yapmışsa email'ini kullan, yapmamışsa girilen ismi veya 'Anonymous'
+        author_name: session?.user?.email || values.authorName || 'Anonymous'
+      };
 
-      setSuccess('Story created successfully!');
+      const { error: insertError } = await supabase
+        .from('stories')
+        .insert([storyData]);
+
+      if (insertError) {
+        console.error('Insert error:', insertError);
+        throw new Error(insertError.message);
+      }
+
+      setSuccess('Story posted successfully!');
       form.reset();
-      setSearchValue("");
-      setOpen(false);
-    } catch (error) {
-      if (error instanceof Error) {
-        console.error('Error creating story:', error.message);
-        setError(error.message || 'Failed to create story. Please try again.');
+      setSearchValue('');
+      setSelectedSong(null);
+    } catch (err) {
+      console.error('Submission error:', err);
+      if (err instanceof Error) {
+        setError(err.message);
       } else {
-        console.error('Unknown error creating story');
         setError('Failed to create story. Please try again.');
       }
     } finally {
@@ -103,150 +90,130 @@ export function AddSongStoryForm() {
     }
   };
 
+  const onSongSelect = (song: Song) => {
+    setValue('songId', song.id);
+    setSelectedSong(song);
+    setSearchValue('');
+  };
+
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-base-100 rounded-lg shadow-lg">
-      <h2 className="text-2xl font-serif font-bold mb-6 text-primary">Add Song Story</h2>
-      
-      {error && (
-        <div className="alert alert-error mb-4">
-          <span>{error}</span>
-        </div>
-      )}
-
-      {success && (
-        <div className="alert alert-success mb-4">
-          <span>{success}</span>
-        </div>
-      )}
-
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+    <div className="w-full max-w-md mx-auto p-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        {/* Song Search */}
         <div className="form-control w-full">
           <label className="label">
-            <span className="label-text">Your Name</span>
+            <span className="label-text">Search for a song</span>
           </label>
-          <input
-            type="text"
-            {...form.register("author_name")}
-            placeholder="Enter your name"
-            className="input input-bordered w-full"
-          />
-          {form.formState.errors.author_name && (
-            <label className="label">
-              <span className="label-text-alt text-error">{form.formState.errors.author_name.message}</span>
-            </label>
-          )}
-        </div>
-
-        <div className="form-control w-full">
-          <label className="label">
-            <span className="label-text">Song</span>
-          </label>
-          <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-              <button
-                type="button"
-                className={cn(
-                  "btn btn-outline w-full justify-between",
-                  !form.watch("songId") && "text-muted-foreground"
-                )}
-              >
-                {form.watch("songId") 
-                  ? songs.find((song) => song.id === parseInt(form.watch("songId")))?.title
-                  : "Select song..."}
-                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-              </button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-              <Command>
-                <div className="flex items-center px-3 border-b border-base-300">
-                  <Search className="w-4 h-4 mr-2 opacity-50" />
-                  <input
-                    placeholder="Search songs..."
-                    value={searchValue}
-                    onChange={(e) => setSearchValue(e.target.value)}
-                    className="flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
-                  />
-                </div>
-                {artistError ? (
-                  <div className="py-6 text-center text-sm">
-                    Failed to load songs.
-                  </div>
-                ) : filteredSongs.length === 0 ? (
-                  <div className="py-6 text-center text-sm">
-                    {searchValue ? "No songs found." : "Type to search songs..."}
-                  </div>
+          <div className="relative">
+            <input
+              type="text"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              placeholder="Search songs..."
+              className="input input-bordered w-full"
+            />
+            {searchValue && (
+              <div className="absolute z-10 w-full mt-1 bg-base-100 border rounded-box shadow-lg max-h-60 overflow-auto">
+                {songsLoading ? (
+                  <div className="p-4 text-center">Loading songs...</div>
+                ) : !filteredSongs?.length ? (
+                  <div className="p-4 text-center">No songs found</div>
                 ) : (
-                  <div className="max-h-[300px] overflow-y-auto">
-                    {filteredSongs.map((song) => (
-                      <div
-                        key={song.id}
-                        onClick={() => {
-                          form.setValue("songId", song.id.toString());
-                          setOpen(false);
-                        }}
-                        className="flex items-center gap-2 px-3 py-2 hover:bg-base-200 cursor-pointer"
-                      >
-                        <Check
-                          className={cn(
-                            "w-4 h-4",
-                            form.watch("songId") === song.id.toString() ? "opacity-100" : "opacity-0"
-                          )}
+                  filteredSongs.map((song) => (
+                    <button
+                      key={song.id}
+                      type="button"
+                      onClick={() => onSongSelect(song)}
+                      className={`w-full p-2 text-left hover:bg-base-200 flex items-center space-x-2 ${
+                        selectedSong?.id === song.id ? 'bg-primary/10' : ''
+                      }`}
+                    >
+                      {song.cover_image && (
+                        <Image
+                          src={song.cover_image}
+                          alt={song.title}
+                          width={40}
+                          height={40}
+                          className="rounded"
                         />
-                        <div>
-                          <div className="font-medium">{song.title}</div>
-                          <div className="text-sm text-muted-foreground">
-                            {song.artist_name} • {song.album_title}
-                          </div>
-                        </div>
+                      )}
+                      <div>
+                        <div className="font-medium">{song.title}</div>
+                        <div className="text-sm opacity-70">{song.artist_name}</div>
                       </div>
-                    ))}
-                  </div>
+                    </button>
+                  ))
                 )}
-              </Command>
-            </PopoverContent>
-          </Popover>
-          {form.formState.errors.songId && (
-            <label className="label">
-              <span className="label-text-alt text-error">{form.formState.errors.songId.message}</span>
-            </label>
+              </div>
+            )}
+          </div>
+          {selectedSong && (
+            <div className="mt-2 p-2 bg-base-200 rounded-box flex items-center space-x-2">
+              {selectedSong.cover_image && (
+                <Image
+                  src={selectedSong.cover_image}
+                  alt={selectedSong.title}
+                  width={40}
+                  height={40}
+                  className="rounded"
+                />
+              )}
+              <div>
+                <div className="font-medium">{selectedSong.title}</div>
+                <div className="text-sm opacity-70">{selectedSong.artist_name}</div>
+              </div>
+            </div>
           )}
         </div>
 
-        <div className="form-control w-full">
-          <label className="label">
-            <span className="label-text">Title</span>
-          </label>
-          <input
-            type="text"
-            {...form.register("title")}
-            placeholder="Enter your story title"
-            className="input input-bordered w-full"
-          />
-          {form.formState.errors.title && (
-            <label className="label">
-              <span className="label-text-alt text-error">{form.formState.errors.title.message}</span>
-            </label>
-          )}
-        </div>
-
+        {/* Story Content */}
         <div className="form-control w-full">
           <label className="label">
             <span className="label-text">Your Story</span>
           </label>
           <textarea
-            {...form.register("content")}
-            placeholder="Share your thoughts about this song..."
-            className="textarea textarea-bordered w-full min-h-[200px]"
+            {...register('content')}
+            placeholder="Share your story about this song..."
+            className="textarea textarea-bordered h-32 w-full"
+            defaultValue=""
           />
-          {form.formState.errors.content && (
+          {errors.content && (
             <label className="label">
-              <span className="label-text-alt text-error">{form.formState.errors.content.message}</span>
+              <span className="label-text-alt text-error">{errors.content.message}</span>
             </label>
           )}
         </div>
 
-        <button type="submit" className="btn btn-primary w-full" disabled={loading}>
-          {loading ? "Posting..." : "Post Story"}
+        {/* Author Name (for non-authenticated users) */}
+        {!supabase.auth.getSession() && (
+          <div className="form-control w-full">
+            <label className="label">
+              <span className="label-text">Your Name (optional)</span>
+            </label>
+            <input
+              type="text"
+              {...register('authorName')}
+              placeholder="Anonymous"
+              className="input input-bordered w-full"
+              defaultValue=""
+            />
+          </div>
+        )}
+
+        {error && (
+          <div className="alert alert-error">{error}</div>
+        )}
+
+        {success && (
+          <div className="alert alert-success">{success}</div>
+        )}
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="btn btn-primary w-full"
+        >
+          {loading ? 'Posting...' : 'Share Story'}
         </button>
       </form>
     </div>

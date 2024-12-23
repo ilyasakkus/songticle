@@ -4,52 +4,42 @@ import { NextResponse } from 'next/server';
 import type { Database } from '../../types/database.types';
 
 export async function GET(request: Request) {
-  const requestUrl = new URL(request.url);
-  const code = requestUrl.searchParams.get('code');
+  try {
+    const requestUrl = new URL(request.url);
+    const code = requestUrl.searchParams.get('code');
+    const next = requestUrl.searchParams.get('next') ?? '/';
 
-  if (code) {
-    const cookieStore = cookies();
-    const supabase = createRouteHandlerClient<Database>({ 
-      cookies: () => cookieStore,
-      supabaseUrl: process.env.SUPABASE_URL,
-      supabaseKey: process.env.SUPABASE_KEY
-    });
+    if (code) {
+      const cookieStore = cookies();
+      const supabase = createRouteHandlerClient<Database>({ 
+        cookies: () => cookieStore,
+      });
 
-    const { data: { session }, error: authError } = await supabase.auth.exchangeCodeForSession(code);
+      const { error } = await supabase.auth.exchangeCodeForSession(code);
 
-    if (authError) {
-      console.error('Auth error:', authError);
-      return NextResponse.redirect(new URL('/auth/error', requestUrl.origin));
-    }
-
-    if (session?.user) {
-      // Check if user exists in profiles
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', session.user.id)
-        .single();
-
-      // If no profile exists, create one
-      if (!profile) {
-        const { error: profileError } = await supabase.from('profiles').insert([
-          {
-            id: session.user.id,
-            email: session.user.email,
-            full_name: session.user.user_metadata?.full_name || null,
-            avatar_url: session.user.user_metadata?.avatar_url || null,
-            updated_at: new Date().toISOString(),
-          },
-        ]);
-
-        if (profileError) {
-          console.error('Error creating profile:', profileError);
-          return NextResponse.redirect(new URL('/auth/error', requestUrl.origin));
-        }
+      if (error) {
+        console.error('Auth callback error:', error);
+        return NextResponse.redirect(
+          `${requestUrl.origin}/login?error=${encodeURIComponent(error.message)}`
+        );
       }
-    }
-  }
 
-  // URL to redirect to after sign in process completes
-  return NextResponse.redirect(new URL('/', requestUrl.origin));
+      return NextResponse.redirect(new URL(next, requestUrl.origin));
+    }
+
+    // Handle access_token in URL fragment for OAuth providers
+    const hash = requestUrl.hash;
+    if (hash && hash.includes('access_token')) {
+      return NextResponse.redirect(new URL(next, requestUrl.origin));
+    }
+
+    return NextResponse.redirect(
+      new URL(`/login?error=${encodeURIComponent('No code or token provided')}`, requestUrl.origin)
+    );
+  } catch (error) {
+    console.error('Unexpected error in auth callback:', error);
+    return NextResponse.redirect(
+      new URL(`/login?error=${encodeURIComponent('An unexpected error occurred')}`, requestUrl.origin)
+    );
+  }
 }

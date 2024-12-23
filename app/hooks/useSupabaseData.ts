@@ -105,6 +105,79 @@ export function useArtistSearch() {
   return { searchArtist, isLoading, error };
 }
 
+import { createClient } from '@supabase/supabase-js';
+import type { Story, Song } from '../types/database.types';
+
+// Initialize Supabase client
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseClient = createClient(supabaseUrl, supabaseKey);
+
+type DataType = 'stories' | 'songs';
+
+interface UseSupabaseDataReturn<T> {
+  data: T[];
+  isLoading: boolean;
+  error: Error | null;
+}
+
+export function useSupabaseData<T extends Story | Song>(table: DataType): UseSupabaseDataReturn<T> {
+  const [data, setData] = useState<T[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        let query = supabaseClient.from(table).select('*');
+
+        if (table === 'stories') {
+          query = query.order('created_at', { ascending: false });
+        }
+
+        const { data: result, error: queryError } = await query;
+
+        if (queryError) {
+          throw queryError;
+        }
+
+        setData(result as T[]);
+      } catch (err) {
+        setError(err instanceof Error ? err : new Error('Failed to fetch data'));
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+
+    // Set up real-time subscription
+    const channel = supabaseClient
+      .channel(`${table}_changes`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: table
+        },
+        () => {
+          fetchData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    };
+  }, [table]);
+
+  return { data, isLoading, error };
+}
+
 export function useStories() {
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -112,9 +185,17 @@ export function useStories() {
 
   const fetchStories = async () => {
     try {
-      const { data, error: err } = await supabase
+      const { data, error: err } = await supabaseClient
         .from('stories')
-        .select('*, profiles(*), songs(*), likes(count), comments(count)')
+        .select(`
+          *,
+          profiles (
+            id,
+            full_name,
+            avatar_url
+          ),
+          comments (count)
+        `)
         .order('created_at', { ascending: false });
 
       if (err) throw err;
