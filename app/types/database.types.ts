@@ -15,11 +15,19 @@ export interface Album {
 
 export interface Song {
   id: number;
+  album_id: number;
   artist_id: number;
-  artist_name: string;
   title: string;
-  album_name: string;
+  title_short: string;
+  title_version: string;
+  duration: number;
   preview_url: string;
+  explicit_lyrics: boolean;
+  explicit_content_lyrics: number;
+  explicit_content_cover: number;
+  rank: number;
+  album_name: string;
+  artist_name: string;
   cover_image: string;
 }
 
