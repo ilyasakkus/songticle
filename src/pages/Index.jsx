@@ -4,6 +4,7 @@ import { Search, Music, Music2, Music3, Music4 } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import Footer from '../components/Footer';
 import Header from '../components/Header';
+import SongScraper from '../components/SongScraper';
 
 const musicCategories = [
   { 
@@ -99,33 +100,32 @@ const Index = () => {
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">Music Directory</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {musicCategories.map((category, index) => (
               <Link
                 key={index}
                 to={category.link}
-                className="group block bg-white rounded-lg overflow-hidden hover:shadow-lg transition-shadow border border-gray-200 p-6"
+                className="p-6 border rounded-lg hover:shadow-lg transition-shadow bg-white"
               >
-                <div className="flex items-center justify-between mb-4">
-                  <div className="p-3 bg-purple-100 rounded-full">
-                    {category.icon}
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    {category.artists.length} Artists
-                  </div>
+                <div className="flex items-center mb-4">
+                  {category.icon}
+                  <h3 className="text-xl font-semibold ml-3">{category.title}</h3>
                 </div>
-                <h3 className="text-xl font-semibold group-hover:text-purple-600 transition-colors mb-2">
-                  {category.title}
-                </h3>
-                <p className="text-gray-600 text-sm mb-4">
-                  {category.description}
-                </p>
+                <p className="text-gray-600 mb-4">{category.description}</p>
                 <div className="text-sm text-gray-500">
                   Featured Artists: {category.artists.join(', ')}
                 </div>
               </Link>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Popular Songs Section */}
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-12">Trending Songs</h2>
+          <SongScraper />
         </div>
       </section>
 
