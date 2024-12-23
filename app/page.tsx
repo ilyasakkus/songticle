@@ -1,203 +1,87 @@
-'use client'
+'use client';
+
 import { useState } from 'react';
 import { ThemeSwitcher } from './components/ThemeSwitcher';
-import { useSupabaseData } from './hooks/useSupabaseData';
+import { useArtistSearch } from './hooks/useSupabaseData';
 
 export default function Home() {
-  const { artists, loading, error } = useSupabaseData();
-  const [expandedArtist, setExpandedArtist] = useState<number | null>(null);
-  const [expandedAlbums, setExpandedAlbums] = useState<{[key: number]: boolean}>({});
+  const [searchQuery, setSearchQuery] = useState('');
+  const { searchArtist, isLoading, error } = useArtistSearch();
+  const [searchResults, setSearchResults] = useState([]);
 
-  const toggleArtist = (artistId: number) => {
-    setExpandedArtist(expandedArtist === artistId ? null : artistId);
-    if (expandedArtist === artistId) {
-      setExpandedAlbums({});
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) return;
+    
+    try {
+      const results = await searchArtist(searchQuery);
+      setSearchResults(results || []);
+    } catch (err) {
+      console.error('Search error:', err);
     }
   };
 
-  const toggleAlbum = (albumId: number) => {
-    setExpandedAlbums(prev => ({
-      ...prev,
-      [albumId]: !prev[albumId]
-    }));
-  };
-
   return (
-    <main className="min-h-screen bg-base-200">
-      {/* Header */}
-      <div className="navbar bg-base-100 shadow-lg px-4">
-        <div className="flex-1">
-          <a className="btn btn-ghost normal-case text-xl gap-2 text-base-content">
-            <span className="material-icons">music_note</span>
-            Songticle
-          </a>
-        </div>
-        <div className="flex-none gap-2">
+    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
+        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
+          Songticle - Share Your Music Stories
+        </p>
+        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
           <ThemeSwitcher />
-          <button className="btn btn-primary gap-2">
-            <span className="material-icons">add_circle</span>
-            Add Story
-          </button>
-          <div className="dropdown dropdown-end">
-            <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
-              <div className="w-10 rounded-full">
-                <img src="https://placehold.co/40x40" alt="profile" />
-              </div>
-            </label>
-            <ul tabIndex={0} className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52">
-              <li>
-                <a className="gap-2 text-base-content">
-                  <span className="material-icons">person</span>
-                  Profile
-                </a>
-              </li>
-              <li>
-                <a className="gap-2 text-base-content">
-                  <span className="material-icons">settings</span>
-                  Settings
-                </a>
-              </li>
-              <li>
-                <a className="gap-2 text-base-content">
-                  <span className="material-icons">logout</span>
-                  Sign out
-                </a>
-              </li>
-            </ul>
-          </div>
         </div>
       </div>
 
-      <div className="flex">
-        {/* Sidebar */}
-        <aside className="w-[240px] bg-base-100 min-h-[calc(100vh-64px)] border-r border-base-200">
-          <div className="p-4">
-            <div className="flex flex-col space-y-2">
-              <a className="flex items-center gap-2 text-primary hover:bg-base-200 p-2 rounded-lg">
-                <span className="material-icons">forum</span>
-                All Discussions
-              </a>
-              <a className="flex items-center gap-2 text-base-content hover:bg-base-200 p-2 rounded-lg">
-                <span className="material-icons">star</span>
-                Following
-              </a>
-              <div className="divider my-2"></div>
-            </div>
+      <div className="relative flex place-items-center">
+        <div className="w-full max-w-md">
+          <div className="mb-8">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search for songs, artists, or albums..."
+              className="w-full p-4 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800"
+              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+            />
+            <button
+              onClick={handleSearch}
+              disabled={isLoading}
+              className="mt-4 w-full bg-blue-500 text-white p-4 rounded-lg hover:bg-blue-600 disabled:bg-blue-300"
+            >
+              {isLoading ? 'Searching...' : 'Search'}
+            </button>
           </div>
-          <div className="px-4">
-            <h2 className="text-sm font-semibold mb-2 text-base-content/80">ARTISTS</h2>
-            {loading ? (
-              <div className="flex items-center justify-center p-4">
-                <span className="loading loading-spinner loading-md"></span>
-              </div>
-            ) : error ? (
-              <div className="text-error p-4 text-sm">{error}</div>
-            ) : (
-              <div className="space-y-1">
-                {artists?.map((artist) => (
-                  <div key={artist.id} className="text-sm">
-                    <button 
-                      onClick={() => toggleArtist(artist.id)}
-                      className="w-full flex items-center justify-between hover:bg-base-200 p-2 rounded-lg cursor-pointer text-base-content"
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="material-icons text-base">person</span>
-                        {artist.name}
-                      </div>
-                      <span className="material-icons text-sm">
-                        {expandedArtist === artist.id ? 'expand_less' : 'expand_more'}
-                      </span>
-                    </button>
-                    {expandedArtist === artist.id && (
-                      <ArtistAlbums 
-                        artistId={artist.id} 
-                        expandedAlbums={expandedAlbums}
-                        toggleAlbum={toggleAlbum}
-                      />
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </aside>
 
-        {/* Main Content */}
-        <div className="flex-1 p-6">
-          <div className="max-w-3xl mx-auto">
-            <div className="flex justify-between items-center mb-6">
-              <div className="join">
-                <button className="btn join-item btn-active">Latest</button>
-                <button className="btn join-item">Top</button>
-                <button className="btn join-item">Solved</button>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              {/* Stories will be loaded here */}
-            </div>
-          </div>
-        </div>
-      </div>
-    </main>
-  );
-}
-
-function ArtistAlbums({ 
-  artistId, 
-  expandedAlbums, 
-  toggleAlbum 
-}: { 
-  artistId: number;
-  expandedAlbums: {[key: number]: boolean};
-  toggleAlbum: (albumId: number) => void;
-}) {
-  const { albums, loading, error } = useArtistData(artistId);
-
-  if (loading) {
-    return (
-      <div className="ml-6 p-2">
-        <span className="loading loading-spinner loading-sm"></span>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="ml-6 p-2 text-sm text-error">
-        Failed to load albums
-      </div>
-    );
-  }
-
-  return (
-    <div className="ml-6 space-y-1 mt-1">
-      {albums?.map((album) => (
-        <div key={album.id}>
-          <button 
-            onClick={() => toggleAlbum(album.id)}
-            className="w-full flex items-center justify-between hover:bg-base-200 p-2 rounded-lg cursor-pointer text-sm text-base-content/90"
-          >
-            <div className="flex items-center gap-2">
-              <span className="material-icons text-base">album</span>
-              {album.title}
-            </div>
-            <span className="material-icons text-sm">
-              {expandedAlbums[album.id] ? 'expand_less' : 'expand_more'}
-            </span>
-          </button>
-          {expandedAlbums[album.id] && album.songs && (
-            <div className="ml-6">
-              {album.songs.map((song) => (
-                <div key={song.id} className="flex items-center gap-2 hover:bg-base-200 p-2 rounded-lg cursor-pointer text-sm text-base-content/80">
-                  <span className="material-icons text-base">music_note</span>
-                  {song.title}
-                </div>
-              ))}
+          {error && (
+            <div className="text-red-500 mb-4">
+              Error: {error}
             </div>
           )}
+
+          <div className="grid grid-cols-1 gap-4">
+            {searchResults.map((result: any) => (
+              <div
+                key={result.id}
+                className="p-4 border rounded-lg dark:border-gray-700 hover:shadow-lg transition-shadow"
+              >
+                <div className="flex items-center space-x-4">
+                  <img
+                    src={result.picture_medium || '/placeholder.png'}
+                    alt={result.name}
+                    className="w-16 h-16 object-cover rounded-full"
+                  />
+                  <div>
+                    <h3 className="text-lg font-semibold">{result.name}</h3>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-      ))}
-    </div>
+      </div>
+
+      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
+        {/* Add your content here */}
+      </div>
+    </main>
   );
 }
