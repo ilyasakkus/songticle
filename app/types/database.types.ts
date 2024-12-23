@@ -4,7 +4,7 @@ export interface Artist {
   picture_small: string;
   picture_medium: string;
   picture_big: string;
-  nb_fan: number;
+  picture_xl: string;
   created_at: string;
 }
 
@@ -15,7 +15,8 @@ export interface Album {
   cover_small: string;
   cover_medium: string;
   cover_big: string;
-  release_date: string;
+  cover_xl: string;
+  release_date?: string;
   created_at: string;
 }
 
@@ -24,8 +25,14 @@ export interface Song {
   album_id: number;
   artist_id: number;
   title: string;
+  title_short: string;
+  title_version: string;
   duration: number;
   preview_url: string;
+  explicit_lyrics: boolean;
+  explicit_content_lyrics: number;
+  explicit_content_cover: number;
+  rank: number;
   created_at: string;
 }
 
