@@ -18,15 +18,51 @@ export function useArtistSearch() {
         // Add artist to database
         const { error: artistError } = await supabase
           .from('artists')
-          .upsert([artist])
+          .upsert({
+            id: artist.id,
+            name: artist.name,
+            picture_small: artist.picture_small,
+            picture_medium: artist.picture_medium
+          })
           .select();
 
         if (artistError) throw artistError;
 
+        // Group songs by album
+        const albumsMap = new Map();
+        songs.forEach(song => {
+          if (!albumsMap.has(song.album_id)) {
+            albumsMap.set(song.album_id, {
+              id: song.album_id,
+              artist_id: artist.id,
+              title: song.album_name,
+              cover_medium: song.cover_image
+            });
+          }
+        });
+
+        // Add albums to database
+        const { error: albumsError } = await supabase
+          .from('albums')
+          .upsert(Array.from(albumsMap.values()))
+          .select();
+
+        if (albumsError) throw albumsError;
+
         // Add songs to database
+        const songsToInsert = songs.map(song => ({
+          id: song.id,
+          album_id: song.album_id,
+          artist_id: artist.id,
+          title: song.title,
+          preview_url: song.preview_url,
+          duration: 0, // Set a default value since it's required
+          explicit_lyrics: false
+        }));
+
         const { error: songsError } = await supabase
           .from('songs')
-          .upsert(songs)
+          .upsert(songsToInsert)
           .select();
 
         if (songsError) throw songsError;

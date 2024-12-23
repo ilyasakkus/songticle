@@ -66,6 +66,7 @@ export async function searchDeezerArtist(query: string): Promise<{ artist: Artis
       artist_id: item.artist.id,
       artist_name: item.artist.name,
       title: item.title,
+      album_id: item.album.id,
       album_name: item.album.title,
       preview_url: item.preview,
       cover_image: item.album.cover_medium
