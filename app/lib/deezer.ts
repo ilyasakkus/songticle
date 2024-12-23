@@ -60,15 +60,23 @@ export async function searchDeezerArtist(query: string): Promise<{ artist: Artis
       picture_medium: firstResult.artist.picture_medium
     };
 
-    // Transform all tracks to our Song type with only the required fields
+    // Transform all tracks to our Song type with all required fields
     const songs: Song[] = data.data.map((item: any) => ({
       id: item.id,
       album_id: item.album.id,
       artist_id: item.artist.id,
       title: item.title,
-      preview_url: item.preview || '',
+      title_short: item.title_short || item.title,
+      title_version: item.title_version || '',
       duration: item.duration || 0,
-      explicit_lyrics: item.explicit_lyrics || false
+      preview_url: item.preview || '',
+      explicit_lyrics: item.explicit_lyrics || false,
+      explicit_content_lyrics: item.explicit_content_lyrics || 0,
+      explicit_content_cover: item.explicit_content_cover || 0,
+      rank: item.rank || 0,
+      album_name: item.album.title,
+      artist_name: item.artist.name,
+      cover_image: item.album.cover_medium
     }));
 
     return { artist, songs };
