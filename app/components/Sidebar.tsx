@@ -3,6 +3,7 @@
 import React from 'react';
 import { useArtistHierarchy } from '../hooks/useArtistHierarchy';
 import { ChevronDown, ChevronRight, Music, Disc, User } from 'lucide-react';
+import { cn } from '../lib/utils';
 
 export function Sidebar() {
   const { artists, loading, error } = useArtistHierarchy();
@@ -25,31 +26,35 @@ export function Sidebar() {
 
   if (loading) {
     return (
-      <div className="w-60 h-full bg-gray-100 p-4">
-        <div className="animate-pulse">
-          <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
-          <div className="h-4 bg-gray-200 rounded w-2/3 mb-4"></div>
+      <aside className="w-60 h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 p-4">
+        <div className="animate-pulse space-y-4">
+          <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-3/4"></div>
+          <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-1/2"></div>
+          <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-2/3"></div>
         </div>
-      </div>
+      </aside>
     );
   }
 
   if (error) {
     return (
-      <div className="w-60 h-full bg-gray-100 p-4">
-        <div className="text-red-500">Error loading artists: {error}</div>
-      </div>
+      <aside className="w-60 h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 p-4">
+        <div className="text-red-500 dark:text-red-400">Error loading artists: {error}</div>
+      </aside>
     );
   }
 
   return (
-    <div className="w-60 h-full bg-gray-100 dark:bg-gray-900 p-4 overflow-y-auto">
+    <aside className="w-60 h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 p-4">
       <div className="space-y-2">
         {artists.map(artist => (
           <div key={artist.id} className="space-y-1">
             <div
-              className="flex items-center space-x-2 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 p-1 rounded"
+              className={cn(
+                "flex items-center space-x-2 cursor-pointer rounded-md p-2",
+                "hover:bg-gray-100 dark:hover:bg-gray-800",
+                "text-gray-900 dark:text-gray-100"
+              )}
               onClick={() => toggleArtist(artist.id)}
             >
               {expandedArtists[artist.id] ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
@@ -62,7 +67,11 @@ export function Sidebar() {
                 {artist.albums.map(album => (
                   <div key={album.id}>
                     <div
-                      className="flex items-center space-x-2 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 p-1 rounded"
+                      className={cn(
+                        "flex items-center space-x-2 cursor-pointer rounded-md p-2",
+                        "hover:bg-gray-100 dark:hover:bg-gray-800",
+                        "text-gray-900 dark:text-gray-100"
+                      )}
                       onClick={() => toggleAlbum(album.id)}
                     >
                       {expandedAlbums[album.id] ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
@@ -75,7 +84,11 @@ export function Sidebar() {
                         {album.songs.map(song => (
                           <div
                             key={song.id}
-                            className="flex items-center space-x-2 hover:bg-gray-200 dark:hover:bg-gray-800 p-1 rounded cursor-pointer"
+                            className={cn(
+                              "flex items-center space-x-2 rounded-md p-2",
+                              "hover:bg-gray-100 dark:hover:bg-gray-800",
+                              "text-gray-900 dark:text-gray-100"
+                            )}
                           >
                             <Music size={16} />
                             <span className="text-sm truncate">{song.title}</span>
@@ -90,6 +103,6 @@ export function Sidebar() {
           </div>
         ))}
       </div>
-    </div>
+    </aside>
   );
 }
