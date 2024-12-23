@@ -1,15 +1,15 @@
 'use client'
-import { artists, stories } from './data/sampleData';
-import { ThemeSwitcher } from './components/ThemeSwitcher';
 import { useState } from 'react';
+import { ThemeSwitcher } from './components/ThemeSwitcher';
+import { useSupabaseData } from './hooks/useSupabaseData';
 
 export default function Home() {
+  const { artists, loading, error } = useSupabaseData();
   const [expandedArtist, setExpandedArtist] = useState<number | null>(null);
   const [expandedAlbums, setExpandedAlbums] = useState<{[key: number]: boolean}>({});
 
   const toggleArtist = (artistId: number) => {
     setExpandedArtist(expandedArtist === artistId ? null : artistId);
-    // Close all albums when closing artist
     if (expandedArtist === artistId) {
       setExpandedAlbums({});
     }
@@ -86,54 +86,39 @@ export default function Home() {
           </div>
           <div className="px-4">
             <h2 className="text-sm font-semibold mb-2 text-base-content/80">ARTISTS</h2>
-            <div className="space-y-1">
-              {artists.map((artist) => (
-                <div key={artist.id} className="text-sm">
-                  <button 
-                    onClick={() => toggleArtist(artist.id)}
-                    className="w-full flex items-center justify-between hover:bg-base-200 p-2 rounded-lg cursor-pointer text-base-content"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="material-icons text-base">person</span>
-                      {artist.name}
-                    </div>
-                    <span className="material-icons text-sm">
-                      {expandedArtist === artist.id ? 'expand_less' : 'expand_more'}
-                    </span>
-                  </button>
-                  {expandedArtist === artist.id && (
-                    <div className="ml-6 space-y-1 mt-1">
-                      {artist.albums.map((album) => (
-                        <div key={album.id}>
-                          <button 
-                            onClick={() => toggleAlbum(album.id)}
-                            className="w-full flex items-center justify-between hover:bg-base-200 p-2 rounded-lg cursor-pointer text-sm text-base-content/90"
-                          >
-                            <div className="flex items-center gap-2">
-                              <span className="material-icons text-base">album</span>
-                              {album.title}
-                            </div>
-                            <span className="material-icons text-sm">
-                              {expandedAlbums[album.id] ? 'expand_less' : 'expand_more'}
-                            </span>
-                          </button>
-                          {expandedAlbums[album.id] && (
-                            <div className="ml-6">
-                              {album.songs.map((song) => (
-                                <div key={song.id} className="flex items-center gap-2 hover:bg-base-200 p-2 rounded-lg cursor-pointer text-sm text-base-content/80">
-                                  <span className="material-icons text-base">music_note</span>
-                                  {song.title}
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
+            {loading ? (
+              <div className="flex items-center justify-center p-4">
+                <span className="loading loading-spinner loading-md"></span>
+              </div>
+            ) : error ? (
+              <div className="text-error p-4 text-sm">{error}</div>
+            ) : (
+              <div className="space-y-1">
+                {artists?.map((artist) => (
+                  <div key={artist.id} className="text-sm">
+                    <button 
+                      onClick={() => toggleArtist(artist.id)}
+                      className="w-full flex items-center justify-between hover:bg-base-200 p-2 rounded-lg cursor-pointer text-base-content"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="material-icons text-base">person</span>
+                        {artist.name}
+                      </div>
+                      <span className="material-icons text-sm">
+                        {expandedArtist === artist.id ? 'expand_less' : 'expand_more'}
+                      </span>
+                    </button>
+                    {expandedArtist === artist.id && (
+                      <ArtistAlbums 
+                        artistId={artist.id} 
+                        expandedAlbums={expandedAlbums}
+                        toggleAlbum={toggleAlbum}
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </aside>
 
@@ -149,43 +134,70 @@ export default function Home() {
             </div>
 
             <div className="space-y-4">
-              {stories.map((story) => (
-                <div key={story.id} className="bg-base-100 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow">
-                  <div className="flex items-start gap-4">
-                    <div className="avatar">
-                      <div className="w-10 rounded-full">
-                        <img src={story.userImage} alt={story.userName} />
-                      </div>
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <h3 className="font-medium text-lg text-base-content hover:text-primary cursor-pointer">
-                          {story.songTitle}
-                        </h3>
-                        <div className="flex items-center gap-2 text-base-content/70">
-                          <span className="flex items-center gap-1">
-                            <span className="material-icons text-sm">chat_bubble_outline</span>
-                            {story.comments}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="text-sm text-base-content/70 mt-1">
-                        <span>{story.userName}</span>
-                        <span className="mx-2">•</span>
-                        <span>replied {story.date}</span>
-                      </div>
-                      <div className="flex gap-2 mt-2">
-                        <span className="badge badge-primary">{story.artist}</span>
-                        <span className="badge badge-ghost">{story.album}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
+              {/* Stories will be loaded here */}
             </div>
           </div>
         </div>
       </div>
     </main>
+  );
+}
+
+function ArtistAlbums({ 
+  artistId, 
+  expandedAlbums, 
+  toggleAlbum 
+}: { 
+  artistId: number;
+  expandedAlbums: {[key: number]: boolean};
+  toggleAlbum: (albumId: number) => void;
+}) {
+  const { albums, loading, error } = useArtistData(artistId);
+
+  if (loading) {
+    return (
+      <div className="ml-6 p-2">
+        <span className="loading loading-spinner loading-sm"></span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="ml-6 p-2 text-sm text-error">
+        Failed to load albums
+      </div>
+    );
+  }
+
+  return (
+    <div className="ml-6 space-y-1 mt-1">
+      {albums?.map((album) => (
+        <div key={album.id}>
+          <button 
+            onClick={() => toggleAlbum(album.id)}
+            className="w-full flex items-center justify-between hover:bg-base-200 p-2 rounded-lg cursor-pointer text-sm text-base-content/90"
+          >
+            <div className="flex items-center gap-2">
+              <span className="material-icons text-base">album</span>
+              {album.title}
+            </div>
+            <span className="material-icons text-sm">
+              {expandedAlbums[album.id] ? 'expand_less' : 'expand_more'}
+            </span>
+          </button>
+          {expandedAlbums[album.id] && album.songs && (
+            <div className="ml-6">
+              {album.songs.map((song) => (
+                <div key={song.id} className="flex items-center gap-2 hover:bg-base-200 p-2 rounded-lg cursor-pointer text-sm text-base-content/80">
+                  <span className="material-icons text-base">music_note</span>
+                  {song.title}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
   );
 }
