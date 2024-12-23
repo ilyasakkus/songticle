@@ -8,39 +8,22 @@ module.exports = {
     './src/**/*.{ts,tsx}',
   ],
   theme: {
-    container: {
-      center: true,
-      padding: "2rem",
-      screens: {
-        "2xl": "1400px",
-      },
-    },
-    extend: {
-      colors: {
-        vintage: {
-          primary: "#8B4513",    // Saddle Brown
-          secondary: "#CD853F",  // Peru
-          accent: "#DEB887",     // Burlywood
-          neutral: "#F5DEB3",    // Wheat
-          base: "#FFF8DC",       // Cornsilk
-          info: "#87CEEB",       // Sky Blue
-          success: "#98FB98",    // Pale Green
-          warning: "#FFD700",    // Gold
-          error: "#CD5C5C",      // Indian Red
-        },
-      },
-    },
+    extend: {},
   },
   plugins: [require("daisyui")],
   daisyui: {
     themes: [
       {
-        vintage: {
+        light: {
           "primary": "#8B4513",
+          "primary-focus": "#723A0F",
           "secondary": "#CD853F",
           "accent": "#DEB887",
           "neutral": "#F5DEB3",
           "base-100": "#FFF8DC",
+          "base-200": "#F5E6CB",
+          "base-300": "#E6D5B8",
+          "base-content": "#4A3728",
           "info": "#87CEEB",
           "success": "#98FB98",
           "warning": "#FFD700",
@@ -48,5 +31,8 @@ module.exports = {
         },
       },
     ],
+    base: true,
+    styled: true,
+    utils: true,
   },
 }
