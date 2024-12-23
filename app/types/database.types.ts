@@ -1,7 +1,8 @@
 export interface Artist {
   id: number;
   name: string;
-  picture: string;
+  picture_small: string;
+  picture_medium: string;
 }
 
 export interface Album {
