@@ -16,7 +16,7 @@ export default function Home() {
           <ThemeSwitcher />
           <button className="btn btn-primary gap-2">
             <span className="material-icons">add_circle</span>
-            Add Story
+            Start a Discussion
           </button>
           <div className="dropdown dropdown-end">
             <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
@@ -50,95 +50,99 @@ export default function Home() {
 
       <div className="flex">
         {/* Sidebar */}
-        <aside className="w-[300px] bg-base-100 min-h-[calc(100vh-64px)] p-4 shadow-lg">
-          <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-            <span className="material-icons">library_music</span>
-            Music Library
-          </h2>
-          <div className="space-y-4">
-            {artists.map((artist) => (
-              <div key={artist.id} className="collapse collapse-arrow bg-base-200">
-                <input type="checkbox" /> 
-                <div className="collapse-title font-medium flex items-center gap-2">
-                  <span className="material-icons text-xl">person</span>
-                  {artist.name}
-                </div>
-                <div className="collapse-content">
-                  {artist.albums.map((album) => (
-                    <div key={album.id} className="ml-4 mb-2">
-                      <div className="collapse collapse-arrow bg-base-100">
-                        <input type="checkbox" />
-                        <div className="collapse-title text-sm flex items-center gap-2">
-                          <span className="material-icons text-sm">album</span>
-                          {album.title} ({album.year})
+        <aside className="w-[240px] bg-base-100 min-h-[calc(100vh-64px)] border-r">
+          <div className="p-4">
+            <div className="flex flex-col space-y-2">
+              <a className="flex items-center gap-2 text-primary hover:bg-base-200 p-2 rounded-lg">
+                <span className="material-icons">forum</span>
+                All Discussions
+              </a>
+              <a className="flex items-center gap-2 hover:bg-base-200 p-2 rounded-lg">
+                <span className="material-icons">star</span>
+                Following
+              </a>
+              <div className="divider my-2"></div>
+            </div>
+          </div>
+          <div className="px-4">
+            <h2 className="text-sm font-semibold mb-2">ARTISTS</h2>
+            <div className="space-y-1">
+              {artists.map((artist) => (
+                <div key={artist.id} className="text-sm">
+                  <div className="flex items-center gap-2 hover:bg-base-200 p-2 rounded-lg cursor-pointer">
+                    <span className="material-icons text-base">person</span>
+                    {artist.name}
+                  </div>
+                  <div className="ml-6 space-y-1">
+                    {artist.albums.map((album) => (
+                      <div key={album.id}>
+                        <div className="flex items-center gap-2 hover:bg-base-200 p-2 rounded-lg cursor-pointer text-sm">
+                          <span className="material-icons text-base">album</span>
+                          {album.title}
                         </div>
-                        <div className="collapse-content">
-                          <ul className="menu menu-sm">
-                            {album.songs.map((song) => (
-                              <li key={song.id}>
-                                <a className="text-sm flex items-center gap-2">
-                                  <span className="material-icons text-sm">music_note</span>
-                                  {song.title}
-                                </a>
-                              </li>
-                            ))}
-                          </ul>
+                        <div className="ml-6">
+                          {album.songs.map((song) => (
+                            <div key={song.id} className="flex items-center gap-2 hover:bg-base-200 p-2 rounded-lg cursor-pointer text-sm">
+                              <span className="material-icons text-base">music_note</span>
+                              {song.title}
+                            </div>
+                          ))}
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </aside>
 
         {/* Main Content */}
         <div className="flex-1 p-6">
-          <div className="max-w-3xl mx-auto space-y-6">
-            {stories.map((story) => (
-              <div key={story.id} className="card bg-base-100 shadow-xl">
-                <div className="card-body">
-                  <div className="flex items-center gap-4 mb-4">
+          <div className="max-w-3xl mx-auto">
+            <div className="flex justify-between items-center mb-6">
+              <div className="join">
+                <button className="btn join-item btn-active">Latest</button>
+                <button className="btn join-item">Top</button>
+                <button className="btn join-item">Solved</button>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              {stories.map((story) => (
+                <div key={story.id} className="bg-base-100 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                  <div className="flex items-start gap-4">
                     <div className="avatar">
-                      <div className="w-12 rounded-full">
+                      <div className="w-10 rounded-full">
                         <img src={story.userImage} alt={story.userName} />
                       </div>
                     </div>
-                    <div>
-                      <h3 className="font-bold">{story.userName}</h3>
-                      <p className="text-sm text-base-content/70">{story.date}</p>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-medium text-lg hover:text-primary cursor-pointer">
+                          {story.songTitle}
+                        </h3>
+                        <div className="flex items-center gap-2 text-base-content/70">
+                          <span className="flex items-center gap-1">
+                            <span className="material-icons text-sm">chat_bubble_outline</span>
+                            {story.comments}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="text-sm text-base-content/70 mt-1">
+                        <span>{story.userName}</span>
+                        <span className="mx-2">•</span>
+                        <span>replied {story.date}</span>
+                      </div>
+                      <div className="flex gap-2 mt-2">
+                        <span className="badge badge-primary">{story.artist}</span>
+                        <span className="badge">{story.album}</span>
+                      </div>
                     </div>
-                  </div>
-                  <div className="mb-4">
-                    <h4 className="font-semibold text-lg flex items-center gap-2">
-                      <span className="material-icons">music_note</span>
-                      {story.songTitle}
-                    </h4>
-                    <p className="text-sm text-base-content/70">
-                      {story.artist} • {story.album}
-                    </p>
-                  </div>
-                  <p className="text-base-content/90">{story.userStory}</p>
-                  <div className="card-actions justify-between items-center mt-4">
-                    <div className="flex gap-4">
-                      <button className="btn btn-ghost btn-sm gap-2">
-                        <span className="material-icons">favorite_border</span>
-                        {story.likes}
-                      </button>
-                      <button className="btn btn-ghost btn-sm gap-2">
-                        <span className="material-icons">chat_bubble_outline</span>
-                        {story.comments}
-                      </button>
-                    </div>
-                    <button className="btn btn-ghost btn-sm gap-2">
-                      <span className="material-icons">share</span>
-                      Share
-                    </button>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </div>
