@@ -26,7 +26,10 @@ export function useArtistSearch() {
           })
           .select();
 
-        if (artistError) throw artistError;
+        if (artistError) {
+          console.error('Artist insert error:', artistError);
+          throw artistError;
+        }
 
         // Group songs by album
         const albumsMap = new Map();
@@ -35,8 +38,8 @@ export function useArtistSearch() {
             albumsMap.set(song.album_id, {
               id: song.album_id,
               artist_id: artist.id,
-              title: song.album_name,
-              cover_medium: song.cover_image
+              title: song.album_name?.substring(0, 255) || '',
+              cover_medium: song.cover_image?.substring(0, 255) || ''
             });
           }
         });
@@ -47,39 +50,51 @@ export function useArtistSearch() {
           .upsert(Array.from(albumsMap.values()))
           .select();
 
-        if (albumsError) throw albumsError;
+        if (albumsError) {
+          console.error('Albums insert error:', albumsError);
+          throw albumsError;
+        }
 
         // Add songs to database with all required fields
-        const songsToInsert = songs.map(song => ({
-          id: song.id,
-          album_id: song.album_id,
-          artist_id: artist.id,
-          title: song.title,
-          title_short: song.title_short,
-          title_version: song.title_version,
-          duration: song.duration,
-          preview_url: song.preview_url,
-          explicit_lyrics: song.explicit_lyrics,
-          explicit_content_lyrics: song.explicit_content_lyrics,
-          explicit_content_cover: song.explicit_content_cover,
-          rank: song.rank,
-          album_name: song.album_name,
-          artist_name: song.artist_name,
-          cover_image: song.cover_image
-        }));
+        const songsToInsert = songs.map(song => {
+          // Log each song before insertion
+          console.log('Preparing song for insert:', song);
+          
+          return {
+            id: song.id,
+            album_id: song.album_id,
+            artist_id: artist.id,
+            title: song.title?.substring(0, 255) || '',
+            title_short: song.title_short?.substring(0, 255) || '',
+            title_version: song.title_version?.substring(0, 255) || '',
+            duration: song.duration,
+            preview_url: song.preview_url?.substring(0, 255) || '',
+            explicit_lyrics: Boolean(song.explicit_lyrics),
+            explicit_content_lyrics: song.explicit_content_lyrics || 0,
+            explicit_content_cover: song.explicit_content_cover || 0,
+            rank: song.rank || 0,
+            album_name: song.album_name || '',
+            artist_name: song.artist_name || '',
+            cover_image: song.cover_image || ''
+          };
+        });
 
         const { error: songsError } = await supabase
           .from('songs')
           .upsert(songsToInsert)
           .select();
 
-        if (songsError) throw songsError;
+        if (songsError) {
+          console.error('Songs insert error:', songsError);
+          throw songsError;
+        }
 
         return { artist, songs };
       }
 
       return { artist, songs };
     } catch (err) {
+      console.error('Search error:', err);
       setError(err.message);
       return { artist: null, songs: [] };
     } finally {
