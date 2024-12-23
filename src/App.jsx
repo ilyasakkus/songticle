@@ -7,6 +7,7 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import MusicMaker from "./pages/MusicMaker";
+import Songs from "./pages/Songs";
 
 const queryClient = new QueryClient();
 
@@ -20,7 +21,8 @@ const App = () => (
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-          <Route path="/music-maker-free" element={<MusicMaker />} />
+          <Route path="/music-maker" element={<MusicMaker />} />
+          <Route path="/songs" element={<Songs />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
