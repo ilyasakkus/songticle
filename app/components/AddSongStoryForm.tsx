@@ -21,9 +21,16 @@ const formSchema = z.object({
   content: z.string().min(10, "Story must be at least 10 characters long"),
 });
 
+type Song = {
+  id: string;
+  title: string;
+  artist_name: string;
+};
+
 export function AddSongStoryForm() {
   const [open, setOpen] = useState(false);
-  const [songs, setSongs] = useState<{ id: string; title: string; artist: string }[]>([]);
+  const [songs, setSongs] = useState<Song[]>([]);
+  const [loading, setLoading] = useState(false);
   const [searchValue, setSearchValue] = useState("");
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -31,18 +38,34 @@ export function AddSongStoryForm() {
   });
 
   const searchSongs = async (value: string) => {
-    const { data, error } = await supabase
-      .from('songs')
-      .select('id, title, artists(name)')
-      .ilike('title', `%${value}%`)
-      .limit(5);
+    if (!value) return;
+    
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('songs')
+        .select(`
+          id,
+          title,
+          artist:artists(name)
+        `)
+        .ilike('title', `%${value}%`)
+        .limit(5);
 
-    if (data) {
-      setSongs(data.map(song => ({
-        id: song.id,
-        title: song.title,
-        artist: song.artists.name,
-      })));
+      if (error) throw error;
+
+      if (data) {
+        const formattedSongs = data.map(song => ({
+          id: song.id,
+          title: song.title,
+          artist_name: song.artist?.name || 'Unknown Artist'
+        }));
+        setSongs(formattedSongs);
+      }
+    } catch (error) {
+      console.error('Error searching songs:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -104,30 +127,38 @@ export function AddSongStoryForm() {
                     searchSongs(value);
                   }}
                 />
-                <CommandEmpty>No songs found.</CommandEmpty>
-                <CommandGroup>
-                  {songs.map((song) => (
-                    <CommandItem
-                      key={song.id}
-                      value={song.id}
-                      onSelect={(value) => {
-                        form.setValue("songId", value);
-                        setOpen(false);
-                      }}
-                    >
-                      <Check
-                        className={cn(
-                          "mr-2 h-4 w-4",
-                          form.watch("songId") === song.id ? "opacity-100" : "opacity-0"
-                        )}
-                      />
-                      {song.title} - {song.artist}
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
+                {loading ? (
+                  <div className="py-6 text-center text-sm">Loading...</div>
+                ) : songs.length === 0 ? (
+                  <CommandEmpty>No songs found.</CommandEmpty>
+                ) : (
+                  <CommandGroup>
+                    {songs.map((song) => (
+                      <CommandItem
+                        key={song.id}
+                        value={song.id}
+                        onSelect={(value) => {
+                          form.setValue("songId", value);
+                          setOpen(false);
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            form.watch("songId") === song.id ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        {song.title} - {song.artist_name}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                )}
               </Command>
             </PopoverContent>
           </Popover>
+          {form.formState.errors.songId && (
+            <p className="text-sm text-red-500">{form.formState.errors.songId.message}</p>
+          )}
         </div>
 
         <div className="space-y-2">
