@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { useArtistHierarchy } from '../hooks/useArtistHierarchy';
 import { ChevronDown, ChevronRight, Music, Disc, User } from 'lucide-react';
@@ -42,12 +44,12 @@ export function Sidebar() {
   }
 
   return (
-    <div className="w-60 h-full bg-gray-100 p-4 overflow-y-auto">
+    <div className="w-60 h-full bg-gray-100 dark:bg-gray-900 p-4 overflow-y-auto">
       <div className="space-y-2">
         {artists.map(artist => (
           <div key={artist.id} className="space-y-1">
             <div
-              className="flex items-center space-x-2 cursor-pointer hover:bg-gray-200 p-1 rounded"
+              className="flex items-center space-x-2 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 p-1 rounded"
               onClick={() => toggleArtist(artist.id)}
             >
               {expandedArtists[artist.id] ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
@@ -60,7 +62,7 @@ export function Sidebar() {
                 {artist.albums.map(album => (
                   <div key={album.id}>
                     <div
-                      className="flex items-center space-x-2 cursor-pointer hover:bg-gray-200 p-1 rounded"
+                      className="flex items-center space-x-2 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 p-1 rounded"
                       onClick={() => toggleAlbum(album.id)}
                     >
                       {expandedAlbums[album.id] ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
@@ -73,7 +75,7 @@ export function Sidebar() {
                         {album.songs.map(song => (
                           <div
                             key={song.id}
-                            className="flex items-center space-x-2 hover:bg-gray-200 p-1 rounded cursor-pointer"
+                            className="flex items-center space-x-2 hover:bg-gray-200 dark:hover:bg-gray-800 p-1 rounded cursor-pointer"
                           >
                             <Music size={16} />
                             <span className="text-sm truncate">{song.title}</span>
