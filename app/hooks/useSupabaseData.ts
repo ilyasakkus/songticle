@@ -49,15 +49,23 @@ export function useArtistSearch() {
 
         if (albumsError) throw albumsError;
 
-        // Add songs to database with only the required columns
+        // Add songs to database with all required fields
         const songsToInsert = songs.map(song => ({
           id: song.id,
           album_id: song.album_id,
           artist_id: artist.id,
           title: song.title,
-          preview_url: song.preview_url || '',
-          duration: song.duration || 0,
-          explicit_lyrics: song.explicit_lyrics || false
+          title_short: song.title_short,
+          title_version: song.title_version,
+          duration: song.duration,
+          preview_url: song.preview_url,
+          explicit_lyrics: song.explicit_lyrics,
+          explicit_content_lyrics: song.explicit_content_lyrics,
+          explicit_content_cover: song.explicit_content_cover,
+          rank: song.rank,
+          album_name: song.album_name,
+          artist_name: song.artist_name,
+          cover_image: song.cover_image
         }));
 
         const { error: songsError } = await supabase
