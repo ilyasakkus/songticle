@@ -30,7 +30,8 @@ type Song = {
 export function AddSongStoryForm() {
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
-  const { artists, loading, error: artistError } = useArtistHierarchy();
+  const [loading, setLoading] = useState(false);
+  const { artists, error: artistError } = useArtistHierarchy();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
@@ -69,30 +70,36 @@ export function AddSongStoryForm() {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       setError(null);
-      setSuccess(null);
+      setLoading(true);
 
-      const { error } = await supabase
-        .from('stories')
-        .insert({
-          title: values.title,
-          content: values.content,
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id;
+
+      const { error: storyError } = await supabase.from('stories').insert([
+        {
           song_id: parseInt(values.songId),
-          author_name: values.author_name,
-          is_anonymous: true
-        });
+          content: values.content,
+          author_name: userId ? undefined : values.author_name,
+          user_id: userId,
+        },
+      ]);
 
-      if (error) throw error;
+      if (storyError) throw storyError;
 
-      // Show success message
-      setSuccess('Your story has been posted successfully!');
-      
-      // Reset form
+      setSuccess('Story created successfully!');
       form.reset();
       setSearchValue("");
       setOpen(false);
     } catch (error) {
-      console.error('Error creating story:', error);
-      setError('Failed to create story. Please try again.');
+      if (error instanceof Error) {
+        console.error('Error creating story:', error.message);
+        setError(error.message || 'Failed to create story. Please try again.');
+      } else {
+        console.error('Unknown error creating story');
+        setError('Failed to create story. Please try again.');
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -160,9 +167,9 @@ export function AddSongStoryForm() {
                     className="flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
                   />
                 </div>
-                {loading ? (
-                  <div className="p-4 text-center">
-                    <span className="loading loading-spinner loading-md"></span>
+                {artistError ? (
+                  <div className="py-6 text-center text-sm">
+                    Failed to load songs.
                   </div>
                 ) : filteredSongs.length === 0 ? (
                   <div className="py-6 text-center text-sm">
@@ -238,8 +245,8 @@ export function AddSongStoryForm() {
           )}
         </div>
 
-        <button type="submit" className="btn btn-primary w-full">
-          Post Story
+        <button type="submit" className="btn btn-primary w-full" disabled={loading}>
+          {loading ? "Posting..." : "Post Story"}
         </button>
       </form>
     </div>
