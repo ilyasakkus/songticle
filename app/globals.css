@@ -34,44 +34,15 @@
     
     --radius: 0.5rem;
   }
-
-  .dark {
-    --background: 34 35% 13%;
-    --foreground: 39 97% 93%;
-    
-    --card: 34 35% 13%;
-    --card-foreground: 39 97% 93%;
-    
-    --popover: 34 35% 13%;
-    --popover-foreground: 39 97% 93%;
-    
-    --primary: 25 75% 31%;
-    --primary-foreground: 39 97% 93%;
-    
-    --secondary: 34 51% 53%;
-    --secondary-foreground: 39 97% 93%;
-    
-    --muted: 34 51% 33%;
-    --muted-foreground: 34 35% 67%;
-    
-    --accent: 34 51% 33%;
-    --accent-foreground: 39 97% 93%;
-    
-    --destructive: 0 43% 58%;
-    --destructive-foreground: 39 97% 93%;
-    
-    --border: 34 35% 27%;
-    --input: 34 35% 27%;
-    --ring: 39 97% 93%;
-  }
 }
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-base-300;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-base-100 text-base-content;
+    font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
   }
 }
 
@@ -81,16 +52,13 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: hsl(var(--background));
-  border: 1px solid hsl(var(--border));
+  @apply bg-base-100 border border-base-300;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted));
-  border: 2px solid hsl(var(--background));
-  border-radius: var(--radius);
+  @apply bg-base-300 border-2 border-base-100 rounded-[var(--radius)];
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--primary));
+  @apply bg-primary/50;
 }

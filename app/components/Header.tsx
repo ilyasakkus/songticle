@@ -1,7 +1,6 @@
 'use client';
 
-import { Search, PlusCircle } from 'lucide-react';
-import { ModeToggle } from './ModeToggle';
+import { PlusCircle } from 'lucide-react';
 import Link from 'next/link';
 
 export function Header() {
@@ -17,14 +16,13 @@ export function Header() {
               Songticle
             </Link>
           </div>
-          <div className="flex-none gap-4">
+          <div className="flex-none">
             <Link href="/add">
               <button className="btn btn-primary">
                 <PlusCircle className="w-4 h-4 mr-2" />
                 Add Song Story
               </button>
             </Link>
-            <ModeToggle />
           </div>
         </div>
       </div>

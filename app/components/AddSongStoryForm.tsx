@@ -1,11 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from './ui/command';
-import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
@@ -38,62 +37,42 @@ export function AddSongStoryForm() {
     resolver: zodResolver(formSchema),
   });
 
+  // Load initial songs when component mounts
+  useEffect(() => {
+    searchSongs("");
+  }, []);
+
   const searchSongs = async (value: string) => {
-    if (!value) return;
-    
     setLoading(true);
     try {
-      // Get all songs matching the search term
       const { data: songsData, error: songsError } = await supabase
         .from('songs')
-        .select('id, title, album_id');
+        .select(`
+          id,
+          title,
+          album:album_id (
+            id,
+            title,
+            artist:artist_id (
+              id,
+              name
+            )
+          )
+        `)
+        .ilike('title', `%${value}%`)
+        .limit(20);
 
       if (songsError) {
         console.error('Error fetching songs:', songsError);
         return;
       }
 
-      // Get all albums for the matching songs
-      const albumIds = songsData.map(song => song.album_id);
-      const { data: albumsData, error: albumsError } = await supabase
-        .from('albums')
-        .select('id, title, artist_id')
-        .in('id', albumIds);
-
-      if (albumsError) {
-        console.error('Error fetching albums:', albumsError);
-        return;
-      }
-
-      // Get all artists for the albums
-      const artistIds = albumsData.map(album => album.artist_id);
-      const { data: artistsData, error: artistsError } = await supabase
-        .from('artists')
-        .select('id, name')
-        .in('id', artistIds);
-
-      if (artistsError) {
-        console.error('Error fetching artists:', artistsError);
-        return;
-      }
-
-      // Create a map for quick lookups
-      const albumMap = new Map(albumsData.map(album => [album.id, album]));
-      const artistMap = new Map(artistsData.map(artist => [artist.id, artist]));
-
-      // Format the songs with album and artist information
-      const formattedSongs = songsData
-        .filter(song => song.title.toLowerCase().includes(value.toLowerCase()))
-        .map(song => {
-          const album = albumMap.get(song.album_id);
-          const artist = album ? artistMap.get(album.artist_id) : null;
-          return {
-            id: song.id,
-            title: song.title,
-            album_title: album?.title || 'Unknown Album',
-            artist_name: artist?.name || 'Unknown Artist',
-          };
-        });
+      const formattedSongs = songsData.map(song => ({
+        id: song.id,
+        title: song.title,
+        album_title: song.album?.title || 'Unknown Album',
+        artist_name: song.album?.artist?.name || 'Unknown Artist',
+      }));
 
       setSongs(formattedSongs);
     } catch (error) {
@@ -113,7 +92,7 @@ export function AddSongStoryForm() {
         .insert({
           title: values.title,
           content: values.content,
-          song_id: values.songId,
+          song_id: parseInt(values.songId),
           user_id: user.id,
         });
 
@@ -121,6 +100,7 @@ export function AddSongStoryForm() {
 
       // Reset form and show success message
       form.reset();
+      setSearchValue("");
       // You might want to add a toast notification here
     } catch (error) {
       console.error('Error creating story:', error);
@@ -129,29 +109,30 @@ export function AddSongStoryForm() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-lg shadow-sm">
-      <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Add Song Story</h2>
+    <div className="max-w-2xl mx-auto p-6 bg-base-100 rounded-lg shadow-lg">
+      <h2 className="text-2xl font-serif font-bold mb-6 text-primary">Add Song Story</h2>
       
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-900 dark:text-gray-100">
-            Song
+        <div className="form-control w-full">
+          <label className="label">
+            <span className="label-text">Song</span>
           </label>
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                role="combobox"
-                aria-expanded={open}
-                className="w-full justify-between"
+              <button
+                type="button"
+                className={cn(
+                  "btn btn-outline w-full justify-between",
+                  !form.watch("songId") && "text-muted-foreground"
+                )}
               >
                 {form.watch("songId") 
                   ? songs.find((song) => song.id === parseInt(form.watch("songId")))?.title
                   : "Select song..."}
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-              </Button>
+              </button>
             </PopoverTrigger>
-            <PopoverContent className="w-full p-0">
+            <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
               <Command>
                 <CommandInput 
                   placeholder="Search songs..." 
@@ -160,14 +141,16 @@ export function AddSongStoryForm() {
                     setSearchValue(value);
                     searchSongs(value);
                   }}
+                  className="input input-bordered"
                 />
-                {loading ? (
-                  <div className="py-6 text-center text-sm">Loading...</div>
-                ) : songs.length === 0 ? (
-                  <CommandEmpty>No songs found.</CommandEmpty>
-                ) : (
-                  <CommandGroup>
-                    {songs.map((song) => (
+                <CommandEmpty>No songs found.</CommandEmpty>
+                <CommandGroup className="max-h-[300px] overflow-y-auto">
+                  {loading ? (
+                    <div className="p-4 text-center">
+                      <span className="loading loading-spinner loading-md"></span>
+                    </div>
+                  ) : (
+                    songs.map((song) => (
                       <CommandItem
                         key={song.id}
                         value={song.id.toString()}
@@ -175,6 +158,7 @@ export function AddSongStoryForm() {
                           form.setValue("songId", value);
                           setOpen(false);
                         }}
+                        className="hover:bg-base-200"
                       >
                         <Check
                           className={cn(
@@ -182,50 +166,61 @@ export function AddSongStoryForm() {
                             form.watch("songId") === song.id.toString() ? "opacity-100" : "opacity-0"
                           )}
                         />
-                        {song.title} - {song.artist_name}
+                        <div>
+                          <div className="font-medium">{song.title}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {song.artist_name} • {song.album_title}
+                          </div>
+                        </div>
                       </CommandItem>
-                    ))}
-                  </CommandGroup>
-                )}
+                    ))
+                  )}
+                </CommandGroup>
               </Command>
             </PopoverContent>
           </Popover>
           {form.formState.errors.songId && (
-            <p className="text-sm text-red-500">{form.formState.errors.songId.message}</p>
+            <label className="label">
+              <span className="label-text-alt text-error">{form.formState.errors.songId.message}</span>
+            </label>
           )}
         </div>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-900 dark:text-gray-100">
-            Title
+        <div className="form-control w-full">
+          <label className="label">
+            <span className="label-text">Title</span>
           </label>
-          <Input
+          <input
             {...form.register("title")}
             placeholder="Enter your story title"
-            className="w-full"
+            className="input input-bordered w-full"
           />
           {form.formState.errors.title && (
-            <p className="text-sm text-red-500">{form.formState.errors.title.message}</p>
+            <label className="label">
+              <span className="label-text-alt text-error">{form.formState.errors.title.message}</span>
+            </label>
           )}
         </div>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-900 dark:text-gray-100">
-            Your Story
+        <div className="form-control w-full">
+          <label className="label">
+            <span className="label-text">Your Story</span>
           </label>
-          <Textarea
+          <textarea
             {...form.register("content")}
             placeholder="Share your thoughts about this song..."
-            className="w-full min-h-[200px]"
+            className="textarea textarea-bordered w-full min-h-[200px]"
           />
           {form.formState.errors.content && (
-            <p className="text-sm text-red-500">{form.formState.errors.content.message}</p>
+            <label className="label">
+              <span className="label-text-alt text-error">{form.formState.errors.content.message}</span>
+            </label>
           )}
         </div>
 
-        <Button type="submit" className="w-full">
+        <button type="submit" className="btn btn-primary w-full">
           Post Story
-        </Button>
+        </button>
       </form>
     </div>
   );
