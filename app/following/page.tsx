@@ -1,4 +1,4 @@
-import { StoryList } from '@/components/StoryList';
+import { StoryList } from '../components/StoryList';
 
 export default function FollowingStoriesPage() {
   return (

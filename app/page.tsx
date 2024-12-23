@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { ThemeSwitcher } from './components/ThemeSwitcher';
-import { useStories } from './hooks/useSupabaseData';
+import { ThemeSwitcher } from '../../components/ThemeSwitcher';
+import { useStories } from '../../hooks/useSupabaseData';
+import { StoryList } from '../../components/StoryList';
 
-export default function Home() {
+export default function HomePage() {
   const { stories, loading, error } = useStories();
   const [selectedTag, setSelectedTag] = useState('latest');
 
@@ -139,44 +140,7 @@ export default function Home() {
                   <p className="text-sm">Be the first to share a story!</p>
                 </div>
               ) : (
-                stories?.map((story: any) => (
-                  <div key={story.id} className="card bg-base-100 shadow-xl">
-                    <div className="card-body">
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="avatar">
-                            <div className="w-10 rounded-full">
-                              <img src={story.profiles?.avatar_url || "https://placehold.co/40x40"} alt={story.profiles?.username} />
-                            </div>
-                          </div>
-                          <div>
-                            <h3 className="font-bold">{story.title}</h3>
-                            <p className="text-sm text-base-content/60">
-                              by {story.profiles?.username} • {new Date(story.created_at).toLocaleDateString()}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                      <p className="mt-4">{story.content}</p>
-                      <div className="card-actions justify-between items-center mt-4">
-                        <div className="flex items-center gap-4">
-                          <button className="btn btn-ghost btn-sm gap-2">
-                            <span className="material-icons">thumb_up</span>
-                            {story.likes?.count || 0}
-                          </button>
-                          <button className="btn btn-ghost btn-sm gap-2">
-                            <span className="material-icons">comment</span>
-                            {story.comments?.count || 0}
-                          </button>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm text-base-content/60">
-                          <span className="material-icons text-base">music_note</span>
-                          {story.songs?.title}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))
+                <StoryList stories={stories} following={false} />
               )}
             </div>
           </div>
