@@ -1,23 +1,23 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { cn } from '../lib/utils';
-import { ModeToggle } from './ModeToggle';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { cn } from "../lib/utils";
+import { ModeToggle } from "./ModeToggle";
 
 export function Navbar() {
   const pathname = usePathname();
 
   const routes = [
     {
-      href: '/',
-      label: 'All Stories',
-      active: pathname === '/',
+      href: "/",
+      label: "All Stories",
+      active: pathname === "/",
     },
     {
-      href: '/following',
-      label: 'Following Stories',
-      active: pathname === '/following',
+      href: "/following",
+      label: "Following Stories",
+      active: pathname === "/following",
     },
   ];
 
@@ -30,8 +30,8 @@ export function Navbar() {
               key={route.href}
               href={route.href}
               className={cn(
-                'text-sm font-medium transition-colors hover:text-primary',
-                route.active ? 'text-black dark:text-white' : 'text-muted-foreground'
+                "text-sm font-medium transition-colors hover:text-primary",
+                route.active ? "text-black dark:text-white" : "text-muted-foreground"
               )}
             >
               {route.label}

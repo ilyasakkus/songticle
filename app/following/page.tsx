@@ -1,4 +1,6 @@
-import { StoryList } from '../components/StoryList';
+'use client';
+
+import { StoryList } from '../../components/StoryList';
 
 export default function FollowingStoriesPage() {
   return (
