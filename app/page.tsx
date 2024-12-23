@@ -2,85 +2,185 @@
 
 import { useState } from 'react';
 import { ThemeSwitcher } from './components/ThemeSwitcher';
-import { useArtistSearch } from './hooks/useSupabaseData';
+import { useStories } from './hooks/useSupabaseData';
 
 export default function Home() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const { searchArtist, isLoading, error } = useArtistSearch();
-  const [searchResults, setSearchResults] = useState([]);
-
-  const handleSearch = async () => {
-    if (!searchQuery.trim()) return;
-    
-    try {
-      const results = await searchArtist(searchQuery);
-      setSearchResults(results || []);
-    } catch (err) {
-      console.error('Search error:', err);
-    }
-  };
+  const { stories, loading, error } = useStories();
+  const [selectedTag, setSelectedTag] = useState('latest');
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Songticle - Share Your Music Stories
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
+    <main className="min-h-screen bg-base-200">
+      {/* Header */}
+      <div className="navbar bg-base-100 shadow-lg px-4">
+        <div className="flex-1">
+          <a className="btn btn-ghost normal-case text-xl gap-2 text-base-content">
+            <span className="material-icons">music_note</span>
+            Songticle
+          </a>
+        </div>
+        <div className="flex-none gap-2">
           <ThemeSwitcher />
-        </div>
-      </div>
-
-      <div className="relative flex place-items-center">
-        <div className="w-full max-w-md">
-          <div className="mb-8">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search for songs, artists, or albums..."
-              className="w-full p-4 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800"
-              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-            />
-            <button
-              onClick={handleSearch}
-              disabled={isLoading}
-              className="mt-4 w-full bg-blue-500 text-white p-4 rounded-lg hover:bg-blue-600 disabled:bg-blue-300"
-            >
-              {isLoading ? 'Searching...' : 'Search'}
-            </button>
-          </div>
-
-          {error && (
-            <div className="text-red-500 mb-4">
-              Error: {error}
-            </div>
-          )}
-
-          <div className="grid grid-cols-1 gap-4">
-            {searchResults.map((result: any) => (
-              <div
-                key={result.id}
-                className="p-4 border rounded-lg dark:border-gray-700 hover:shadow-lg transition-shadow"
-              >
-                <div className="flex items-center space-x-4">
-                  <img
-                    src={result.picture_medium || '/placeholder.png'}
-                    alt={result.name}
-                    className="w-16 h-16 object-cover rounded-full"
-                  />
-                  <div>
-                    <h3 className="text-lg font-semibold">{result.name}</h3>
-                  </div>
-                </div>
+          <button className="btn btn-primary gap-2">
+            <span className="material-icons">add_circle</span>
+            Add Story
+          </button>
+          <div className="dropdown dropdown-end">
+            <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
+              <div className="w-10 rounded-full">
+                <img src="https://placehold.co/40x40" alt="profile" />
               </div>
-            ))}
+            </label>
+            <ul tabIndex={0} className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52">
+              <li>
+                <a className="gap-2 text-base-content">
+                  <span className="material-icons">person</span>
+                  Profile
+                </a>
+              </li>
+              <li>
+                <a className="gap-2 text-base-content" href="/admin">
+                  <span className="material-icons">admin_panel_settings</span>
+                  Admin
+                </a>
+              </li>
+              <li>
+                <a className="gap-2 text-base-content">
+                  <span className="material-icons">settings</span>
+                  Settings
+                </a>
+              </li>
+              <li>
+                <a className="gap-2 text-base-content">
+                  <span className="material-icons">logout</span>
+                  Sign out
+                </a>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
 
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        {/* Add your content here */}
+      <div className="flex">
+        {/* Sidebar */}
+        <aside className="w-[240px] bg-base-100 min-h-[calc(100vh-64px)] border-r border-base-200">
+          <div className="p-4">
+            <div className="flex flex-col space-y-2">
+              <a className="flex items-center gap-2 text-primary hover:bg-base-200 p-2 rounded-lg">
+                <span className="material-icons">forum</span>
+                All Discussions
+              </a>
+              <a className="flex items-center gap-2 text-base-content hover:bg-base-200 p-2 rounded-lg">
+                <span className="material-icons">star</span>
+                Following
+              </a>
+              <div className="divider my-2"></div>
+            </div>
+          </div>
+
+          <div className="px-4">
+            <h2 className="text-sm font-semibold mb-2 text-base-content/80">TAGS</h2>
+            <div className="space-y-1">
+              <a className="flex items-center gap-2 text-sm hover:bg-base-200 p-2 rounded-lg cursor-pointer text-base-content">
+                <span className="material-icons text-base">local_offer</span>
+                Pop
+              </a>
+              <a className="flex items-center gap-2 text-sm hover:bg-base-200 p-2 rounded-lg cursor-pointer text-base-content">
+                <span className="material-icons text-base">local_offer</span>
+                Rock
+              </a>
+              <a className="flex items-center gap-2 text-sm hover:bg-base-200 p-2 rounded-lg cursor-pointer text-base-content">
+                <span className="material-icons text-base">local_offer</span>
+                Hip Hop
+              </a>
+            </div>
+          </div>
+        </aside>
+
+        {/* Main Content */}
+        <div className="flex-1 p-6">
+          <div className="max-w-3xl mx-auto">
+            <div className="flex justify-between items-center mb-6">
+              <div className="join">
+                <button 
+                  className={`btn join-item ${selectedTag === 'latest' ? 'btn-active' : ''}`}
+                  onClick={() => setSelectedTag('latest')}
+                >
+                  Latest
+                </button>
+                <button 
+                  className={`btn join-item ${selectedTag === 'top' ? 'btn-active' : ''}`}
+                  onClick={() => setSelectedTag('top')}
+                >
+                  Top
+                </button>
+                <button 
+                  className={`btn join-item ${selectedTag === 'solved' ? 'btn-active' : ''}`}
+                  onClick={() => setSelectedTag('solved')}
+                >
+                  Solved
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              {loading ? (
+                <div className="flex items-center justify-center p-12">
+                  <span className="loading loading-spinner loading-lg"></span>
+                </div>
+              ) : error ? (
+                <div className="alert alert-error">
+                  <span className="material-icons">error</span>
+                  {error}
+                </div>
+              ) : stories?.length === 0 ? (
+                <div className="text-center p-12 text-base-content/60">
+                  <span className="material-icons text-6xl mb-4">forum</span>
+                  <p className="text-xl">No stories yet</p>
+                  <p className="text-sm">Be the first to share a story!</p>
+                </div>
+              ) : (
+                stories?.map((story: any) => (
+                  <div key={story.id} className="card bg-base-100 shadow-xl">
+                    <div className="card-body">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="avatar">
+                            <div className="w-10 rounded-full">
+                              <img src={story.profiles?.avatar_url || "https://placehold.co/40x40"} alt={story.profiles?.username} />
+                            </div>
+                          </div>
+                          <div>
+                            <h3 className="font-bold">{story.title}</h3>
+                            <p className="text-sm text-base-content/60">
+                              by {story.profiles?.username} • {new Date(story.created_at).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <p className="mt-4">{story.content}</p>
+                      <div className="card-actions justify-between items-center mt-4">
+                        <div className="flex items-center gap-4">
+                          <button className="btn btn-ghost btn-sm gap-2">
+                            <span className="material-icons">thumb_up</span>
+                            {story.likes?.count || 0}
+                          </button>
+                          <button className="btn btn-ghost btn-sm gap-2">
+                            <span className="material-icons">comment</span>
+                            {story.comments?.count || 0}
+                          </button>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-base-content/60">
+                          <span className="material-icons text-base">music_note</span>
+                          {story.songs?.title}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </main>
   );
