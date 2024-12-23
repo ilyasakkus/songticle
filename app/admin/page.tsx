@@ -90,7 +90,7 @@ export default function AdminPage() {
             <div className="card-body">
               <div className="flex items-center gap-6 mb-6">
                 <img
-                  src={searchResults.artist.picture}
+                  src={searchResults.artist.picture_medium}
                   alt={searchResults.artist.name}
                   className="w-32 h-32 rounded-lg object-cover"
                 />
