@@ -24,10 +24,18 @@ export function Sidebar() {
     }));
   };
 
+  const isArtistExpanded = (artistId: number): boolean => {
+    return expandedArtists[artistId] || false;
+  };
+
+  const isAlbumExpanded = (albumId: number): boolean => {
+    return expandedAlbums[albumId] || false;
+  };
+
   const filteredArtists = React.useMemo(() => {
     if (!searchTerm) return artists;
     
-    return artists.filter(artist => 
+    return artists?.filter(artist => 
       artist.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       artist.albums?.some(album => 
         album.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -35,7 +43,7 @@ export function Sidebar() {
           song.title.toLowerCase().includes(searchTerm.toLowerCase())
         )
       )
-    );
+    ) || [];
   }, [artists, searchTerm]);
 
   if (loading) {
@@ -78,11 +86,11 @@ export function Sidebar() {
       </div>
       
       <div className="space-y-2 overflow-y-auto max-h-[calc(100vh-200px)]">
-        {filteredArtists.map(artist => (
+        {filteredArtists?.map(artist => (
           <div key={artist.id} className="collapse collapse-arrow bg-base-200">
             <input 
               type="checkbox" 
-              checked={expandedArtists[artist.id]}
+              checked={isArtistExpanded(artist.id)}
               onChange={() => toggleArtist(artist.id)}
             />
             <div className="collapse-title flex items-center gap-2 text-sm">
@@ -90,13 +98,13 @@ export function Sidebar() {
               <span className="truncate">{artist.name}</span>
             </div>
             
-            {expandedArtists[artist.id] && artist.albums && (
+            {isArtistExpanded(artist.id) && artist.albums && (
               <div className="collapse-content">
                 {artist.albums.map(album => (
                   <div key={album.id} className="collapse collapse-arrow bg-base-100 my-1">
                     <input 
                       type="checkbox" 
-                      checked={expandedAlbums[album.id]}
+                      checked={isAlbumExpanded(album.id)}
                       onChange={() => toggleAlbum(album.id)}
                     />
                     <div className="collapse-title flex items-center gap-2 text-sm py-2">
@@ -104,7 +112,7 @@ export function Sidebar() {
                       <span className="truncate">{album.title}</span>
                     </div>
                     
-                    {expandedAlbums[album.id] && album.songs && (
+                    {isAlbumExpanded(album.id) && album.songs && (
                       <div className="collapse-content">
                         {album.songs.map(song => (
                           <div
