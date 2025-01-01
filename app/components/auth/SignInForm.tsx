@@ -52,17 +52,27 @@ export function SignInForm({ onClose }: Props) {
 
   const handleGoogleSignIn = async () => {
     try {
+      setLoading(true);
       setError(null);
-      const { error } = await supabase.auth.signInWithOAuth({
+
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
           redirectTo: `${window.location.origin}/auth/callback`
         }
       });
 
       if (error) throw error;
+      
+      // Don't close the modal here as we'll be redirected to Google
     } catch (error: any) {
-      setError(error.message);
+      console.error('Google sign-in error:', error);
+      setError(error.message || 'Failed to sign in with Google');
+      setLoading(false);
     }
   };
 
@@ -137,6 +147,7 @@ export function SignInForm({ onClose }: Props) {
         <button 
           type="button"
           onClick={handleGoogleSignIn}
+          disabled={loading}
           className="btn w-full"
         >
           <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">

@@ -11,8 +11,8 @@ import Image from 'next/image';
 
 const formSchema = z.object({
   songId: z.number(),
+  title: z.string().min(3, 'Title must be at least 3 characters').max(100, 'Title must be less than 100 characters'),
   content: z.string().min(10, 'Story must be at least 10 characters'),
-  authorName: z.string().optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -29,12 +29,12 @@ export function AddSongStoryForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       songId: undefined,
+      title: '',
       content: '',
-      authorName: '',
     },
   });
 
-  const { register, handleSubmit, formState: { errors }, setValue } = form;
+  const { register, handleSubmit, formState: { errors }, setValue, watch } = form;
 
   const filteredSongs = searchValue
     ? songs?.filter((song) =>
@@ -49,8 +49,13 @@ export function AddSongStoryForm() {
       setError(null);
       setSuccess(null);
 
-      const { data: sessionData } = await supabase.auth.getSession();
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) throw sessionError;
+
       const session = sessionData.session;
+      if (!session) {
+        throw new Error('Please sign in to share your story');
+      }
 
       if (!values.songId) {
         throw new Error('Please select a song first');
@@ -58,20 +63,20 @@ export function AddSongStoryForm() {
 
       const storyData = {
         song_id: values.songId,
+        title: values.title,
         content: values.content,
-        // Eğer kullanıcı giriş yapmışsa user_id'sini kullan, yapmamışsa null
-        user_id: session?.user?.id || null,
-        // Eğer kullanıcı giriş yapmışsa email'ini kullan, yapmamışsa girilen ismi veya 'Anonymous'
-        author_name: session?.user?.email || values.authorName || 'Anonymous'
+        user_id: session.user.id
       };
 
       const { error: insertError } = await supabase
         .from('stories')
-        .insert([storyData]);
+        .insert([storyData])
+        .select()
+        .single();
 
       if (insertError) {
         console.error('Insert error:', insertError);
-        throw new Error(insertError.message);
+        throw new Error(insertError.message || 'Failed to create story');
       }
 
       setSuccess('Story posted successfully!');
@@ -166,6 +171,24 @@ export function AddSongStoryForm() {
           )}
         </div>
 
+        {/* Story Title */}
+        <div className="form-control w-full">
+          <label className="label">
+            <span className="label-text">Story Title</span>
+          </label>
+          <input
+            type="text"
+            {...register('title')}
+            placeholder="Give your story a title..."
+            className="input input-bordered w-full"
+          />
+          {errors.title && (
+            <label className="label">
+              <span className="label-text-alt text-error">{errors.title.message}</span>
+            </label>
+          )}
+        </div>
+
         {/* Story Content */}
         <div className="form-control w-full">
           <label className="label">
@@ -175,7 +198,6 @@ export function AddSongStoryForm() {
             {...register('content')}
             placeholder="Share your story about this song..."
             className="textarea textarea-bordered h-32 w-full"
-            defaultValue=""
           />
           {errors.content && (
             <label className="label">
@@ -183,22 +205,6 @@ export function AddSongStoryForm() {
             </label>
           )}
         </div>
-
-        {/* Author Name (for non-authenticated users) */}
-        {!supabase.auth.getSession() && (
-          <div className="form-control w-full">
-            <label className="label">
-              <span className="label-text">Your Name (optional)</span>
-            </label>
-            <input
-              type="text"
-              {...register('authorName')}
-              placeholder="Anonymous"
-              className="input input-bordered w-full"
-              defaultValue=""
-            />
-          </div>
-        )}
 
         {error && (
           <div className="alert alert-error">{error}</div>

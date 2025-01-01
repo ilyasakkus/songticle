@@ -20,7 +20,7 @@ export async function GET(request: Request) {
       if (error) {
         console.error('Auth callback error:', error);
         return NextResponse.redirect(
-          `${requestUrl.origin}/login?error=${encodeURIComponent(error.message)}`
+          `${requestUrl.origin}/?error=${encodeURIComponent(error.message)}`
         );
       }
 
@@ -30,16 +30,16 @@ export async function GET(request: Request) {
     // Handle access_token in URL fragment for OAuth providers
     const hash = requestUrl.hash;
     if (hash && hash.includes('access_token')) {
-      return NextResponse.redirect(new URL(next, requestUrl.origin));
+      return NextResponse.redirect(new URL('/', requestUrl.origin));
     }
 
     return NextResponse.redirect(
-      new URL(`/login?error=${encodeURIComponent('No code or token provided')}`, requestUrl.origin)
+      new URL(`/?error=${encodeURIComponent('Authentication failed')}`, requestUrl.origin)
     );
   } catch (error) {
     console.error('Unexpected error in auth callback:', error);
     return NextResponse.redirect(
-      new URL(`/login?error=${encodeURIComponent('An unexpected error occurred')}`, requestUrl.origin)
+      new URL(`/?error=${encodeURIComponent('An unexpected error occurred')}`, requestUrl.origin)
     );
   }
 }
