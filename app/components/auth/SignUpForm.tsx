@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { supabase } from '../../lib/supabase';
 import { X } from 'lucide-react';
+import { AuthError } from '@supabase/supabase-js';
 
 const formSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -42,9 +43,13 @@ export function SignUpForm({ onClose }: Props) {
       });
 
       if (error) throw error;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Google sign-in error:', error);
-      setError(error.message);
+      if (error instanceof AuthError) {
+        setError(error.message);
+      } else {
+        setError('Failed to sign in with Google');
+      }
     } finally {
       setLoading(false);
     }
@@ -66,7 +71,6 @@ export function SignUpForm({ onClose }: Props) {
       setLoading(true);
       setError(null);
 
-      // Sign up the user
       const { data, error: signUpError } = await supabase.auth.signUp({
         email: values.email,
         password: values.password,
@@ -79,18 +83,19 @@ export function SignUpForm({ onClose }: Props) {
       });
 
       if (signUpError) throw signUpError;
-
-      // Profile will be created automatically by the database trigger
       
-      // Show success message and close modal
       setSuccess('Account created successfully! Please check your email to verify your account.');
       setTimeout(() => {
         onClose();
       }, 2000);
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Signup error:', error);
-      setError(error.message || 'An error occurred during sign up');
+      if (error instanceof AuthError) {
+        setError(error.message);
+      } else {
+        setError('An error occurred during sign up');
+      }
     } finally {
       setLoading(false);
     }

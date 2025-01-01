@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { supabase } from '../../lib/supabase';
 import { X } from 'lucide-react';
+import { AuthError } from '@supabase/supabase-js';
 
 const formSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -42,9 +43,12 @@ export function SignInForm({ onClose }: Props) {
 
       // Close modal on success
       onClose();
-      // You might want to show a success toast here
-    } catch (error: any) {
-      setError(error.message);
+    } catch (error: unknown) {
+      if (error instanceof AuthError) {
+        setError(error.message);
+      } else {
+        setError('An unexpected error occurred');
+      }
     } finally {
       setLoading(false);
     }
@@ -69,9 +73,13 @@ export function SignInForm({ onClose }: Props) {
       if (error) throw error;
       
       // Don't close the modal here as we'll be redirected to Google
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Google sign-in error:', error);
-      setError(error.message || 'Failed to sign in with Google');
+      if (error instanceof AuthError) {
+        setError(error.message);
+      } else {
+        setError('Failed to sign in with Google');
+      }
       setLoading(false);
     }
   };

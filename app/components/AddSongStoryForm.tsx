@@ -34,7 +34,7 @@ export function AddSongStoryForm() {
     },
   });
 
-  const { register, handleSubmit, formState: { errors }, setValue, watch } = form;
+  const { register, handleSubmit, formState: { errors }, setValue } = form;
 
   const filteredSongs = searchValue
     ? songs?.filter((song) =>
