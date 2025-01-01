@@ -71,7 +71,7 @@ export function SignUpForm({ onClose }: Props) {
       setLoading(true);
       setError(null);
 
-      const { data, error: signUpError } = await supabase.auth.signUp({
+      const { error: signUpError } = await supabase.auth.signUp({
         email: values.email,
         password: values.password,
         options: {

@@ -15,7 +15,37 @@ interface DeezerResponse<T> {
   error?: DeezerError;
 }
 
-function makeRequest(path: string): Promise<any> {
+interface DeezerTrack {
+  id: number;
+  title: string;
+  title_short: string;
+  title_version: string;
+  duration: string;
+  preview: string;
+  explicit_lyrics: boolean;
+  explicit_content_lyrics: number;
+  explicit_content_cover: number;
+  rank: string;
+  artist: {
+    id: number;
+    name: string;
+    picture_small: string;
+    picture_medium: string;
+  };
+  album: {
+    id: number;
+    title: string;
+    cover_medium: string;
+  };
+}
+
+interface DeezerSearchResponse {
+  data: DeezerTrack[];
+  total: number;
+  next?: string;
+}
+
+function makeRequest(path: string): Promise<DeezerSearchResponse> {
   return new Promise((resolve, reject) => {
     const options = {
       method: 'GET',
@@ -54,7 +84,7 @@ function makeRequest(path: string): Promise<any> {
   });
 }
 
-export async function searchDeezerArtist(query: string): Promise<DeezerResponse<{ artist: Artist, songs: Song[] }>> {
+export async function searchDeezerArtist(query: string): Promise<DeezerResponse<{ artist: Artist | null, songs: Song[] }>> {
   try {
     const data = await makeRequest(`/search?q=${encodeURIComponent(query)}`);
     
@@ -74,20 +104,20 @@ export async function searchDeezerArtist(query: string): Promise<DeezerResponse<
     };
 
     // Transform all tracks to our Song type with all required fields
-    const songs: Song[] = data.data.map((item: any) => {
+    const songs: Song[] = data.data.map((item: DeezerTrack) => {
       console.log('Processing song item:', item); // Debug log
       return {
         id: item.id,
         album_id: item.album.id,
         artist_id: artist.id,
-        title: item.title?.substring(0, 255) || '', // Limit to 255 chars
+        title: item.title?.substring(0, 255) || '',
         title_short: item.title_short?.substring(0, 255) || item.title?.substring(0, 255) || '',
         title_version: item.title_version?.substring(0, 255) || '',
         duration: parseInt(item.duration) || 0,
         preview_url: item.preview?.substring(0, 255) || '',
         explicit_lyrics: Boolean(item.explicit_lyrics),
-        explicit_content_lyrics: parseInt(item.explicit_content_lyrics) || 0,
-        explicit_content_cover: parseInt(item.explicit_content_cover) || 0,
+        explicit_content_lyrics: parseInt(String(item.explicit_content_lyrics)) || 0,
+        explicit_content_cover: parseInt(String(item.explicit_content_cover)) || 0,
         rank: parseInt(item.rank) || 0,
         album_name: item.album.title || '',
         artist_name: item.artist.name || '',
