@@ -104,6 +104,7 @@ type Story = {
     title: string
     artist_id: number
     cover_image: string | null
+    preview_url: string | null
     artists: {
       name: string
     } | null
@@ -135,11 +136,11 @@ export const useStories = () => {
               title,
               artist_id,
               cover_image,
+              preview_url,
               artists!songs_artist_id_fkey (
                 name
               )
-            ),
-            author:profiles(id, full_name)
+            )
           `)
           .order('created_at', { ascending: false })
 
@@ -150,24 +151,38 @@ export const useStories = () => {
 
         if (storiesData) {
           console.log('Raw stories data:', JSON.stringify(storiesData, null, 2))
+          // Get all unique user_ids
+          const userIds = [...new Set(storiesData.map(story => story.user_id))]
+          
+          // Fetch profiles for these users
+          const { data: profilesData } = await supabase
+            .from('profiles')
+            .select('id, full_name')
+            .in('id', userIds)
+
+          console.log('First story songs data:', storiesData[0]?.songs)
+
+          // Create a map of user_id to profile
+          const profileMap = new Map(profilesData?.map(profile => [profile.id, profile]))
+
+          // Transform stories with profile data
           const transformedStories = storiesData.map(story => {
             try {
-              if (!story.songs?.[0]) return null
-              
               return {
                 id: story.id,
                 content: story.content,
                 created_at: story.created_at,
                 song_id: story.song_id,
                 user_id: story.user_id,
-                songs: {
+                songs: story.songs?.[0] ? {
                   id: story.songs[0].id,
                   title: story.songs[0].title,
                   artist_id: story.songs[0].artist_id,
                   cover_image: story.songs[0].cover_image,
+                  preview_url: story.songs[0].preview_url,
                   artists: story.songs[0].artists?.[0] || null
-                },
-                author: story.author?.[0] || null
+                } : null,
+                author: profileMap.get(story.user_id) || null
               } as Story
             } catch (e) {
               console.log('Transform error for story:', story.id, e)

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Play, Pause } from 'lucide-react';
 import { useStories } from '../hooks/useSupabaseData';
+import Image from 'next/image'
 
 interface Story {
   id: number
@@ -83,12 +84,34 @@ export function StoryList() {
           <div key={story.id} className="card bg-base-100 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex flex-row items-center p-2">
               {/* Album Cover Thumbnail */}
-              <div className="flex-shrink-0 w-16 h-16 relative rounded-lg overflow-hidden">
-                <img
-                  src={story.songs?.cover_image || '/placeholder-album.jpg'}
-                  alt={story.songs?.title || 'Album cover'}
-                  className="object-cover w-full h-full"
-                />
+              <div className="flex-shrink-0 w-16 h-16 relative rounded-lg overflow-hidden bg-gray-100">
+                {story.songs?.cover_image ? (
+                  <Image
+                    src={story.songs.cover_image}
+                    alt={story.songs.title || 'Album cover'}
+                    fill
+                    className="object-cover"
+                    sizes="64px"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                    </svg>
+                  </div>
+                )}
+                {story.songs?.preview_url && (
+                  <button
+                    onClick={() => handlePlayPause(story.songs!.id, story.songs!.preview_url!)}
+                    className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 hover:opacity-100 transition-opacity"
+                  >
+                    {playingSongId === story.songs.id ? (
+                      <Pause className="h-6 w-6 text-white" />
+                    ) : (
+                      <Play className="h-6 w-6 text-white" />
+                    )}
+                  </button>
+                )}
               </div>
 
               {/* Content */}
