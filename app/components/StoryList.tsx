@@ -101,7 +101,7 @@ export function StoryList() {
                     <div className="text-xs text-gray-500 flex items-center gap-2">
                       <span>{story.songs?.artist_name}</span>
                       <span>•</span>
-                      <span>Shared by {story.profile?.full_name || 'Anonymous'}</span>
+                      <span>Shared by {story.profiles?.full_name || 'Anonymous'}</span>
                       <span>•</span>
                       <span>{new Date(story.created_at!).toLocaleDateString()}</span>
                     </div>

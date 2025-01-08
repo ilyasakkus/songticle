@@ -37,6 +37,10 @@ export function useSupabaseData<T>(
   return { data, isLoading, error };
 }
 
+interface Album {
+  songs: Song[]
+}
+
 export function useArtistSearch() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -67,7 +71,7 @@ export function useArtistSearch() {
       if (data) {
         setSearchResults({
           artist: data,
-          songs: data.albums?.flatMap(album => album.songs) || []
+          songs: data.albums?.flatMap((album: Album) => album.songs) || []
         });
       } else {
         setSearchResults({ artist: null, songs: [] });
@@ -97,7 +101,7 @@ type Story = {
   comments: number
   likes: number
   user_id: string
-  profile?: {
+  profiles?: {
     full_name: string
   } | null
   songs?: {
@@ -121,19 +125,24 @@ export const useStories = () => {
           .from('stories')
           .select(`
             *,
-            songs!stories_song_id_fkey (
+            songs:songs!stories_song_id_fkey (
               id,
               title,
               artist_id,
               cover_image
             ),
-            profile:profiles!stories_user_id_fkey (
+            profiles (
               full_name
             )
           `)
           .order('created_at', { ascending: false })
 
-        if (storiesError) throw storiesError
+        if (storiesError) {
+          console.error('Stories error:', storiesError)
+          throw storiesError
+        }
+
+        console.log('Raw stories data:', JSON.stringify(storiesData, null, 2))
 
         if (storiesData) {
           const storiesWithCounts = await Promise.all(
