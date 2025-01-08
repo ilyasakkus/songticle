@@ -129,16 +129,16 @@ export const useStories = () => {
             created_at,
             song_id,
             user_id,
-            songs (
+            songs!inner (
               id,
               title,
               artist_id,
               cover_image,
-              artists (
+              artists!inner (
                 name
               )
             ),
-            profiles (
+            profiles!inner (
               full_name
             )
           `)
@@ -152,11 +152,11 @@ export const useStories = () => {
         if (storiesData) {
           const transformedStories = storiesData.map(story => ({
             ...story,
-            songs: story.songs?.[0] ? {
+            songs: {
               ...story.songs[0],
-              artists: story.songs[0].artists?.[0] || null
-            } : null,
-            profiles: story.profiles?.[0] || null
+              artists: story.songs[0].artists[0]
+            },
+            profiles: story.profiles[0]
           }))
           setStories(transformedStories)
         }
