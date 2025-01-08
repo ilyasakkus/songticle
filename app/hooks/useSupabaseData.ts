@@ -108,7 +108,8 @@ type Story = {
       name: string
     } | null
   } | null
-  profiles: {
+  author: {
+    id: string
     full_name: string
   } | null
 }
@@ -129,39 +130,55 @@ export const useStories = () => {
             created_at,
             song_id,
             user_id,
-            songs!inner (
+            songs!stories_song_id_fkey (
               id,
               title,
               artist_id,
               cover_image,
-              artists!inner (
+              artists!songs_artist_id_fkey (
                 name
               )
             ),
-            profiles!inner (
-              full_name
-            )
+            author:profiles(id, full_name)
           `)
           .order('created_at', { ascending: false })
 
         if (storiesError) {
-          console.error('Stories error:', storiesError)
+          console.log('Stories error details:', JSON.stringify(storiesError, null, 2))
           throw storiesError
         }
 
         if (storiesData) {
-          const transformedStories = storiesData.map(story => ({
-            ...story,
-            songs: {
-              ...story.songs[0],
-              artists: story.songs[0].artists[0]
-            },
-            profiles: story.profiles[0]
-          }))
+          console.log('Raw stories data:', JSON.stringify(storiesData, null, 2))
+          const transformedStories = storiesData.map(story => {
+            try {
+              if (!story.songs?.[0]) return null
+              
+              return {
+                id: story.id,
+                content: story.content,
+                created_at: story.created_at,
+                song_id: story.song_id,
+                user_id: story.user_id,
+                songs: {
+                  id: story.songs[0].id,
+                  title: story.songs[0].title,
+                  artist_id: story.songs[0].artist_id,
+                  cover_image: story.songs[0].cover_image,
+                  artists: story.songs[0].artists?.[0] || null
+                },
+                author: story.author?.[0] || null
+              } as Story
+            } catch (e) {
+              console.log('Transform error for story:', story.id, e)
+              return null
+            }
+          }).filter((story): story is Story => story !== null)
+          
           setStories(transformedStories)
         }
       } catch (err) {
-        console.error('Error fetching stories:', err)
+        console.log('Full error object:', JSON.stringify(err, null, 2))
         setError(err instanceof Error ? err.message : 'Failed to fetch stories')
       } finally {
         setLoading(false)
