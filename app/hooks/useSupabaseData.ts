@@ -98,18 +98,18 @@ type Story = {
   content: string
   created_at: string
   song_id: number
-  comments: number
-  likes: number
   user_id: string
-  profiles?: {
-    full_name: string
-  } | null
-  songs?: {
+  songs: {
     id: number
     title: string
     artist_id: number
-    artist_name?: string
-    cover_image?: string | null
+    cover_image: string | null
+    artists: {
+      name: string
+    } | null
+  } | null
+  profiles: {
+    full_name: string
   } | null
 }
 
@@ -124,12 +124,19 @@ export const useStories = () => {
         const { data: storiesData, error: storiesError } = await supabase
           .from('stories')
           .select(`
-            *,
-            songs:songs!stories_song_id_fkey (
+            id,
+            content,
+            created_at,
+            song_id,
+            user_id,
+            songs (
               id,
               title,
               artist_id,
-              cover_image
+              cover_image,
+              artists (
+                name
+              )
             ),
             profiles (
               full_name
@@ -142,33 +149,16 @@ export const useStories = () => {
           throw storiesError
         }
 
-        console.log('Raw stories data:', JSON.stringify(storiesData, null, 2))
-
         if (storiesData) {
-          const storiesWithCounts = await Promise.all(
-            storiesData.map(async (story) => {
-              const [{ count: commentCount }, { count: likeCount }] = await Promise.all([
-                supabase
-                  .from('story_comments')
-                  .select('*', { count: 'exact', head: true })
-                  .eq('story_id', story.id)
-                  .then(({ count }) => ({ count: count || 0 })),
-                supabase
-                  .from('story_likes')
-                  .select('*', { count: 'exact', head: true })
-                  .eq('story_id', story.id)
-                  .then(({ count }) => ({ count: count || 0 }))
-              ])
-
-              return {
-                ...story,
-                comments: commentCount,
-                likes: likeCount
-              }
-            })
-          )
-
-          setStories(storiesWithCounts)
+          const transformedStories = storiesData.map(story => ({
+            ...story,
+            songs: story.songs?.[0] ? {
+              ...story.songs[0],
+              artists: story.songs[0].artists?.[0] || null
+            } : null,
+            profiles: story.profiles?.[0] || null
+          }))
+          setStories(transformedStories)
         }
       } catch (err) {
         console.error('Error fetching stories:', err)

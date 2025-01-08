@@ -99,7 +99,7 @@ export function StoryList() {
                       {story.songs?.title}
                     </h3>
                     <div className="text-xs text-gray-500 flex items-center gap-2">
-                      <span>{story.songs?.artist_name}</span>
+                      <span>{story.songs?.artists?.name}</span>
                       <span>•</span>
                       <span>Shared by {story.profiles?.full_name || 'Anonymous'}</span>
                       <span>•</span>
@@ -112,20 +112,10 @@ export function StoryList() {
                     <button className="btn btn-ghost btn-sm flex items-center gap-2">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="w-4 h-4 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path></svg>
                       <span className="text-sm">Add comment</span>
-                      {story.comments > 0 && (
-                        <span className="text-xs bg-base-200 px-2 py-0.5 rounded-full">
-                          {story.comments}
-                        </span>
-                      )}
                     </button>
                     <button className="btn btn-ghost btn-sm flex items-center gap-2">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="w-4 h-4 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
                       <span className="text-sm">Like</span>
-                      {story.likes > 0 && (
-                        <span className="text-xs bg-base-200 px-2 py-0.5 rounded-full">
-                          {story.likes}
-                        </span>
-                      )}
                     </button>
                   </div>
                 </div>
