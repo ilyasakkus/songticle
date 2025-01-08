@@ -12,30 +12,21 @@ create table if not exists public.profiles (
 alter table public.profiles enable row level security;
 
 -- Create policies
-create policy "Public profiles are viewable by everyone."
+create policy "Public profiles are viewable by everyone"
     on profiles for select
-    using ( true );
+    using (true);
 
-create policy "Users can insert their own profile."
+create policy "Users can insert their own profile"
     on profiles for insert
-    with check ( auth.uid() = id );
+    with check (auth.uid() = id);
 
-create policy "Users can update their own profile."
+create policy "Users can update their own profile"
     on profiles for update
-    using ( auth.uid() = id );
+    using (auth.uid() = id);
 
--- Create indexes for better performance
-create index if not exists profiles_email_idx on public.profiles (email);
-
--- Set up realtime
-alter publication supabase_realtime add table profiles;
-
--- Function to handle new user creation
+-- Create function to handle new user profiles
 create or replace function public.handle_new_user()
-returns trigger
-language plpgsql
-security definer set search_path = public
-as $$
+returns trigger as $$
 begin
     insert into public.profiles (id, email, full_name, avatar_url, updated_at)
     values (
@@ -47,10 +38,15 @@ begin
     );
     return new;
 end;
-$$;
+$$ language plpgsql security definer;
 
--- Trigger for new user creation
-drop trigger if exists on_auth_user_created on auth.users;
-create trigger on_auth_user_created
+-- Create trigger for new users
+create or replace trigger on_auth_user_created
     after insert on auth.users
     for each row execute procedure public.handle_new_user();
+
+-- Create indexes for better performance
+create index if not exists profiles_email_idx on public.profiles (email);
+
+-- Set up realtime
+alter publication supabase_realtime add table profiles;

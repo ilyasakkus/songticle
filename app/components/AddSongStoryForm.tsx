@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { supabase } from '../lib/supabase';
 import { useSupabaseData } from '../hooks/useSupabaseData';
+import { useAuth } from '../hooks/useAuth';
 import type { Song } from '../types/database.types';
 import Image from 'next/image';
 
@@ -18,6 +19,7 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 export function AddSongStoryForm() {
+  const { user, isAuthenticated } = useAuth();
   const [searchValue, setSearchValue] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -45,28 +47,26 @@ export function AddSongStoryForm() {
 
   const onSubmit = async (values: FormData) => {
     try {
+      if (!isAuthenticated || !user) {
+        throw new Error('Lütfen hikaye paylaşmak için giriş yapın');
+      }
+
       setLoading(true);
       setError(null);
       setSuccess(null);
 
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-      if (sessionError) throw sessionError;
-
-      const session = sessionData.session;
-      if (!session) {
-        throw new Error('Please sign in to share your story');
-      }
-
       if (!values.songId) {
-        throw new Error('Please select a song first');
+        throw new Error('Lütfen önce bir şarkı seçin');
       }
 
       const storyData = {
         song_id: values.songId,
         title: values.title,
         content: values.content,
-        user_id: session.user.id
+        user_id: user.id
       };
+
+      console.log('Submitting story data:', storyData);
 
       const { error: insertError } = await supabase
         .from('stories')
@@ -76,10 +76,10 @@ export function AddSongStoryForm() {
 
       if (insertError) {
         console.error('Insert error:', insertError);
-        throw new Error(insertError.message || 'Failed to create story');
+        throw new Error(insertError.message || 'Hikaye oluşturulamadı');
       }
 
-      setSuccess('Story posted successfully!');
+      setSuccess('Hikayeniz başarıyla paylaşıldı!');
       form.reset();
       setSearchValue('');
       setSelectedSong(null);
@@ -88,7 +88,7 @@ export function AddSongStoryForm() {
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError('Failed to create story. Please try again.');
+        setError('Hikaye paylaşılırken bir hata oluştu. Lütfen tekrar deneyin.');
       }
     } finally {
       setLoading(false);

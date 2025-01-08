@@ -2,84 +2,41 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { User } from '@supabase/auth-helpers-nextjs';
-
-interface Profile {
-  id: string;
-  email: string;
-  full_name: string | null;
-  avatar_url: string | null;
-  updated_at: string;
-}
-
-interface AuthState {
-  user: User | null;
-  profile: Profile | null;
-  loading: boolean;
-  error: Error | null;
-}
+import { User, Session } from '@supabase/supabase-js';
 
 export function useAuth() {
-  const [authState, setAuthState] = useState<AuthState>({
-    user: null,
-    profile: null,
-    loading: true,
-    error: null,
-  });
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session }, error }) => {
       if (error) {
-        setAuthState(prev => ({ ...prev, error, loading: false }));
-        return;
+        console.error('Error fetching session:', error);
       }
-
-      if (session?.user) {
-        fetchProfile(session.user);
-      } else {
-        setAuthState(prev => ({ ...prev, loading: false }));
-      }
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session?.user) {
-        fetchProfile(session.user);
-      } else {
-        setAuthState(prev => ({ ...prev, user: null, profile: null }));
-      }
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log('Auth state changed:', _event, session?.user);
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
     });
 
-    return () => {
-      subscription.unsubscribe();
-    };
+    return () => subscription.unsubscribe();
   }, []);
 
-  const fetchProfile = async (user: User) => {
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-
-      if (error) throw error;
-
-      setAuthState({
-        user,
-        profile: data,
-        loading: false,
-        error: null,
-      });
-    } catch (error) {
-      setAuthState(prev => ({
-        ...prev,
-        error: error as Error,
-        loading: false,
-      }));
-    }
+  return {
+    user,
+    session,
+    loading,
+    isAuthenticated: !!user,
   };
-
-  return authState;
 }

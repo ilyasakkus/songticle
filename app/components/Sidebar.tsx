@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { useArtistHierarchy } from '../hooks/useArtistHierarchy';
 import { Music, Disc, User, Search } from 'lucide-react';
 
@@ -93,10 +94,13 @@ export function Sidebar() {
               checked={isArtistExpanded(artist.id)}
               onChange={() => toggleArtist(artist.id)}
             />
-            <div className="collapse-title flex items-center gap-2 text-sm">
+            <Link 
+              href={`/artist/${artist.id}`}
+              className="collapse-title flex items-center gap-2 text-sm hover:text-primary"
+            >
               <User size={16} />
               <span className="truncate">{artist.name}</span>
-            </div>
+            </Link>
             
             {isArtistExpanded(artist.id) && artist.albums && (
               <div className="collapse-content">
@@ -107,10 +111,13 @@ export function Sidebar() {
                       checked={isAlbumExpanded(album.id)}
                       onChange={() => toggleAlbum(album.id)}
                     />
-                    <div className="collapse-title flex items-center gap-2 text-sm py-2">
+                    <Link 
+                      href={`/album/${album.id}`}
+                      className="collapse-title flex items-center gap-2 text-sm py-2 hover:text-primary"
+                    >
                       <Disc size={16} />
                       <span className="truncate">{album.title}</span>
-                    </div>
+                    </Link>
                     
                     {isAlbumExpanded(album.id) && album.songs && (
                       <div className="collapse-content">

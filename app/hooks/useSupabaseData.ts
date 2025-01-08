@@ -45,7 +45,7 @@ export function useArtistSearch() {
     songs: []
   });
 
-  const searchArtist = async (query: string, addToDb: boolean = false) => {
+  const searchArtist = async (query: string) => {
     try {
       setIsLoading(true);
       setError(null);
@@ -87,4 +87,90 @@ export function useArtistSearch() {
   };
 
   return { searchArtist, isLoading, error, searchResults };
+}
+
+type Story = {
+  id: number
+  content: string
+  created_at: string
+  song_id: number
+  comments: number
+  likes: number
+  user_id: string
+  profile?: {
+    full_name: string
+  } | null
+  songs?: {
+    id: number
+    title: string
+    artist_id: number
+    artist_name?: string
+    cover_image?: string | null
+  } | null
+}
+
+export const useStories = () => {
+  const [stories, setStories] = useState<Story[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchStories = async () => {
+      try {
+        const { data: storiesData, error: storiesError } = await supabase
+          .from('stories')
+          .select(`
+            *,
+            songs!stories_song_id_fkey (
+              id,
+              title,
+              artist_id,
+              cover_image
+            ),
+            profile:profiles!stories_user_id_fkey (
+              full_name
+            )
+          `)
+          .order('created_at', { ascending: false })
+
+        if (storiesError) throw storiesError
+
+        if (storiesData) {
+          const storiesWithCounts = await Promise.all(
+            storiesData.map(async (story) => {
+              const [{ count: commentCount }, { count: likeCount }] = await Promise.all([
+                supabase
+                  .from('story_comments')
+                  .select('*', { count: 'exact', head: true })
+                  .eq('story_id', story.id)
+                  .then(({ count }) => ({ count: count || 0 })),
+                supabase
+                  .from('story_likes')
+                  .select('*', { count: 'exact', head: true })
+                  .eq('story_id', story.id)
+                  .then(({ count }) => ({ count: count || 0 }))
+              ])
+
+              return {
+                ...story,
+                comments: commentCount,
+                likes: likeCount
+              }
+            })
+          )
+
+          setStories(storiesWithCounts)
+        }
+      } catch (err) {
+        console.error('Error fetching stories:', err)
+        setError(err instanceof Error ? err.message : 'Failed to fetch stories')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchStories()
+  }, [])
+
+  return { stories, loading, error }
 }

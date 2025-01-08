@@ -43,6 +43,7 @@ export function SignInForm({ onClose }: Props) {
 
       // Close modal on success
       onClose();
+      window.location.reload(); // Ensure auth state is refreshed
     } catch (error: unknown) {
       if (error instanceof AuthError) {
         setError(error.message);
@@ -59,26 +60,32 @@ export function SignInForm({ onClose }: Props) {
       setLoading(true);
       setError(null);
 
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
           queryParams: {
             access_type: 'offline',
-            prompt: 'consent',
-          },
-          redirectTo: `${window.location.origin}/auth/callback`
+            prompt: 'consent'
+          }
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Google sign-in error:', error);
+        throw error;
+      }
+
+      if (data?.url) {
+        window.location.href = data.url;
+      }
       
-      // Don't close the modal here as we'll be redirected to Google
     } catch (error: unknown) {
       console.error('Google sign-in error:', error);
       if (error instanceof AuthError) {
         setError(error.message);
       } else {
-        setError('Failed to sign in with Google');
+        setError('Google ile giriş yapılırken bir hata oluştu');
       }
       setLoading(false);
     }
