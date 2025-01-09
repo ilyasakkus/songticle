@@ -8,6 +8,7 @@ interface DeezerItem {
   id: number
   title: string
   preview?: string
+  duration: number
   artist: {
     id: number
     name: string
@@ -46,6 +47,8 @@ export default function AdminPage() {
         const transformedData = response.data.map((item: any) => ({
           id: item.id,
           title: item.title,
+          preview: item.preview,
+          duration: item.duration || 0,
           artist: {
             id: item.artist?.id,
             name: item.artist?.name,
@@ -174,6 +177,7 @@ export default function AdminPage() {
           artist_id: item.artist.id,
           title: item.title?.substring(0, 255) || '',
           preview_url: item.preview?.substring(0, 255) || '',
+          duration: item.duration,
           album_name: item.album.title?.substring(0, 255) || '',
           artist_name: item.artist.name?.substring(0, 255) || '',
           cover_image: item.album.cover_medium?.substring(0, 255) || ''

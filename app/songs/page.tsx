@@ -6,11 +6,21 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Search } from 'lucide-react'
 import { slugify } from '../lib/utils'
+import { useDebounce } from '../hooks/useDebounce'
 
 interface Song {
   id: number
   title: string
   preview_url: string | null
+  albums: {
+    id: number
+    title: string
+    cover_medium: string | null
+  }
+  artists: {
+    id: number
+    name: string
+  }
   album: {
     id: number
     title: string
@@ -35,9 +45,14 @@ export default function SongsPage() {
   const [hasMore, setHasMore] = useState(true)
   const supabase = createClientComponentClient()
 
+  const debouncedSongSearch = useDebounce(songSearchTerm, 300)
+  const debouncedAlbumSearch = useDebounce(albumSearchTerm, 300)
+  const debouncedArtistSearch = useDebounce(artistSearchTerm, 300)
+
   useEffect(() => {
-    fetchSongs()
-  }, [])
+    setSongs([])
+    fetchSongs(0)
+  }, [debouncedSongSearch, debouncedAlbumSearch, debouncedArtistSearch])
 
   const fetchSongs = async (start = 0) => {
     try {
@@ -45,7 +60,7 @@ export default function SongsPage() {
       isInitialFetch ? setLoading(true) : setLoadingMore(true)
       setError(null)
 
-      const { data, error } = await supabase
+      let query = supabase
         .from('songs')
         .select(`
           id,
@@ -61,8 +76,24 @@ export default function SongsPage() {
             name
           )
         `)
+
+      // Add search filters
+      if (debouncedSongSearch) {
+        query = query.ilike('title', `%${debouncedSongSearch}%`)
+      }
+      if (debouncedAlbumSearch) {
+        query = query.ilike('album_name', `%${debouncedAlbumSearch}%`)
+      }
+      if (debouncedArtistSearch) {
+        query = query.ilike('artist_name', `%${debouncedArtistSearch}%`)
+      }
+
+      // Add pagination
+      query = query
         .order('title')
         .range(start, start + PAGE_SIZE - 1)
+
+      const { data, error } = await query
 
       if (error) throw error
 
@@ -70,7 +101,7 @@ export default function SongsPage() {
         ...song,
         album: song.albums,
         artist: song.artists
-      })) || []
+      })) as Song[]
 
       if (isInitialFetch) {
         setSongs(transformedData)
@@ -93,13 +124,6 @@ export default function SongsPage() {
       fetchSongs(songs.length)
     }
   }
-
-  const filteredSongs = songs.filter(song => {
-    const songMatch = song.title.toLowerCase().includes(songSearchTerm.toLowerCase())
-    const albumMatch = song.album.title.toLowerCase().includes(albumSearchTerm.toLowerCase())
-    const artistMatch = song.artist.name.toLowerCase().includes(artistSearchTerm.toLowerCase())
-    return songMatch && albumMatch && artistMatch
-  })
 
   if (loading) {
     return (
@@ -164,7 +188,7 @@ export default function SongsPage() {
       </div>
       
       <div className="space-y-4 mt-8">
-        {filteredSongs.map((song) => (
+        {songs.map((song) => (
           <Link 
             key={song.id}
             href={`/songs/${song.id}/${slugify(song.title)}`}
@@ -216,7 +240,7 @@ export default function SongsPage() {
       </div>
 
       {/* Load More Button */}
-      {hasMore && !songSearchTerm && !albumSearchTerm && !artistSearchTerm && (
+      {hasMore && (
         <div className="flex justify-center mt-8">
           <button
             onClick={handleLoadMore}
