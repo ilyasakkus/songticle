@@ -1,9 +1,9 @@
-import AlbumContent from './AlbumContent'
+type Props = {
+  params: {
+    id: string
+  }
+}
 
-export default function AlbumPage({
-  params,
-}: {
-  params: { id: string }
-}) {
-  return <AlbumContent id={params.id} />
+export default function Page(props: Props) {
+  return null
 } 
