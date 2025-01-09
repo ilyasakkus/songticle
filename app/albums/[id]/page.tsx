@@ -1,13 +1,11 @@
-import { AlbumClient } from '../AlbumClient'
+import { AlbumClient } from './AlbumClient'
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { notFound } from 'next/navigation'
-import { slugify } from '../../../lib/utils'
 
 interface Props {
   params: {
     id: string
-    slug: string
   }
 }
 
@@ -28,18 +26,8 @@ export default async function AlbumPage({ params }: Props) {
     .eq('id', params.id)
     .single()
 
-  if (albumError) {
+  if (albumError || !album) {
     console.error('Error fetching album:', albumError)
-    return <div>Error loading album</div>
-  }
-
-  if (!album) {
-    return notFound()
-  }
-
-  // Verify slug matches album title
-  const expectedSlug = slugify(album.title)
-  if (params.slug !== expectedSlug) {
     return notFound()
   }
 

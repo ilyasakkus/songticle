@@ -1,13 +1,11 @@
-import { SongClient } from '../SongClient'
+import { SongClient } from './SongClient'
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { notFound } from 'next/navigation'
-import { slugify } from '../../../lib/utils'
 
 interface Props {
   params: {
     id: string
-    slug: string
   }
 }
 
@@ -32,18 +30,8 @@ export default async function SongPage({ params }: Props) {
     .eq('id', params.id)
     .single()
 
-  if (songError) {
+  if (songError || !song) {
     console.error('Error fetching song:', songError)
-    return <div>Error loading song</div>
-  }
-
-  if (!song) {
-    return notFound()
-  }
-
-  // Verify slug matches song title
-  const expectedSlug = slugify(song.title)
-  if (params.slug !== expectedSlug) {
     return notFound()
   }
 

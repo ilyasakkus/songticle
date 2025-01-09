@@ -235,7 +235,7 @@ export default function SongsPage() {
         {songs.map((song) => (
           <Link 
             key={song.id}
-            href={`/songs/${song.id}/${slugify(song.title)}`}
+            href={`/songs/${song.id}`}
             className="flex items-center gap-4 p-4 bg-base-100 rounded-lg shadow hover:shadow-md transition-shadow block"
           >
             <div className="shrink-0">
@@ -261,7 +261,7 @@ export default function SongsPage() {
                 <div 
                   onClick={(e: React.MouseEvent<HTMLDivElement>) => {
                     e.preventDefault()
-                    window.location.href = `/artists/${song.artist.id}/${slugify(song.artist.name)}`
+                    window.location.href = `/artists/${song.artist.id}`
                   }}
                   className="hover:text-primary hover:underline cursor-pointer"
                 >
@@ -271,7 +271,7 @@ export default function SongsPage() {
                 <div 
                   onClick={(e: React.MouseEvent<HTMLDivElement>) => {
                     e.preventDefault()
-                    window.location.href = `/albums/${song.album.id}/${slugify(song.album.title)}`
+                    window.location.href = `/albums/${song.album.id}`
                   }}
                   className="hover:text-primary hover:underline truncate cursor-pointer"
                 >

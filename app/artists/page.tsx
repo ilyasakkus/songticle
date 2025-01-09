@@ -18,57 +18,103 @@ const PAGE_SIZE = 40
 export default function ArtistsPage() {
   const [artists, setArtists] = useState<Artist[]>([])
   const [loading, setLoading] = useState(true)
-  const [loadingMore, setLoadingMore] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
-  const [hasMore, setHasMore] = useState(true)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalCount, setTotalCount] = useState(0)
   const supabase = createClientComponentClient()
 
   useEffect(() => {
-    fetchArtists()
-  }, [])
+    setCurrentPage(1)
+    void fetchArtists(1)
+  }, [searchTerm])
 
-  const fetchArtists = async (start = 0) => {
+  useEffect(() => {
+    void fetchArtists(currentPage)
+  }, [currentPage])
+
+  const fetchArtists = async (page: number) => {
     try {
-      const isInitialFetch = start === 0
-      isInitialFetch ? setLoading(true) : setLoadingMore(true)
+      setLoading(true)
       setError(null)
 
-      const { data, error } = await supabase
+      // Calculate range
+      const from = (page - 1) * PAGE_SIZE
+      const to = from + PAGE_SIZE - 1
+
+      let query = supabase
         .from('artists')
-        .select('*')
+        .select('*', { count: 'exact' })
+
+      // Add search filter
+      if (searchTerm) {
+        query = query.ilike('name', `%${searchTerm}%`)
+      }
+
+      // Add pagination
+      query = query
         .order('name')
-        .range(start, start + PAGE_SIZE - 1)
+        .range(from, to)
+
+      const { data, error, count } = await query
 
       if (error) throw error
 
-      if (isInitialFetch) {
-        setArtists(data || [])
-      } else {
-        setArtists(prev => [...prev, ...(data || [])])
+      setArtists(data || [])
+      if (count !== null) {
+        setTotalCount(count)
       }
-
-      setHasMore((data?.length || 0) === PAGE_SIZE)
     } catch (err) {
       console.error('Error fetching artists:', err)
       setError('Failed to load artists')
     } finally {
       setLoading(false)
-      setLoadingMore(false)
     }
   }
 
-  const handleLoadMore = () => {
-    if (!loadingMore && hasMore) {
-      fetchArtists(artists.length)
-    }
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const filteredArtists = artists.filter(artist =>
-    artist.name.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  const getPageNumbers = () => {
+    const totalPages = Math.ceil(totalCount / PAGE_SIZE)
+    const pageNumbers: (number | string)[] = []
+    const maxVisiblePages = 5
 
-  if (loading) {
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(i)
+      }
+    } else {
+      pageNumbers.push(1)
+
+      let start = Math.max(currentPage - Math.floor(maxVisiblePages / 2), 2)
+      let end = Math.min(start + maxVisiblePages - 3, totalPages - 1)
+
+      if (end === totalPages - 1) {
+        start = Math.max(end - maxVisiblePages + 3, 2)
+      }
+
+      if (start > 2) {
+        pageNumbers.push('...')
+      }
+
+      for (let i = start; i <= end; i++) {
+        pageNumbers.push(i)
+      }
+
+      if (end < totalPages - 1) {
+        pageNumbers.push('...')
+      }
+
+      pageNumbers.push(totalPages)
+    }
+
+    return pageNumbers
+  }
+
+  if (loading && artists.length === 0) {
     return (
       <div className="flex justify-center items-center min-h-[200px]">
         <span className="loading loading-spinner loading-lg"></span>
@@ -83,6 +129,8 @@ export default function ArtistsPage() {
       </div>
     )
   }
+
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE)
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -107,7 +155,7 @@ export default function ArtistsPage() {
       </div>
       
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4 mt-8">
-        {filteredArtists.map((artist) => (
+        {artists.map((artist) => (
           <Link 
             key={artist.id}
             href={`/artists/${artist.id}/${slugify(artist.name)}`}
@@ -137,19 +185,37 @@ export default function ArtistsPage() {
         ))}
       </div>
 
-      {/* Load More Button */}
-      {hasMore && !searchTerm && (
-        <div className="flex justify-center mt-8">
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-2 mt-8">
           <button
-            onClick={handleLoadMore}
-            disabled={loadingMore}
-            className="btn btn-primary"
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1 || loading}
+            className="btn btn-circle btn-sm"
           >
-            {loadingMore ? (
-              <span className="loading loading-spinner"></span>
-            ) : (
-              'Load More'
-            )}
+            ←
+          </button>
+          
+          {getPageNumbers().map((pageNumber, index) => (
+            <button
+              key={index}
+              onClick={() => typeof pageNumber === 'number' ? handlePageChange(pageNumber) : null}
+              disabled={loading || pageNumber === '...'}
+              className={`btn btn-circle btn-sm ${
+                pageNumber === currentPage ? 'btn-primary' : 
+                pageNumber === '...' ? 'btn-disabled' : ''
+              }`}
+            >
+              {pageNumber}
+            </button>
+          ))}
+
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages || loading}
+            className="btn btn-circle btn-sm"
+          >
+            →
           </button>
         </div>
       )}
