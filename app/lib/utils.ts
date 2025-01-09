@@ -12,21 +12,16 @@ export function formatDuration(seconds: number): string {
 }
 
 export function slugify(text: string): string {
-  const turkishChars: { [key: string]: string } = {
-    'ğ': 'g', 'Ğ': 'G',
-    'ü': 'u', 'Ü': 'U',
-    'ş': 's', 'Ş': 'S',
-    'ı': 'i', 'İ': 'I',
-    'ö': 'o', 'Ö': 'O',
-    'ç': 'c', 'Ç': 'C'
+  const trMap: { [key: string]: string } = {
+    'ı': 'i', 'ğ': 'g', 'ü': 'u', 'ş': 's', 'ö': 'o', 'ç': 'c',
+    'İ': 'I', 'Ğ': 'G', 'Ü': 'U', 'Ş': 'S', 'Ö': 'O', 'Ç': 'C'
   }
 
   return text
+    .replace(/[ıİğĞüÜşŞöÖçÇ]/g, (char) => trMap[char] || char) // Convert Turkish characters
     .toLowerCase()
-    // Replace Turkish characters
-    .replace(/[ğüşıöçĞÜŞİÖÇ]/g, letter => turkishChars[letter] || letter)
-    // Replace non-alphanumeric characters with hyphens
-    .replace(/[^a-z0-9]+/g, '-')
-    // Remove hyphens from start and end
-    .replace(/^-+|-+$/g, '')
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, '') // Remove invalid chars
+    .replace(/\s+/g, '-') // Replace spaces with -
+    .replace(/-+/g, '-') // Replace multiple - with single -
 }

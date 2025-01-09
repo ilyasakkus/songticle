@@ -1,144 +1,251 @@
 'use client';
 
-import React, { useState } from 'react';
-import Link from 'next/link';
-import { useArtistHierarchy } from '../hooks/useArtistHierarchy';
-import { Music, Disc, User, Search } from 'lucide-react';
+import { useState, useEffect } from 'react'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import Link from 'next/link'
+import Image from 'next/image'
+import { Search, History, Star, Clock, Music, ChevronRight, ChevronDown } from 'lucide-react'
+import { slugify } from '../lib/utils'
 
-export function Sidebar() {
-  const { artists, loading, error } = useArtistHierarchy();
-  const [expandedArtists, setExpandedArtists] = React.useState<Record<number, boolean>>({});
-  const [expandedAlbums, setExpandedAlbums] = React.useState<Record<number, boolean>>({});
-  const [searchTerm, setSearchTerm] = useState('');
+interface Artist {
+  id: number
+  name: string
+  picture_medium: string | null
+}
 
-  const toggleArtist = (artistId: number) => {
-    setExpandedArtists(prev => ({
+interface Album {
+  id: number
+  title: string
+  cover_medium: string | null
+  artists: {
+    id: number
+    name: string
+  }
+}
+
+interface SearchHistory {
+  term: string
+  type: 'artist' | 'album' | 'song'
+  timestamp: number
+}
+
+export default function Sidebar() {
+  const [popularArtists, setPopularArtists] = useState<Artist[]>([])
+  const [recentAlbums, setRecentAlbums] = useState<Album[]>([])
+  const [searchHistory, setSearchHistory] = useState<SearchHistory[]>([])
+  const [expandedSections, setExpandedSections] = useState({
+    artists: true,
+    albums: true,
+    history: true
+  })
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const supabase = createClientComponentClient()
+
+  useEffect(() => {
+    fetchData()
+    loadSearchHistory()
+  }, [])
+
+  const fetchData = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+
+      // Fetch popular artists (for now, just getting first 5)
+      const { data: artistsData, error: artistsError } = await supabase
+        .from('artists')
+        .select('id, name, picture_medium')
+        .order('name')
+        .limit(5)
+
+      if (artistsError) throw artistsError
+
+      // Fetch recent albums
+      const { data: albumsData, error: albumsError } = await supabase
+        .from('albums')
+        .select(`
+          id,
+          title,
+          cover_medium,
+          artists!albums_artist_id_fkey (
+            id,
+            name
+          )
+        `)
+        .order('id', { ascending: false })
+        .limit(5)
+
+      if (albumsError) throw albumsError
+
+      setPopularArtists(artistsData || [])
+      setRecentAlbums(albumsData || [])
+    } catch (err) {
+      console.error('Error fetching sidebar data:', err)
+      setError('Failed to load sidebar data')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const loadSearchHistory = () => {
+    const history = localStorage.getItem('searchHistory')
+    if (history) {
+      setSearchHistory(JSON.parse(history))
+    }
+  }
+
+  const toggleSection = (section: keyof typeof expandedSections) => {
+    setExpandedSections(prev => ({
       ...prev,
-      [artistId]: !prev[artistId]
-    }));
-  };
-
-  const toggleAlbum = (albumId: number) => {
-    setExpandedAlbums(prev => ({
-      ...prev,
-      [albumId]: !prev[albumId]
-    }));
-  };
-
-  const isArtistExpanded = (artistId: number): boolean => {
-    return expandedArtists[artistId] || false;
-  };
-
-  const isAlbumExpanded = (albumId: number): boolean => {
-    return expandedAlbums[albumId] || false;
-  };
-
-  const filteredArtists = React.useMemo(() => {
-    if (!searchTerm) return artists;
-    
-    return artists?.filter(artist => 
-      artist.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      artist.albums?.some(album => 
-        album.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        album.songs?.some(song => 
-          song.title.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-      )
-    ) || [];
-  }, [artists, searchTerm]);
+      [section]: !prev[section]
+    }))
+  }
 
   if (loading) {
     return (
-      <aside className="w-60 h-full bg-base-100 border-r border-base-300 p-4">
-        <div className="animate-pulse space-y-4">
-          <div className="h-4 bg-base-300 rounded w-3/4"></div>
-          <div className="h-4 bg-base-300 rounded w-1/2"></div>
-          <div className="h-4 bg-base-300 rounded w-2/3"></div>
-        </div>
-      </aside>
-    );
+      <div className="p-4">
+        <span className="loading loading-spinner loading-sm"></span>
+      </div>
+    )
   }
 
   if (error) {
     return (
-      <aside className="w-60 h-full bg-base-100 border-r border-base-300 p-4">
-        <div className="text-error">Error loading artists: {error}</div>
-      </aside>
-    );
+      <div className="p-4 text-error text-sm">
+        <span>{error}</span>
+      </div>
+    )
   }
 
   return (
-    <aside className="w-60 h-full bg-base-100 border-r border-base-300 p-4">
-      <div className="space-y-4 mb-4">
-        <div className="form-control">
-          <div className="input-group">
-            <span className="btn btn-square btn-ghost">
-              <Search className="h-4 w-4" />
-            </span>
-            <input
-              type="search"
-              placeholder="Search artists, albums, songs..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="input input-bordered w-full"
-            />
+    <div className="w-64 bg-base-200 h-full p-4 flex flex-col gap-6">
+      {/* Popular Artists Section */}
+      <div>
+        <button 
+          onClick={() => toggleSection('artists')}
+          className="flex items-center justify-between w-full mb-2 text-sm font-semibold"
+        >
+          <div className="flex items-center gap-2">
+            <Star className="h-4 w-4" />
+            <span>Popular Artists</span>
           </div>
-        </div>
-      </div>
-      
-      <div className="space-y-2 overflow-y-auto max-h-[calc(100vh-200px)]">
-        {filteredArtists?.map(artist => (
-          <div key={artist.id} className="collapse collapse-arrow bg-base-200">
-            <input 
-              type="checkbox" 
-              checked={isArtistExpanded(artist.id)}
-              onChange={() => toggleArtist(artist.id)}
-            />
-            <Link 
-              href={`/artist/${artist.id}`}
-              className="collapse-title flex items-center gap-2 text-sm hover:text-primary"
-            >
-              <User size={16} />
-              <span className="truncate">{artist.name}</span>
-            </Link>
-            
-            {isArtistExpanded(artist.id) && artist.albums && (
-              <div className="collapse-content">
-                {artist.albums.map(album => (
-                  <div key={album.id} className="collapse collapse-arrow bg-base-100 my-1">
-                    <input 
-                      type="checkbox" 
-                      checked={isAlbumExpanded(album.id)}
-                      onChange={() => toggleAlbum(album.id)}
-                    />
-                    <Link 
-                      href={`/album/${album.id}`}
-                      className="collapse-title flex items-center gap-2 text-sm py-2 hover:text-primary"
-                    >
-                      <Disc size={16} />
-                      <span className="truncate">{album.title}</span>
-                    </Link>
-                    
-                    {isAlbumExpanded(album.id) && album.songs && (
-                      <div className="collapse-content">
-                        {album.songs.map(song => (
-                          <div
-                            key={song.id}
-                            className="flex items-center gap-2 p-2 hover:bg-base-200 rounded-btn cursor-pointer"
-                          >
-                            <Music size={16} />
-                            <span className="text-sm truncate">{song.title}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+          {expandedSections.artists ? (
+            <ChevronDown className="h-4 w-4" />
+          ) : (
+            <ChevronRight className="h-4 w-4" />
+          )}
+        </button>
+        {expandedSections.artists && (
+          <div className="space-y-2">
+            {popularArtists.map((artist) => (
+              <Link
+                key={artist.id}
+                href={`/artists/${artist.id}/${slugify(artist.name)}`}
+                className="flex items-center gap-2 p-2 hover:bg-base-300 rounded-lg transition-colors"
+              >
+                {artist.picture_medium ? (
+                  <Image
+                    src={artist.picture_medium}
+                    alt={artist.name}
+                    width={32}
+                    height={32}
+                    className="rounded-full"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-base-300 flex items-center justify-center">
+                    <Music className="h-4 w-4 opacity-50" />
                   </div>
-                ))}
-              </div>
+                )}
+                <span className="text-sm truncate">{artist.name}</span>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Recent Albums Section */}
+      <div>
+        <button 
+          onClick={() => toggleSection('albums')}
+          className="flex items-center justify-between w-full mb-2 text-sm font-semibold"
+        >
+          <div className="flex items-center gap-2">
+            <Clock className="h-4 w-4" />
+            <span>Recent Albums</span>
+          </div>
+          {expandedSections.albums ? (
+            <ChevronDown className="h-4 w-4" />
+          ) : (
+            <ChevronRight className="h-4 w-4" />
+          )}
+        </button>
+        {expandedSections.albums && (
+          <div className="space-y-2">
+            {recentAlbums.map((album) => (
+              <Link
+                key={album.id}
+                href={`/albums/${album.id}/${slugify(album.title)}`}
+                className="flex items-center gap-2 p-2 hover:bg-base-300 rounded-lg transition-colors"
+              >
+                {album.cover_medium ? (
+                  <Image
+                    src={album.cover_medium}
+                    alt={album.title}
+                    width={32}
+                    height={32}
+                    className="rounded"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded bg-base-300 flex items-center justify-center">
+                    <Music className="h-4 w-4 opacity-50" />
+                  </div>
+                )}
+                <div className="min-w-0 flex-1">
+                  <div className="text-sm truncate">{album.title}</div>
+                  <div className="text-xs text-gray-500 truncate">{album.artists.name}</div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Search History Section */}
+      <div>
+        <button 
+          onClick={() => toggleSection('history')}
+          className="flex items-center justify-between w-full mb-2 text-sm font-semibold"
+        >
+          <div className="flex items-center gap-2">
+            <History className="h-4 w-4" />
+            <span>Recent Searches</span>
+          </div>
+          {expandedSections.history ? (
+            <ChevronDown className="h-4 w-4" />
+          ) : (
+            <ChevronRight className="h-4 w-4" />
+          )}
+        </button>
+        {expandedSections.history && (
+          <div className="space-y-2">
+            {searchHistory.length > 0 ? (
+              searchHistory.map((item, index) => (
+                <div
+                  key={index}
+                  className="flex items-center gap-2 p-2 hover:bg-base-300 rounded-lg transition-colors text-sm"
+                >
+                  <Search className="h-4 w-4 opacity-50" />
+                  <span className="truncate">{item.term}</span>
+                  <span className="text-xs text-gray-500">{item.type}</span>
+                </div>
+              ))
+            ) : (
+              <div className="text-sm text-gray-500 p-2">No recent searches</div>
             )}
           </div>
-        ))}
+        )}
       </div>
-    </aside>
-  );
+    </div>
+  )
 }

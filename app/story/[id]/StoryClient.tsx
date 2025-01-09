@@ -1,11 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { useAuth } from '@/app/providers/AuthProvider'
-import { supabase } from '@/app/lib/supabase'
-import { formatDistanceToNow } from 'date-fns'
 import { Heart, MessageCircle } from 'lucide-react'
+import { formatDistanceToNow } from 'date-fns'
+import { useAuth } from '../../providers/AuthProvider'
+import { supabase } from '../../lib/supabase'
+import { SignInForm } from '../../components/auth/SignInForm'
 
 interface Story {
   id: number
@@ -55,6 +56,7 @@ export default function StoryClient({ storyId }: StoryClientProps) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [showSignIn, setShowSignIn] = useState(false)
 
   const isLiked = user ? likes.some(like => like.user_id === user.id) : false
 
@@ -220,11 +222,7 @@ export default function StoryClient({ storyId }: StoryClientProps) {
 
   const handleLike = async () => {
     if (!user) {
-      // Redirect to sign in
-      const signInModal = document.getElementById('sign-in-modal') as HTMLDialogElement
-      if (signInModal) {
-        signInModal.showModal()
-      }
+      setShowSignIn(true)
       return
     }
 
@@ -239,7 +237,7 @@ export default function StoryClient({ storyId }: StoryClientProps) {
             .eq('id', likeToRemove.id)
 
           if (error) throw error
-          fetchLikes() // Fetch fresh likes after unlike
+          fetchLikes()
         }
       } else {
         // Like
@@ -253,7 +251,7 @@ export default function StoryClient({ storyId }: StoryClientProps) {
           ])
 
         if (error) throw error
-        fetchLikes() // Fetch fresh likes after like
+        fetchLikes()
       }
     } catch (err) {
       console.error('Error updating like:', err)
@@ -324,16 +322,7 @@ export default function StoryClient({ storyId }: StoryClientProps) {
         {/* Actions */}
         <div className="px-6 py-4 border-b flex items-center gap-6">
           <button
-            onClick={() => {
-              if (!user) {
-                const signInModal = document.getElementById('sign-in-modal') as HTMLDialogElement
-                if (signInModal) {
-                  signInModal.showModal()
-                }
-                return
-              }
-              handleLike()
-            }}
+            onClick={handleLike}
             className={`btn btn-ghost gap-2 ${isLiked ? 'text-primary' : ''}`}
           >
             <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
@@ -378,12 +367,8 @@ export default function StoryClient({ storyId }: StoryClientProps) {
                 <span>For add your comment, please</span>
                 <button 
                   className="btn btn-sm btn-primary"
-                  onClick={() => {
-                    const signInModal = document.getElementById('sign-in-modal') as HTMLDialogElement
-                    if (signInModal) {
-                      signInModal.showModal()
-                    }
-                  }}
+                  onClick={() => setShowSignIn(true)}
+                  type="button"
                 >
                   sign in
                 </button>
@@ -418,6 +403,17 @@ export default function StoryClient({ storyId }: StoryClientProps) {
           </div>
         </div>
       </div>
+
+      {/* Sign In Modal */}
+      {showSignIn && (
+        <div className="modal modal-open">
+          <div className="modal-box">
+            <h3 className="font-bold text-lg mb-4">Sign In</h3>
+            <SignInForm onClose={() => setShowSignIn(false)} />
+          </div>
+          <div className="modal-backdrop" onClick={() => setShowSignIn(false)} />
+        </div>
+      )}
     </div>
   )
 } 

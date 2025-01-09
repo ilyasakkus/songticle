@@ -1,71 +1,105 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { supabase } from '../lib/supabase'
-import { Play, Pause } from 'lucide-react'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import Image from 'next/image'
+import { Search } from 'lucide-react'
+import { slugify } from '../lib/utils'
 
 interface Song {
   id: number
   title: string
-  cover_image: string | null
   preview_url: string | null
-  artists: {
+  album: {
+    id: number
+    title: string
+    cover_medium: string | null
+  }
+  artist: {
+    id: number
     name: string
-  } | null
+  }
 }
+
+const PAGE_SIZE = 40
 
 export default function SongsPage() {
   const [songs, setSongs] = useState<Song[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [playingSongId, setPlayingSongId] = useState<number | null>(null)
-  const [audio, setAudio] = useState<HTMLAudioElement | null>(null)
+  const [songSearchTerm, setSongSearchTerm] = useState('')
+  const [albumSearchTerm, setAlbumSearchTerm] = useState('')
+  const [artistSearchTerm, setArtistSearchTerm] = useState('')
+  const [hasMore, setHasMore] = useState(true)
+  const supabase = createClientComponentClient()
 
   useEffect(() => {
-    const fetchSongs = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('songs')
-          .select(`
-            *,
-            artists!songs_artist_id_fkey (
-              name
-            )
-          `)
-          .order('title')
-
-        if (error) throw error
-
-        setSongs(data || [])
-      } catch (err) {
-        console.error('Error fetching songs:', err)
-        setError('Failed to load songs')
-      } finally {
-        setLoading(false)
-      }
-    }
-
     fetchSongs()
   }, [])
 
-  const handlePlayPause = async (songId: number, previewUrl: string) => {
-    if (playingSongId === songId) {
-      audio?.pause()
-      setPlayingSongId(null)
-      setAudio(null)
-    } else {
-      audio?.pause()
-      const newAudio = new Audio(previewUrl)
-      await newAudio.play()
-      setPlayingSongId(songId)
-      setAudio(newAudio)
+  const fetchSongs = async (start = 0) => {
+    try {
+      const isInitialFetch = start === 0
+      isInitialFetch ? setLoading(true) : setLoadingMore(true)
+      setError(null)
 
-      newAudio.onended = () => {
-        setPlayingSongId(null)
-        setAudio(null)
+      const { data, error } = await supabase
+        .from('songs')
+        .select(`
+          id,
+          title,
+          preview_url,
+          albums!songs_album_id_fkey (
+            id,
+            title,
+            cover_medium
+          ),
+          artists!songs_artist_id_fkey (
+            id,
+            name
+          )
+        `)
+        .order('title')
+        .range(start, start + PAGE_SIZE - 1)
+
+      if (error) throw error
+
+      const transformedData = data?.map(song => ({
+        ...song,
+        album: song.albums,
+        artist: song.artists
+      })) || []
+
+      if (isInitialFetch) {
+        setSongs(transformedData)
+      } else {
+        setSongs(prev => [...prev, ...transformedData])
       }
+
+      setHasMore((data?.length || 0) === PAGE_SIZE)
+    } catch (err) {
+      console.error('Error fetching songs:', err)
+      setError('Failed to load songs')
+    } finally {
+      setLoading(false)
+      setLoadingMore(false)
     }
   }
+
+  const handleLoadMore = () => {
+    if (!loadingMore && hasMore) {
+      fetchSongs(songs.length)
+    }
+  }
+
+  const filteredSongs = songs.filter(song => {
+    const songMatch = song.title.toLowerCase().includes(songSearchTerm.toLowerCase())
+    const albumMatch = song.album.title.toLowerCase().includes(albumSearchTerm.toLowerCase())
+    const artistMatch = song.artist.name.toLowerCase().includes(artistSearchTerm.toLowerCase())
+    return songMatch && albumMatch && artistMatch
+  })
 
   if (loading) {
     return (
@@ -84,47 +118,123 @@ export default function SongsPage() {
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6">Songs</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {songs.map((song) => (
-          <div key={song.id} className="card bg-base-100 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center p-4 gap-4">
-              <div className="relative w-16 h-16">
-                {song.cover_image ? (
-                  <img
-                    src={song.cover_image}
-                    alt={song.title}
-                    className="w-full h-full rounded-lg object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full rounded-lg bg-gray-200 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
-                    </svg>
-                  </div>
-                )}
-                {song.preview_url && (
-                  <button
-                    onClick={() => handlePlayPause(song.id, song.preview_url!)}
-                    className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 hover:opacity-100 transition-opacity rounded-lg"
-                  >
-                    {playingSongId === song.id ? (
-                      <Pause className="h-6 w-6 text-white" />
-                    ) : (
-                      <Play className="h-6 w-6 text-white" />
-                    )}
-                  </button>
-                )}
-              </div>
-              <div className="flex-1 min-w-0">
-                <h2 className="font-medium text-sm line-clamp-1">{song.title}</h2>
-                <p className="text-xs text-gray-500">{song.artists?.name}</p>
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex flex-col gap-8">
+        <h1 className="text-3xl font-bold">Songs</h1>
+        
+        {/* Search Bars */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="input-group">
+            <span className="btn btn-square btn-ghost">
+              <Search className="h-5 w-5" />
+            </span>
+            <input
+              type="search"
+              placeholder="Search songs..."
+              value={songSearchTerm}
+              onChange={(e) => setSongSearchTerm(e.target.value)}
+              className="input input-bordered w-full"
+            />
+          </div>
+          <div className="input-group">
+            <span className="btn btn-square btn-ghost">
+              <Search className="h-5 w-5" />
+            </span>
+            <input
+              type="search"
+              placeholder="Search by album..."
+              value={albumSearchTerm}
+              onChange={(e) => setAlbumSearchTerm(e.target.value)}
+              className="input input-bordered w-full"
+            />
+          </div>
+          <div className="input-group">
+            <span className="btn btn-square btn-ghost">
+              <Search className="h-5 w-5" />
+            </span>
+            <input
+              type="search"
+              placeholder="Search by artist..."
+              value={artistSearchTerm}
+              onChange={(e) => setArtistSearchTerm(e.target.value)}
+              className="input input-bordered w-full"
+            />
+          </div>
+        </div>
+      </div>
+      
+      <div className="space-y-4 mt-8">
+        {filteredSongs.map((song) => (
+          <div 
+            key={song.id}
+            className="flex items-center gap-4 p-4 bg-base-100 rounded-lg shadow hover:shadow-md transition-shadow"
+          >
+            <Link 
+              href={`/albums/${song.album.id}/${slugify(song.album.title)}`}
+              className="shrink-0"
+            >
+              {song.album.cover_medium ? (
+                <Image
+                  src={song.album.cover_medium}
+                  alt={song.album.title}
+                  width={64}
+                  height={64}
+                  className="rounded"
+                />
+              ) : (
+                <div className="w-16 h-16 rounded bg-base-300 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-base-content opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                  </svg>
+                </div>
+              )}
+            </Link>
+            <div className="flex-1 min-w-0">
+              <h2 className="text-lg font-semibold truncate">{song.title}</h2>
+              <div className="flex items-center gap-2 text-sm text-gray-500">
+                <Link 
+                  href={`/artists/${song.artist.id}/${slugify(song.artist.name)}`}
+                  className="hover:text-primary hover:underline"
+                >
+                  {song.artist.name}
+                </Link>
+                <span>•</span>
+                <Link 
+                  href={`/albums/${song.album.id}/${slugify(song.album.title)}`}
+                  className="hover:text-primary hover:underline truncate"
+                >
+                  {song.album.title}
+                </Link>
               </div>
             </div>
+            {song.preview_url && (
+              <button className="btn btn-ghost btn-circle shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </button>
+            )}
           </div>
         ))}
       </div>
+
+      {/* Load More Button */}
+      {hasMore && !songSearchTerm && !albumSearchTerm && !artistSearchTerm && (
+        <div className="flex justify-center mt-8">
+          <button
+            onClick={handleLoadMore}
+            disabled={loadingMore}
+            className="btn btn-primary"
+          >
+            {loadingMore ? (
+              <span className="loading loading-spinner"></span>
+            ) : (
+              'Load More'
+            )}
+          </button>
+        </div>
+      )}
     </div>
   )
 } 

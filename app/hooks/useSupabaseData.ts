@@ -195,3 +195,48 @@ export const useStories = () => {
 
   return { stories, loading, error }
 }
+
+export function useArtists() {
+  const [artists, setArtists] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    fetchArtists()
+  }, [])
+
+  const fetchArtists = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+
+      const { data: artistsData, error: artistsError } = await supabase
+        .from('artists')
+        .select(`
+          id,
+          name,
+          picture_medium,
+          albums!albums_artist_id_fkey (
+            id,
+            title,
+            cover_medium
+          )
+        `)
+        .order('name')
+
+      if (artistsError) {
+        console.error('Supabase error:', artistsError)
+        throw new Error(artistsError.message)
+      }
+
+      setArtists(artistsData || [])
+    } catch (err) {
+      console.error('Error fetching artists:', err)
+      setError(err instanceof Error ? err.message : 'Failed to load artists')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return { artists, loading, error }
+}
