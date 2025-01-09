@@ -115,23 +115,7 @@ type Story = {
   } | null
 }
 
-type SupabaseStory = {
-  id: number
-  content: string
-  created_at: string
-  song_id: number
-  user_id: string
-  songs: {
-    id: number
-    title: string
-    artist_id: number
-    cover_image: string | null
-    preview_url: string | null
-    artists: {
-      name: string
-    } | null
-  }
-}
+
 
 export const useStories = () => {
   const [stories, setStories] = useState<Story[]>([])

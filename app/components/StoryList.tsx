@@ -5,27 +5,6 @@ import { Play, Pause } from 'lucide-react';
 import { useStories } from '../hooks/useSupabaseData';
 import Image from 'next/image'
 
-interface Story {
-  id: number
-  content: string
-  created_at: string
-  song_id: number
-  user_id: string
-  songs: {
-    id: number
-    title: string
-    artist_id: number
-    cover_image: string | null
-    preview_url: string | null
-    artists: {
-      name: string
-    } | null
-  } | null
-  author: {
-    id: string
-    full_name: string
-  } | null
-}
 
 export function StoryList() {
   const { stories, loading, error } = useStories();
