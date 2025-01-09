@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Play, Pause } from 'lucide-react';
 import { useStories } from '../hooks/useSupabaseData';
 import Image from 'next/image'
+import { getTrackPreview } from '../lib/deezer';
 
 
 export function StoryList() {
@@ -15,10 +16,6 @@ export function StoryList() {
 
   const handlePlayPause = async (songId: number, previewUrl: string) => {
     console.log('Playing song:', { songId, previewUrl });
-    
-    // Create proxy URL
-    const proxyUrl = `/api/preview?url=${encodeURIComponent(previewUrl)}`;
-    console.log('Proxy URL:', proxyUrl);
     
     if (playingSongId === songId) {
       // Pause current song
@@ -32,20 +29,15 @@ export function StoryList() {
       audio?.pause();
       
       try {
-        // First check if the audio is accessible
-        const response = await fetch(proxyUrl);
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to load audio');
+        // Get fresh preview URL from Deezer
+        const freshPreviewUrl = await getTrackPreview(songId);
+        if (!freshPreviewUrl) {
+          throw new Error('No preview URL available');
         }
-
-        // Get the audio data
-        const audioBlob = await response.blob();
-        const audioUrl = URL.createObjectURL(audioBlob);
         
         // Play new song
-        console.log('Creating new audio with blob URL:', audioUrl);
-        const newAudio = new Audio(audioUrl);
+        console.log('Creating new audio with URL:', freshPreviewUrl);
+        const newAudio = new Audio(freshPreviewUrl);
         
         // Add error handling for loading
         newAudio.onerror = () => {
@@ -57,7 +49,6 @@ export function StoryList() {
           });
           setPlayingSongId(null);
           setAudio(null);
-          URL.revokeObjectURL(audioUrl);
         };
 
         // Add loading event
@@ -75,7 +66,6 @@ export function StoryList() {
           console.log('Song ended');
           setPlayingSongId(null);
           setAudio(null);
-          URL.revokeObjectURL(audioUrl);
         };
       } catch (error) {
         console.error('Error playing audio:', error);

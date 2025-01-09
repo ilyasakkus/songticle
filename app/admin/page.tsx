@@ -1,8 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useArtistSearch } from '../hooks/useSupabaseData';
-import { supabase, uploadAlbumCover, uploadArtistImage } from '../lib/supabase';
+import { supabase } from '../lib/supabase';
 import { searchDeezerArtist } from '../lib/deezer';
 
 export default function AdminPage() {
