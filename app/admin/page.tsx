@@ -4,11 +4,33 @@ import { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { searchDeezerArtist } from '../lib/deezer';
 
+interface DeezerItem {
+  id: number
+  title: string
+  preview?: string
+  artist: {
+    id: number
+    name: string
+    picture?: string
+    picture_small?: string
+    picture_medium?: string
+  }
+  album: {
+    id: number
+    title: string
+    cover?: string
+    cover_small?: string
+    cover_medium?: string
+    cover_big?: string
+    cover_xl?: string
+  }
+}
+
 export default function AdminPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [results, setResults] = useState<any[]>([]);
+  const [results, setResults] = useState<DeezerItem[]>([]);
 
   const handleSearch = async () => {
     if (!searchTerm.trim()) return;
@@ -21,7 +43,7 @@ export default function AdminPage() {
       
       if (response && Array.isArray(response.data)) {
         // Transform the data to ensure we have all required fields
-        const transformedData = response.data.map(item => ({
+        const transformedData = response.data.map((item: any) => ({
           id: item.id,
           title: item.title,
           artist: {
@@ -57,7 +79,7 @@ export default function AdminPage() {
     }
   };
 
-  const handleAddToSupabase = async (item: any) => {
+  const handleAddToSupabase = async (item: DeezerItem) => {
     try {
       setLoading(true);
       console.log('Adding to Supabase:', item);
