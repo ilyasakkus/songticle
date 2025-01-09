@@ -3,12 +3,15 @@
 import { useState } from 'react';
 import { Play, Pause } from 'lucide-react';
 import { useStories } from '../hooks/useSupabaseData';
+import { useAuth } from '../providers/AuthProvider';
 import Image from 'next/image'
 import { getTrackPreview } from '../lib/deezer';
 import Link from 'next/link';
+import { slugify } from '../lib/utils';
 
 
 export function StoryList() {
+  const { user } = useAuth();
   const { stories, loading, error } = useStories();
   const [playingSongId, setPlayingSongId] = useState<number | null>(null);
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
@@ -76,6 +79,16 @@ export function StoryList() {
     }
   };
 
+  const handleLikeClick = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent Link navigation
+    if (!user) {
+      const signInModal = document.getElementById('sign-in-modal') as HTMLDialogElement;
+      if (signInModal) {
+        signInModal.showModal();
+      }
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[200px]">
@@ -106,6 +119,9 @@ export function StoryList() {
     <div className="container mx-auto p-4">
       <div className="space-y-2">
         {stories.map((story) => {
+          const songTitle = story.songs?.title || 'untitled'
+          const slug = slugify(songTitle)
+          
           console.log('Story data:', {
             id: story.id,
             songId: story.songs?.id,
@@ -116,7 +132,7 @@ export function StoryList() {
           return (
             <Link 
               key={story.id} 
-              href={`/story/${story.id}`}
+              href={`/story/${story.id}/${slug}`}
               className="block"
             >
               <div className="card bg-base-100 shadow-sm hover:shadow-md transition-shadow">
@@ -174,7 +190,10 @@ export function StoryList() {
                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="w-4 h-4 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path></svg>
                           <span className="text-sm">Add comment</span>
                         </button>
-                        <button className="btn btn-ghost btn-sm flex items-center gap-2">
+                        <button 
+                          className="btn btn-ghost btn-sm flex items-center gap-2"
+                          onClick={(e) => handleLikeClick(e)}
+                        >
                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="w-4 h-4 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
                           <span className="text-sm">Like</span>
                         </button>

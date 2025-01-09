@@ -60,6 +60,8 @@ export default function StoryClient({ storyId }: StoryClientProps) {
 
   useEffect(() => {
     fetchStory()
+    fetchComments()
+    fetchLikes()
   }, [storyId])
 
   const fetchStory = async () => {
@@ -121,10 +123,72 @@ export default function StoryClient({ storyId }: StoryClientProps) {
     }
   }
 
+  const fetchComments = async () => {
+    try {
+      // First fetch comments
+      const { data: commentsData, error: commentsError } = await supabase
+        .from('story_comments')
+        .select('*')
+        .eq('story_id', storyId)
+        .order('created_at', { ascending: true })
+
+      if (commentsError) throw commentsError
+
+      if (commentsData && commentsData.length > 0) {
+        // Get unique user IDs
+        const userIds = [...new Set(commentsData.map(comment => comment.user_id))]
+
+        // Fetch profiles for these users
+        const { data: profilesData, error: profilesError } = await supabase
+          .from('profiles')
+          .select('id, full_name, avatar_url')
+          .in('id', userIds)
+
+        if (profilesError) throw profilesError
+
+        // Create a map of user_id to profile
+        const profileMap = new Map(profilesData?.map(profile => [profile.id, profile]))
+
+        // Combine comments with profile data
+        const commentsWithProfiles = commentsData.map(comment => ({
+          id: comment.id,
+          content: comment.content,
+          created_at: comment.created_at,
+          user_id: comment.user_id,
+          author: profileMap.get(comment.user_id) || null
+        }))
+
+        setComments(commentsWithProfiles)
+      } else {
+        setComments([])
+      }
+    } catch (err) {
+      console.error('Error fetching comments:', err)
+    }
+  }
+
+  const fetchLikes = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('story_likes')
+        .select('id, user_id')
+        .eq('story_id', storyId)
+
+      if (error) throw error
+      setLikes(data || [])
+    } catch (err) {
+      console.error('Error fetching likes:', err)
+    }
+  }
+
   const handleComment = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!user) {
-      setError('Please sign in to comment')
+      // Redirect to sign in
+      const signInModal = document.getElementById('sign-in-modal') as HTMLDialogElement
+      if (signInModal) {
+        signInModal.showModal()
+      }
       return
     }
 
@@ -145,16 +209,7 @@ export default function StoryClient({ storyId }: StoryClientProps) {
       if (error) throw error
 
       setNewComment('')
-      setComments([...comments, {
-        id: Date.now(), // Temporary ID
-        content: newComment.trim(),
-        created_at: new Date().toISOString(),
-        user_id: user.id,
-        author: {
-          full_name: user.user_metadata.full_name || 'Anonymous',
-          avatar_url: user.user_metadata.avatar_url
-        }
-      }])
+      fetchComments() // Fetch fresh comments after posting
     } catch (err) {
       console.error('Error posting comment:', err)
       setError('Failed to post comment')
@@ -165,15 +220,17 @@ export default function StoryClient({ storyId }: StoryClientProps) {
 
   const handleLike = async () => {
     if (!user) {
-      setError('Please sign in to like stories')
+      // Redirect to sign in
+      const signInModal = document.getElementById('sign-in-modal') as HTMLDialogElement
+      if (signInModal) {
+        signInModal.showModal()
+      }
       return
     }
 
     try {
       if (isLiked) {
-        // Unlike - optimistically update UI
-        setLikes(likes.filter(like => like.user_id !== user.id))
-        
+        // Unlike
         const likeToRemove = likes.find(like => like.user_id === user.id)
         if (likeToRemove) {
           const { error } = await supabase
@@ -181,17 +238,11 @@ export default function StoryClient({ storyId }: StoryClientProps) {
             .delete()
             .eq('id', likeToRemove.id)
 
-          if (error) {
-            // Revert on error
-            setLikes(prevLikes => [...prevLikes, likeToRemove])
-            throw error
-          }
+          if (error) throw error
+          fetchLikes() // Fetch fresh likes after unlike
         }
       } else {
-        // Like - optimistically update UI
-        const newLike = { id: Date.now(), user_id: user.id }
-        setLikes([...likes, newLike])
-        
+        // Like
         const { error } = await supabase
           .from('story_likes')
           .insert([
@@ -201,11 +252,8 @@ export default function StoryClient({ storyId }: StoryClientProps) {
             }
           ])
 
-        if (error) {
-          // Revert on error
-          setLikes(prevLikes => prevLikes.filter(like => like.id !== newLike.id))
-          throw error
-        }
+        if (error) throw error
+        fetchLikes() // Fetch fresh likes after like
       }
     } catch (err) {
       console.error('Error updating like:', err)
@@ -276,7 +324,16 @@ export default function StoryClient({ storyId }: StoryClientProps) {
         {/* Actions */}
         <div className="px-6 py-4 border-b flex items-center gap-6">
           <button
-            onClick={handleLike}
+            onClick={() => {
+              if (!user) {
+                const signInModal = document.getElementById('sign-in-modal') as HTMLDialogElement
+                if (signInModal) {
+                  signInModal.showModal()
+                }
+                return
+              }
+              handleLike()
+            }}
             className={`btn btn-ghost gap-2 ${isLiked ? 'text-primary' : ''}`}
           >
             <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
@@ -292,27 +349,47 @@ export default function StoryClient({ storyId }: StoryClientProps) {
         <div className="p-6">
           <h2 className="text-lg font-semibold mb-4">Comments</h2>
           
-          {/* New Comment Form */}
-          <form onSubmit={handleComment} className="mb-6">
-            <div className="form-control">
-              <textarea
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                placeholder="Add a comment..."
-                className="textarea textarea-bordered h-24"
-                disabled={submitting}
-              />
+          {/* New Comment Form or Sign In Message */}
+          {user ? (
+            <form onSubmit={handleComment} className="mb-6">
+              <div className="form-control">
+                <textarea
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  placeholder="Add a comment..."
+                  className="textarea textarea-bordered h-24"
+                  disabled={submitting}
+                />
+              </div>
+              <div className="mt-2 flex justify-end">
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={submitting || !newComment.trim()}
+                >
+                  {submitting ? 'Posting...' : 'Post Comment'}
+                </button>
+              </div>
+            </form>
+          ) : (
+            <div className="alert alert-info mb-6">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current shrink-0 w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              <div className="flex items-center gap-2">
+                <span>For add your comment, please</span>
+                <button 
+                  className="btn btn-sm btn-primary"
+                  onClick={() => {
+                    const signInModal = document.getElementById('sign-in-modal') as HTMLDialogElement
+                    if (signInModal) {
+                      signInModal.showModal()
+                    }
+                  }}
+                >
+                  sign in
+                </button>
+              </div>
             </div>
-            <div className="mt-2 flex justify-end">
-              <button
-                type="submit"
-                className="btn btn-primary"
-                disabled={submitting || !newComment.trim()}
-              >
-                {submitting ? 'Posting...' : 'Post Comment'}
-              </button>
-            </div>
-          </form>
+          )}
 
           {/* Comments List */}
           <div className="space-y-4">
