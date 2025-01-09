@@ -147,12 +147,10 @@ export const useStories = () => {
           .order('created_at', { ascending: false })
 
         if (storiesError) {
-          console.log('Stories error details:', JSON.stringify(storiesError, null, 2))
           throw storiesError
         }
 
         if (storiesData) {
-          console.log('Raw stories data:', JSON.stringify(storiesData, null, 2))
           // Get all unique user_ids
           const userIds = [...new Set(storiesData.map(story => story.user_id))]
           
@@ -166,35 +164,26 @@ export const useStories = () => {
           const profileMap = new Map(profilesData?.map(profile => [profile.id, profile]))
 
           // Transform stories with profile data
-          const transformedStories = storiesData.map(story => {
-            console.log('Processing story:', {
-              id: story.id,
-              songs: story.songs,
-              songKeys: story.songs ? Object.keys(story.songs) : []
-            })
-
-            return {
-              id: story.id,
-              content: story.content,
-              created_at: story.created_at,
-              song_id: story.song_id,
-              user_id: story.user_id,
-              songs: story.songs ? {
-                id: story.songs.id,
-                title: story.songs.title,
-                artist_id: story.songs.artist_id,
-                cover_image: story.songs.cover_image,
-                preview_url: story.songs.preview_url,
-                artists: story.songs.artists
-              } : null,
-              author: profileMap.get(story.user_id) || null
-            }
-          })
+          const transformedStories = storiesData.map(story => ({
+            id: story.id,
+            content: story.content,
+            created_at: story.created_at,
+            song_id: story.song_id,
+            user_id: story.user_id,
+            songs: story.songs ? {
+              id: story.songs.id,
+              title: story.songs.title,
+              artist_id: story.songs.artist_id,
+              cover_image: story.songs.cover_image,
+              preview_url: story.songs.preview_url,
+              artists: story.songs.artists
+            } : null,
+            author: profileMap.get(story.user_id) || null
+          }))
           
           setStories(transformedStories)
         }
       } catch (err) {
-        console.log('Full error object:', JSON.stringify(err, null, 2))
         setError(err instanceof Error ? err.message : 'Failed to fetch stories')
       } finally {
         setLoading(false)

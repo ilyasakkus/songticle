@@ -24,8 +24,11 @@ export default function AlbumsPage() {
         const { data, error } = await supabase
           .from('albums')
           .select(`
-            *,
-            artists (
+            id,
+            title,
+            cover_medium,
+            artist_id,
+            artists:artists!albums_artist_id_fkey (
               name
             )
           `)

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { Home, Mic2, Disc3, Music2, ListMusic, PlusCircle } from 'lucide-react';
@@ -9,7 +10,6 @@ import { useProfile } from '../hooks/useProfile';
 import { SignInForm } from './auth/SignInForm';
 import { SignUpForm } from './auth/SignUpForm';
 import { supabase } from '../lib/supabase';
-import Image from 'next/image';
 
 const navItems = [
   { href: '/', label: 'Home', icon: Home },
@@ -45,37 +45,43 @@ export function Header() {
     }
   }
 
-  // Only show loading spinner when authenticating
-  const isLoading = authLoading || (user && profileLoading)
-
   return (
     <header className="bg-base-100 shadow-sm">
       <div className="container mx-auto">
         <div className="navbar min-h-16 px-4">
-          <div className="flex-1 flex items-center gap-1 overflow-x-auto">
-            {navItems.map(({ href, label, icon: Icon }) => {
-              const isActive = pathname === href;
-              
-              return (
-                <Link
-                  key={href}
-                  href={href}
-                  className={`
-                    flex items-center gap-2 px-4 py-3 transition-colors
-                    hover:text-primary
-                    ${isActive ? 'text-primary border-b-2 border-primary' : 'text-base-content'}
-                  `}
-                >
-                  <Icon className="h-4 w-4" />
-                  <span className="text-sm font-medium">{label}</span>
-                </Link>
-              );
-            })}
+          {/* Left side - Title */}
+          <div className="flex-1 flex items-center gap-4">
+            <Link href="/" className="text-2xl font-bold text-primary">
+              Songticle
+            </Link>
+            
+            {/* Navigation Menu */}
+            <nav className="flex items-center gap-1 overflow-x-auto">
+              {navItems.map(({ href, label, icon: Icon }) => {
+                const isActive = pathname === href;
+                
+                return (
+                  <Link
+                    key={href}
+                    href={href}
+                    className={`
+                      flex items-center gap-2 px-4 py-3 transition-colors
+                      hover:text-primary
+                      ${isActive ? 'text-primary border-b-2 border-primary' : 'text-base-content'}
+                    `}
+                  >
+                    <Icon className="h-4 w-4" />
+                    <span className="text-sm font-medium">{label}</span>
+                  </Link>
+                );
+              })}
+            </nav>
           </div>
 
+          {/* Right side - Auth/User Actions */}
           <div className="flex-none gap-4">
-            {isLoading ? (
-              <div className="loading loading-spinner loading-sm"></div>
+            {authLoading ? (
+              <div className="loading loading-spinner loading-sm" />
             ) : user ? (
               <>
                 <Link href="/add">
@@ -134,8 +140,10 @@ export function Header() {
       {showSignIn && (
         <div className="modal modal-open">
           <div className="modal-box">
+            <h3 className="font-bold text-lg mb-4">Sign In</h3>
             <SignInForm onClose={() => setShowSignIn(false)} />
           </div>
+          <div className="modal-backdrop" onClick={() => setShowSignIn(false)} />
         </div>
       )}
 
@@ -143,10 +151,12 @@ export function Header() {
       {showSignUp && (
         <div className="modal modal-open">
           <div className="modal-box">
+            <h3 className="font-bold text-lg mb-4">Sign Up</h3>
             <SignUpForm onClose={() => setShowSignUp(false)} />
           </div>
+          <div className="modal-backdrop" onClick={() => setShowSignUp(false)} />
         </div>
       )}
     </header>
-  );
+  )
 }
