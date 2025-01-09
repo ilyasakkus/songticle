@@ -20,8 +20,30 @@ export default function AdminPage() {
       console.log('Deezer response:', response);
       
       if (response && Array.isArray(response.data)) {
-        setResults(response.data);
-        console.log('Setting results:', response.data);
+        // Transform the data to ensure we have all required fields
+        const transformedData = response.data.map(item => ({
+          id: item.id,
+          title: item.title,
+          artist: {
+            id: item.artist?.id,
+            name: item.artist?.name,
+            picture: item.artist?.picture,
+            picture_small: item.artist?.picture_small,
+            picture_medium: item.artist?.picture_medium
+          },
+          album: {
+            id: item.album?.id,
+            title: item.album?.title,
+            cover: item.album?.cover,
+            cover_small: item.album?.cover_small,
+            cover_medium: item.album?.cover_medium,
+            cover_big: item.album?.cover_big,
+            cover_xl: item.album?.cover_xl
+          }
+        }));
+        
+        setResults(transformedData);
+        console.log('Setting transformed results:', transformedData);
       } else {
         setError('No results found');
         setResults([]);
@@ -114,7 +136,7 @@ export default function AdminPage() {
       const { data: existingSong, error: checkSongError } = await supabase
         .from('songs')
         .select('*')
-        .eq('id', item.track.id)
+        .eq('id', item.id)
         .single();
       
       if (checkSongError && checkSongError.code !== 'PGRST116') {
@@ -125,18 +147,11 @@ export default function AdminPage() {
       // Insert song if not exists
       if (!existingSong) {
         const songData = {
-          id: item.track.id,
+          id: item.id,
           album_id: item.album.id,
           artist_id: item.artist.id,
-          title: item.track.title?.substring(0, 255) || '',
-          title_short: item.track.title_short?.substring(0, 255) || '',
-          title_version: (item.track.title_version || '')?.substring(0, 255),
-          duration: parseInt(item.track.duration),
-          preview_url: item.track.preview?.substring(0, 255) || '',
-          explicit_lyrics: item.track.explicit_lyrics,
-          explicit_content_lyrics: item.track.explicit_content_lyrics || 0,
-          explicit_content_cover: item.track.explicit_content_cover || 0,
-          rank: parseInt(item.track.rank),
+          title: item.title?.substring(0, 255) || '',
+          preview_url: item.preview?.substring(0, 255) || '',
           album_name: item.album.title?.substring(0, 255) || '',
           artist_name: item.artist.name?.substring(0, 255) || '',
           cover_image: item.album.cover_medium?.substring(0, 255) || ''
@@ -162,20 +177,6 @@ export default function AdminPage() {
     }
   };
 
-  const handleAddAllToSupabase = async () => {
-    try {
-      setLoading(true);
-      for (const item of results) {
-        await handleAddToSupabase(item);
-      }
-      console.log('Finished processing all items');
-    } catch (err: any) {
-      console.error('Error adding all items:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Admin Panel</h1>
@@ -185,7 +186,7 @@ export default function AdminPage() {
           type="text"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Search artists..."
+          placeholder="Search songs..."
           className="input input-bordered flex-1"
           onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
         />
@@ -214,7 +215,7 @@ export default function AdminPage() {
         <>
           <div className="flex justify-end mb-4">
             <button
-              onClick={handleAddAllToSupabase}
+              onClick={() => results.forEach(handleAddToSupabase)}
               disabled={loading}
               className="btn btn-primary"
             >
@@ -224,7 +225,7 @@ export default function AdminPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {results.map((item) => (
-              <div key={item.track.id} className="card bg-base-100 shadow-md">
+              <div key={item.id} className="card bg-base-100 shadow-md">
                 <figure className="px-4 pt-4">
                   <img
                     src={item.artist.picture_medium || item.artist.picture}
@@ -242,8 +243,17 @@ export default function AdminPage() {
                     />
                     <div>
                       <p className="text-sm font-medium">Album: {item.album.title}</p>
-                      <p className="text-sm">Track: {item.track.title}</p>
+                      <p className="text-sm">Track: {item.title}</p>
                     </div>
+                  </div>
+                  <div className="card-actions justify-end mt-4">
+                    <button
+                      onClick={() => handleAddToSupabase(item)}
+                      disabled={loading}
+                      className="btn btn-primary btn-sm"
+                    >
+                      {loading ? 'Adding...' : 'Add to Database'}
+                    </button>
                   </div>
                 </div>
               </div>

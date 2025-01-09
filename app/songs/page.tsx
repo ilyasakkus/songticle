@@ -165,14 +165,12 @@ export default function SongsPage() {
       
       <div className="space-y-4 mt-8">
         {filteredSongs.map((song) => (
-          <div 
+          <Link 
             key={song.id}
-            className="flex items-center gap-4 p-4 bg-base-100 rounded-lg shadow hover:shadow-md transition-shadow"
+            href={`/songs/${song.id}/${slugify(song.title)}`}
+            className="flex items-center gap-4 p-4 bg-base-100 rounded-lg shadow hover:shadow-md transition-shadow block"
           >
-            <Link 
-              href={`/albums/${song.album.id}/${slugify(song.album.title)}`}
-              className="shrink-0"
-            >
+            <div className="shrink-0">
               {song.album.cover_medium ? (
                 <Image
                   src={song.album.cover_medium}
@@ -188,34 +186,32 @@ export default function SongsPage() {
                   </svg>
                 </div>
               )}
-            </Link>
+            </div>
             <div className="flex-1 min-w-0">
               <h2 className="text-lg font-semibold truncate">{song.title}</h2>
               <div className="flex items-center gap-2 text-sm text-gray-500">
-                <Link 
-                  href={`/artists/${song.artist.id}/${slugify(song.artist.name)}`}
-                  className="hover:text-primary hover:underline"
+                <div 
+                  onClick={(e) => {
+                    e.preventDefault()
+                    window.location.href = `/artists/${song.artist.id}/${slugify(song.artist.name)}`
+                  }}
+                  className="hover:text-primary hover:underline cursor-pointer"
                 >
                   {song.artist.name}
-                </Link>
+                </div>
                 <span>•</span>
-                <Link 
-                  href={`/albums/${song.album.id}/${slugify(song.album.title)}`}
-                  className="hover:text-primary hover:underline truncate"
+                <div 
+                  onClick={(e) => {
+                    e.preventDefault()
+                    window.location.href = `/albums/${song.album.id}/${slugify(song.album.title)}`
+                  }}
+                  className="hover:text-primary hover:underline truncate cursor-pointer"
                 >
                   {song.album.title}
-                </Link>
+                </div>
               </div>
             </div>
-            {song.preview_url && (
-              <button className="btn btn-ghost btn-circle shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </button>
-            )}
-          </div>
+          </Link>
         ))}
       </div>
 

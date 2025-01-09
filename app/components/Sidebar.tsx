@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 import { useState, useEffect } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
@@ -29,7 +29,7 @@ interface SearchHistory {
   timestamp: number
 }
 
-export default function Sidebar() {
+export function Sidebar() {
   const [popularArtists, setPopularArtists] = useState<Artist[]>([])
   const [recentAlbums, setRecentAlbums] = useState<Album[]>([])
   const [searchHistory, setSearchHistory] = useState<SearchHistory[]>([])
