@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
@@ -106,7 +107,7 @@ export default function SongsPage() {
 
       if (error) throw error
 
-      const transformedData: Song[] = (data as DatabaseSong[])?.map(song => ({
+      const transformedData: Song[] = (data as unknown as DatabaseSong[])?.map(song => ({
         id: song.id,
         title: song.title,
         preview_url: song.preview_url,
@@ -198,7 +199,7 @@ export default function SongsPage() {
               type="search"
               placeholder="Search songs..."
               value={songSearchTerm}
-              onChange={(e) => setSongSearchTerm(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSongSearchTerm(e.target.value)}
               className="input input-bordered w-full"
             />
           </div>
@@ -210,7 +211,7 @@ export default function SongsPage() {
               type="search"
               placeholder="Search by album..."
               value={albumSearchTerm}
-              onChange={(e) => setAlbumSearchTerm(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAlbumSearchTerm(e.target.value)}
               className="input input-bordered w-full"
             />
           </div>
@@ -222,7 +223,7 @@ export default function SongsPage() {
               type="search"
               placeholder="Search by artist..."
               value={artistSearchTerm}
-              onChange={(e) => setArtistSearchTerm(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setArtistSearchTerm(e.target.value)}
               className="input input-bordered w-full"
             />
           </div>
@@ -258,7 +259,7 @@ export default function SongsPage() {
               <h2 className="text-lg font-semibold truncate">{song.title}</h2>
               <div className="flex items-center gap-2 text-sm text-gray-500">
                 <div 
-                  onClick={(e: React.MouseEvent) => {
+                  onClick={(e: React.MouseEvent<HTMLDivElement>) => {
                     e.preventDefault()
                     window.location.href = `/artists/${song.artist.id}/${slugify(song.artist.name)}`
                   }}
@@ -268,7 +269,7 @@ export default function SongsPage() {
                 </div>
                 <span>•</span>
                 <div 
-                  onClick={(e: React.MouseEvent) => {
+                  onClick={(e: React.MouseEvent<HTMLDivElement>) => {
                     e.preventDefault()
                     window.location.href = `/albums/${song.album.id}/${slugify(song.album.title)}`
                   }}

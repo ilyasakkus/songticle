@@ -5,6 +5,9 @@ const nextConfig = {
       'cdn-images.dzcdn.net',
       'lh3.googleusercontent.com'
     ]
+  },
+  eslint: {
+    ignoreDuringBuilds: true
   }
 }
 

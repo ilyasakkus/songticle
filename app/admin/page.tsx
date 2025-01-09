@@ -3,43 +3,48 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { searchDeezerArtist } from '../lib/deezer';
+import Image from 'next/image';
+
+interface DeezerResponse {
+  data: DeezerItem[]
+  total: number
+  next?: string
+}
 
 interface DeezerItem {
   id: number
   title: string
-  preview?: string
-  duration: number
+  preview: string
   artist: {
     id: number
     name: string
-    picture?: string
-    picture_small?: string
-    picture_medium?: string
   }
   album: {
     id: number
     title: string
-    cover?: string
-    cover_small?: string
-    cover_medium?: string
-    cover_big?: string
-    cover_xl?: string
+    cover_medium: string
   }
+}
+
+interface SearchResults {
+  songs: DeezerItem[]
+  artists: DeezerItem[]
+  albums: DeezerItem[]
 }
 
 export default function AdminPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [results, setResults] = useState<DeezerItem[]>([]);
+  const [results, setResults] = useState<SearchResults>({ songs: [], artists: [], albums: [] });
 
-  const handleSearch = async () => {
-    if (!searchTerm.trim()) return;
+  const handleSearch = async (query: string, type: 'track' | 'artist' | 'album') => {
+    if (!query.trim()) return;
     
     try {
       setLoading(true);
       setError(null);
-      const response = await searchDeezerArtist(searchTerm);
+      const response = await searchDeezerArtist(query);
       console.log('Deezer response:', response);
       
       if (response && Array.isArray(response.data)) {
@@ -67,16 +72,16 @@ export default function AdminPage() {
           }
         }));
         
-        setResults(transformedData);
+        setResults({ ...results, [type]: transformedData });
         console.log('Setting transformed results:', transformedData);
       } else {
         setError('No results found');
-        setResults([]);
+        setResults({ ...results, [type]: [] });
       }
     } catch (err) {
       console.error('Search error:', err);
       setError('Failed to search');
-      setResults([]);
+      setResults({ ...results, [type]: [] });
     } finally {
       setLoading(false);
     }
@@ -204,7 +209,7 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-4">Admin Panel</h1>
       
       <div className="flex gap-2 mb-4">
@@ -214,10 +219,10 @@ export default function AdminPage() {
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search songs..."
           className="input input-bordered flex-1"
-          onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+          onKeyDown={(e) => e.key === 'Enter' && handleSearch(searchTerm, 'track')}
         />
         <button 
-          onClick={handleSearch}
+          onClick={() => handleSearch(searchTerm, 'track')}
           disabled={loading}
           className="btn btn-primary"
         >
@@ -237,11 +242,11 @@ export default function AdminPage() {
         </div>
       )}
 
-      {!loading && results.length > 0 && (
+      {!loading && results.songs.length > 0 && (
         <>
           <div className="flex justify-end mb-4">
             <button
-              onClick={() => results.forEach(handleAddToSupabase)}
+              onClick={() => results.songs.forEach(handleAddToSupabase)}
               disabled={loading}
               className="btn btn-primary"
             >
@@ -249,16 +254,16 @@ export default function AdminPage() {
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {results.map((item) => (
-              <div key={item.id} className="card bg-base-100 shadow-md">
-                <figure className="px-4 pt-4">
-                  <img
-                    src={item.artist.picture_medium || item.artist.picture}
-                    alt={item.artist.name}
-                    className="rounded-lg w-32 h-32 object-cover"
-                  />
-                </figure>
+          <div className="mt-4">
+            {results.songs.map((item) => (
+              <div key={item.id} className="flex items-center gap-4 p-4 bg-base-100 rounded-lg shadow mb-4">
+                <Image
+                  src={item.album.cover_medium}
+                  alt={item.title}
+                  width={64}
+                  height={64}
+                  className="rounded"
+                />
                 <div className="card-body">
                   <h2 className="card-title text-lg">{item.artist.name}</h2>
                   <div className="flex items-center gap-2">
@@ -288,11 +293,15 @@ export default function AdminPage() {
         </>
       )}
 
-      {!loading && results.length === 0 && searchTerm && (
+      {!loading && results.songs.length === 0 && searchTerm && (
         <div className="alert alert-info">
           <span>No results found for "{searchTerm}"</span>
         </div>
       )}
+
+      <div className="mt-8">
+        <p>Note: Items marked with &ldquo;Added&rdquo; have already been imported to the database.</p>
+      </div>
     </div>
   );
 }
