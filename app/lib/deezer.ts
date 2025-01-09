@@ -1,20 +1,10 @@
-import { Artist, Song } from '../types/database.types';
 import https from 'https';
-import { supabase, uploadAlbumCover, uploadArtistImage } from './supabase';
 
 const RAPID_API_KEY = 'd0ae159158msh252d03370e660d8p125f2djsn4ba29578ca04';
 const RAPID_API_HOST = 'deezerdevs-deezer.p.rapidapi.com';
 
-interface DeezerError {
-  type: string;
-  message: string;
-  code: number;
-}
 
-interface DeezerResponse<T> {
-  data?: T;
-  error?: DeezerError;
-}
+
 
 interface DeezerTrack {
   id: number;
