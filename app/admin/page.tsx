@@ -129,18 +129,18 @@ export default function AdminPage() {
           id: item.track.id,
           album_id: item.album.id,
           artist_id: item.artist.id,
-          title: item.track.title,
-          title_short: item.track.title_short,
-          title_version: item.track.title_version || '',
+          title: item.track.title?.substring(0, 255) || '',
+          title_short: item.track.title_short?.substring(0, 255) || '',
+          title_version: (item.track.title_version || '')?.substring(0, 255),
           duration: parseInt(item.track.duration),
-          preview_url: item.track.preview,
+          preview_url: item.track.preview?.substring(0, 255) || '',
           explicit_lyrics: item.track.explicit_lyrics,
           explicit_content_lyrics: item.track.explicit_content_lyrics || 0,
           explicit_content_cover: item.track.explicit_content_cover || 0,
           rank: parseInt(item.track.rank),
-          album_name: item.album.title,
-          artist_name: item.artist.name,
-          cover_image: item.album.cover_medium
+          album_name: item.album.title?.substring(0, 255) || '',
+          artist_name: item.artist.name?.substring(0, 255) || '',
+          cover_image: item.album.cover_medium?.substring(0, 255) || ''
         };
         
         console.log('Inserting song data:', JSON.stringify(songData, null, 2));

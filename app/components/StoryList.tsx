@@ -10,15 +10,20 @@ interface Story {
   content: string
   created_at: string
   song_id: number
-  author_name?: string
-  comments: number
-  songs?: {
+  user_id: string
+  songs: {
     id: number
     title: string
     artist_id: number
-    artist_name?: string
-    cover_image?: string | null
-    preview_url?: string | null
+    cover_image: string | null
+    preview_url: string | null
+    artists: {
+      name: string
+    } | null
+  } | null
+  author: {
+    id: string
+    full_name: string
   } | null
 }
 
@@ -27,27 +32,77 @@ export function StoryList() {
   const [playingSongId, setPlayingSongId] = useState<number | null>(null);
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
 
-  const handlePlayPause = (songId: number, previewUrl: string) => {
+  console.log('Stories in StoryList:', JSON.stringify(stories, null, 2));
+
+  const handlePlayPause = async (songId: number, previewUrl: string) => {
+    console.log('Playing song:', { songId, previewUrl });
+    
+    // Create proxy URL
+    const proxyUrl = `/api/preview?url=${encodeURIComponent(previewUrl)}`;
+    console.log('Proxy URL:', proxyUrl);
+    
     if (playingSongId === songId) {
       // Pause current song
+      console.log('Pausing current song');
       audio?.pause();
       setPlayingSongId(null);
       setAudio(null);
     } else {
       // Stop current song if any
+      console.log('Stopping current song if any');
       audio?.pause();
       
-      // Play new song
-      const newAudio = new Audio(previewUrl);
-      newAudio.play();
-      setPlayingSongId(songId);
-      setAudio(newAudio);
-      
-      // Handle song end
-      newAudio.onended = () => {
+      try {
+        // First check if the audio is accessible
+        const response = await fetch(proxyUrl);
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to load audio');
+        }
+
+        // Get the audio data
+        const audioBlob = await response.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
+        
+        // Play new song
+        console.log('Creating new audio with blob URL:', audioUrl);
+        const newAudio = new Audio(audioUrl);
+        
+        // Add error handling for loading
+        newAudio.onerror = () => {
+          console.error('Audio loading error:', {
+            error: newAudio.error,
+            networkState: newAudio.networkState,
+            readyState: newAudio.readyState,
+            currentSrc: newAudio.currentSrc
+          });
+          setPlayingSongId(null);
+          setAudio(null);
+          URL.revokeObjectURL(audioUrl);
+        };
+
+        // Add loading event
+        newAudio.onloadeddata = () => {
+          console.log('Audio loaded successfully');
+        };
+
+        // Try to play
+        await newAudio.play();
+        setPlayingSongId(songId);
+        setAudio(newAudio);
+        
+        // Handle song end
+        newAudio.onended = () => {
+          console.log('Song ended');
+          setPlayingSongId(null);
+          setAudio(null);
+          URL.revokeObjectURL(audioUrl);
+        };
+      } catch (error) {
+        console.error('Error playing audio:', error);
         setPlayingSongId(null);
         setAudio(null);
-      };
+      }
     }
   };
 
@@ -80,74 +135,83 @@ export function StoryList() {
   return (
     <div className="container mx-auto p-4">
       <div className="space-y-2">
-        {stories.map((story) => (
-          <div key={story.id} className="card bg-base-100 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex flex-row items-center p-2">
-              {/* Album Cover Thumbnail */}
-              <div className="flex-shrink-0 w-16 h-16 relative rounded-lg overflow-hidden bg-gray-100">
-                {story.songs?.cover_image ? (
-                  <Image
-                    src={story.songs.cover_image}
-                    alt={story.songs.title || 'Album cover'}
-                    fill
-                    className="object-cover"
-                    sizes="64px"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
-                    </svg>
-                  </div>
-                )}
-                {story.songs?.preview_url && (
-                  <button
-                    onClick={() => handlePlayPause(story.songs!.id, story.songs!.preview_url!)}
-                    className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 hover:opacity-100 transition-opacity"
-                  >
-                    {playingSongId === story.songs.id ? (
-                      <Pause className="h-6 w-6 text-white" />
-                    ) : (
-                      <Play className="h-6 w-6 text-white" />
-                    )}
-                  </button>
-                )}
-              </div>
+        {stories.map((story) => {
+          console.log('Story data:', {
+            id: story.id,
+            songId: story.songs?.id,
+            previewUrl: story.songs?.preview_url,
+            coverImage: story.songs?.cover_image
+          });
+          
+          return (
+            <div key={story.id} className="card bg-base-100 shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex flex-row items-center p-2">
+                {/* Album Cover Thumbnail */}
+                <div className="flex-shrink-0 w-16 h-16 relative rounded-lg overflow-hidden bg-gray-100">
+                  {story.songs?.cover_image ? (
+                    <Image
+                      src={story.songs.cover_image}
+                      alt={story.songs.title || 'Album cover'}
+                      fill
+                      className="object-cover"
+                      sizes="64px"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                      </svg>
+                    </div>
+                  )}
+                  {story.songs?.preview_url && (
+                    <button
+                      onClick={() => handlePlayPause(story.songs!.id, story.songs!.preview_url!)}
+                      className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 hover:opacity-100 transition-opacity"
+                    >
+                      {playingSongId === story.songs.id ? (
+                        <Pause className="h-6 w-6 text-white" />
+                      ) : (
+                        <Play className="h-6 w-6 text-white" />
+                      )}
+                    </button>
+                  )}
+                </div>
 
-              {/* Content */}
-              <div className="flex-1 ml-4">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-medium text-sm line-clamp-1">
-                      {story.songs?.title}
-                    </h3>
-                    <div className="text-xs text-gray-500 flex items-center gap-2">
-                      <span>{story.songs?.artists?.name}</span>
-                      <span>•</span>
-                      <span>Shared by {story.author?.full_name || 'Anonymous'}</span>
-                      <span>•</span>
-                      <span>{new Date(story.created_at!).toLocaleDateString()}</span>
+                {/* Content */}
+                <div className="flex-1 ml-4">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="font-medium text-sm line-clamp-1">
+                        {story.songs?.title}
+                      </h3>
+                      <div className="text-xs text-gray-500 flex items-center gap-2">
+                        <span>{story.songs?.artists?.name}</span>
+                        <span>•</span>
+                        <span>Shared by {story.author?.full_name || 'Anonymous'}</span>
+                        <span>•</span>
+                        <span>{new Date(story.created_at!).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                    
+                    {/* Actions */}
+                    <div className="flex gap-2">
+                      <button className="btn btn-ghost btn-sm flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="w-4 h-4 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path></svg>
+                        <span className="text-sm">Add comment</span>
+                      </button>
+                      <button className="btn btn-ghost btn-sm flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="w-4 h-4 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                        <span className="text-sm">Like</span>
+                      </button>
                     </div>
                   </div>
                   
-                  {/* Actions */}
-                  <div className="flex gap-2">
-                    <button className="btn btn-ghost btn-sm flex items-center gap-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="w-4 h-4 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path></svg>
-                      <span className="text-sm">Add comment</span>
-                    </button>
-                    <button className="btn btn-ghost btn-sm flex items-center gap-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="w-4 h-4 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                      <span className="text-sm">Like</span>
-                    </button>
-                  </div>
+                  <p className="text-sm mt-1 line-clamp-2 text-gray-600">{story.content}</p>
                 </div>
-                
-                <p className="text-sm mt-1 line-clamp-2 text-gray-600">{story.content}</p>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

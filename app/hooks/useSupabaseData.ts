@@ -115,6 +115,24 @@ type Story = {
   } | null
 }
 
+type SupabaseStory = {
+  id: number
+  content: string
+  created_at: string
+  song_id: number
+  user_id: string
+  songs: {
+    id: number
+    title: string
+    artist_id: number
+    cover_image: string | null
+    preview_url: string | null
+    artists: {
+      name: string
+    } | null
+  }
+}
+
 export const useStories = () => {
   const [stories, setStories] = useState<Story[]>([])
   const [loading, setLoading] = useState(true)
@@ -131,13 +149,13 @@ export const useStories = () => {
             created_at,
             song_id,
             user_id,
-            songs!stories_song_id_fkey (
+            songs:songs!stories_song_id_fkey (
               id,
               title,
               artist_id,
               cover_image,
               preview_url,
-              artists!songs_artist_id_fkey (
+              artists:artists!songs_artist_id_fkey (
                 name
               )
             )
@@ -160,35 +178,34 @@ export const useStories = () => {
             .select('id, full_name')
             .in('id', userIds)
 
-          console.log('First story songs data:', storiesData[0]?.songs)
-
           // Create a map of user_id to profile
           const profileMap = new Map(profilesData?.map(profile => [profile.id, profile]))
 
           // Transform stories with profile data
           const transformedStories = storiesData.map(story => {
-            try {
-              return {
-                id: story.id,
-                content: story.content,
-                created_at: story.created_at,
-                song_id: story.song_id,
-                user_id: story.user_id,
-                songs: story.songs?.[0] ? {
-                  id: story.songs[0].id,
-                  title: story.songs[0].title,
-                  artist_id: story.songs[0].artist_id,
-                  cover_image: story.songs[0].cover_image,
-                  preview_url: story.songs[0].preview_url,
-                  artists: story.songs[0].artists?.[0] || null
-                } : null,
-                author: profileMap.get(story.user_id) || null
-              } as Story
-            } catch (e) {
-              console.log('Transform error for story:', story.id, e)
-              return null
+            console.log('Processing story:', {
+              id: story.id,
+              songs: story.songs,
+              songKeys: story.songs ? Object.keys(story.songs) : []
+            })
+
+            return {
+              id: story.id,
+              content: story.content,
+              created_at: story.created_at,
+              song_id: story.song_id,
+              user_id: story.user_id,
+              songs: story.songs && {
+                id: story.songs.id,
+                title: story.songs.title,
+                artist_id: story.songs.artist_id,
+                cover_image: story.songs.cover_image,
+                preview_url: story.songs.preview_url,
+                artists: story.songs.artists
+              },
+              author: profileMap.get(story.user_id) || null
             }
-          }).filter((story): story is Story => story !== null)
+          })
           
           setStories(transformedStories)
         }
