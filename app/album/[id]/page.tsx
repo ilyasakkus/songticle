@@ -1,4 +1,4 @@
-import { GetServerSideProps } from 'next'
+import { use } from 'react'
 
 type Props = {
   params: {
@@ -6,28 +6,26 @@ type Props = {
   }
 }
 
-export const getServerSideProps: GetServerSideProps<Props> = async (context) => {
-  const { id } = context.params as { id: string }
-
-  // Perform any data fetching or processing here
-
-  return {
-    props: {
-      params: {
-        id
-      }
-    }
+async function fetchAlbumData(id: string) {
+  // Replace with your actual data fetching logic
+  const response = await fetch(`https://api.example.com/albums/${id}`)
+  if (!response.ok) {
+    throw new Error('Failed to fetch album data')
   }
+  return response.json()
 }
 
-export default function Page({ params }: Props) {
+export default async function Page({ params }: Props) {
   const { id } = params
 
-  // Render your component using the id
+  // Fetch data directly in the component
+  const albumData = await fetchAlbumData(id)
+
   return (
     <div>
       <h1>Album ID: {id}</h1>
-      {/* Add more content here */}
+      <h2>Album Title: {albumData.title}</h2>
+      {/* Render more album details here */}
     </div>
   )
 } 
