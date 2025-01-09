@@ -179,14 +179,14 @@ export const useStories = () => {
               created_at: story.created_at,
               song_id: story.song_id,
               user_id: story.user_id,
-              songs: story.songs && {
+              songs: story.songs ? {
                 id: story.songs.id,
                 title: story.songs.title,
                 artist_id: story.songs.artist_id,
                 cover_image: story.songs.cover_image,
                 preview_url: story.songs.preview_url,
                 artists: story.songs.artists
-              },
+              } : null,
               author: profileMap.get(story.user_id) || null
             }
           })
