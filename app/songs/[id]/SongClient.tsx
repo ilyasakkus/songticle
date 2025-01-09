@@ -115,15 +115,13 @@ export function SongClient({ song }: Props) {
 
   const fetchComments = async () => {
     try {
+      console.log('Fetching comments for song:', song.id)
+      
       const { data: commentsData, error: commentsError } = await supabase
         .from('song_comments')
         .select(`
-          id,
-          content,
-          created_at,
-          user_id,
-          song_id,
-          profiles!song_comments_user_id_fkey (
+          *,
+          profiles:user_id (
             username,
             avatar_url
           )
@@ -133,13 +131,19 @@ export function SongClient({ song }: Props) {
 
       if (commentsError) {
         console.error('Comments error details:', commentsError)
+        console.error('Error code:', commentsError.code)
+        console.error('Error message:', commentsError.message)
+        console.error('Error details:', commentsError.details)
         throw commentsError
       }
 
-      console.log('Fetched comments:', commentsData)
+      console.log('Fetched comments data:', commentsData)
       setComments(commentsData || [])
     } catch (err) {
       console.error('Error fetching comments:', err)
+      if (err instanceof Error) {
+        console.error('Error message:', err.message)
+      }
     }
   }
 
