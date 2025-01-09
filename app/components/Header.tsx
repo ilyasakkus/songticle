@@ -2,15 +2,25 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { usePathname } from 'next/navigation';
+import { Home, Mic2, Disc3, Music2, ListMusic, PlusCircle } from 'lucide-react';
 import { useAuth } from '../providers/AuthProvider';
 import { useProfile } from '../hooks/useProfile';
 import { SignInForm } from './auth/SignInForm';
 import { SignUpForm } from './auth/SignUpForm';
 import { supabase } from '../lib/supabase';
 import Image from 'next/image';
-import { PlusCircle } from 'lucide-react';
+
+const navItems = [
+  { href: '/', label: 'Home', icon: Home },
+  { href: '/artists', label: 'Artists', icon: Mic2 },
+  { href: '/albums', label: 'Albums', icon: Disc3 },
+  { href: '/songs', label: 'Songs', icon: Music2 },
+  { href: '/playlists', label: 'Playlists', icon: ListMusic }
+];
 
 export function Header() {
+  const pathname = usePathname();
   const { user, loading: authLoading } = useAuth();
   const { profile, loading: profileLoading } = useProfile(user?.id);
   const [showSignIn, setShowSignIn] = useState(false);
@@ -39,14 +49,30 @@ export function Header() {
   const isLoading = authLoading || (user && profileLoading)
 
   return (
-    <header className="bg-base-100 border-b border-base-300">
-      <div className="container mx-auto px-4">
-        <div className="navbar min-h-16">
-          <div className="flex-1">
-            <Link href="/" className="text-2xl font-serif font-bold text-primary hover:text-primary-focus transition-colors">
-              Songticle
-            </Link>
+    <header className="bg-base-100 shadow-sm">
+      <div className="container mx-auto">
+        <div className="navbar min-h-16 px-4">
+          <div className="flex-1 flex items-center gap-1 overflow-x-auto">
+            {navItems.map(({ href, label, icon: Icon }) => {
+              const isActive = pathname === href;
+              
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  className={`
+                    flex items-center gap-2 px-4 py-3 transition-colors
+                    hover:text-primary
+                    ${isActive ? 'text-primary border-b-2 border-primary' : 'text-base-content'}
+                  `}
+                >
+                  <Icon className="h-4 w-4" />
+                  <span className="text-sm font-medium">{label}</span>
+                </Link>
+              );
+            })}
           </div>
+
           <div className="flex-none gap-4">
             {isLoading ? (
               <div className="loading loading-spinner loading-sm"></div>

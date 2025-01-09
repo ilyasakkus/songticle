@@ -1,15 +1,12 @@
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
 import './globals.css'
-import { AuthProvider } from './providers/AuthProvider'
+import { Inter } from 'next/font/google'
 import { Header } from './components/Header'
-import { Sidebar } from './components/Sidebar'
 
 const inter = Inter({ subsets: ['latin'] })
 
-export const metadata: Metadata = {
+export const metadata = {
   title: 'Songticle',
-  description: 'Share your song stories',
+  description: 'Share your music stories',
 }
 
 export default function RootLayout({
@@ -18,21 +15,12 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="en" data-theme="light">
       <body className={inter.className}>
-        <AuthProvider>
-          <div className="min-h-screen bg-base-100">
-            <Header />
-            <div className="container mx-auto px-4">
-              <div className="flex gap-6 pt-6">
-                <Sidebar />
-                <main className="flex-1">
-                  {children}
-                </main>
-              </div>
-            </div>
-          </div>
-        </AuthProvider>
+        <Header />
+        <main className="min-h-screen bg-base-200">
+          {children}
+        </main>
       </body>
     </html>
   )
