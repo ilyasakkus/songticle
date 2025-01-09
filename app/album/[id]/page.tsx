@@ -1,9 +1,9 @@
 import { Metadata } from 'next'
 import AlbumContent from './AlbumContent'
 
-type Props = {
+interface Props {
   params: { id: string }
-  searchParams: { [key: string]: string | string[] | undefined }
+  searchParams: Record<string, string | string[] | undefined>
 }
 
 export default function AlbumPage({ params }: Props) {
