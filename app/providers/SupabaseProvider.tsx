@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
-import { Database } from '@/types/supabase';
+import { Database } from '../types/database.types';
 
 type SupabaseContext = {
   supabase: ReturnType<typeof createClientComponentClient<Database>>;
