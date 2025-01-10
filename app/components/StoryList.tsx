@@ -9,8 +9,11 @@ import { getTrackPreview } from '../lib/deezer';
 import Link from 'next/link';
 import { slugify } from '../lib/utils';
 
+interface StoryListProps {
+  following?: boolean
+}
 
-export function StoryList() {
+export function StoryList({ following = false }: StoryListProps) {
   const { user } = useAuth();
   const { stories, loading, error } = useStories();
   const [playingSongId, setPlayingSongId] = useState<number | null>(null);

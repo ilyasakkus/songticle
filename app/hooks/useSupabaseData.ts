@@ -117,9 +117,7 @@ type Story = {
   } | null
 }
 
-
-
-export const useStories = () => {
+export const useStories = (following?: boolean) => {
   const [stories, setStories] = useState<Story[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -127,7 +125,7 @@ export const useStories = () => {
   useEffect(() => {
     const fetchStories = async () => {
       try {
-        const { data: storiesData, error: storiesError } = await supabase
+        let query = supabase
           .from('stories')
           .select(`
             id,
@@ -147,6 +145,15 @@ export const useStories = () => {
             )
           `)
           .order('created_at', { ascending: false })
+
+        // If following is true, we'll return an empty array since there's no following system
+        if (following) {
+          setStories([])
+          setLoading(false)
+          return
+        }
+
+        const { data: storiesData, error: storiesError } = await query
 
         if (storiesError) {
           throw storiesError
