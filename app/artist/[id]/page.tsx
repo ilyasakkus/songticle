@@ -4,10 +4,17 @@ import { useEffect, useState, use } from 'react';
 import Image from 'next/image'
 import Link from 'next/link'
 import { supabase } from '@/app/lib/supabase'
-import type { Artist, Album, Song } from '@/app/types/database.types'
+import type { Artist, Song } from '@/app/types/database.types'
+
+interface Album {
+  id: number
+  title: string
+  cover_medium: string | null
+  songs?: Song[]
+}
 
 interface ArtistWithAlbums extends Artist {
-  albums: (Album & { songs: Song[] })[]
+  albums: Album[]
 }
 
 export default function ArtistPage(props: { params: Promise<{ id: string }> }) {
