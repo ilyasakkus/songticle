@@ -76,7 +76,7 @@ export function useArtistHierarchy() {
       setArtists(artistsWithAlbums);
     } catch (err) {
       console.error('Error fetching artist hierarchy:', err);
-      setError(err.message);
+      setError(err instanceof Error ? err.message : 'Failed to fetch artist hierarchy');
     } finally {
       setLoading(false);
     }
