@@ -3,8 +3,10 @@ import { supabase } from '../lib/supabase';
 import type { Database } from '../types/database.types';
 import type { Artist, Song } from '../types/database.types';
 
+type TableNames = keyof Database['public']['Tables'] | 'songs';
+
 export function useSupabaseData<T>(
-  table: keyof Database['public']['Tables']
+  table: TableNames
 ) {
   const [data, setData] = useState<T[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
