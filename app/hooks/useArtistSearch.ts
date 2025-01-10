@@ -77,7 +77,7 @@ export function useArtistSearch() {
         }
 
         // Prepare songs with all required fields
-        const songsToInsert = songs.map(song => ({
+        const songsToInsert = songs.map((song: Song) => ({
           id: song.id,
           album_id: song.album_id,
           artist_id: artist.id,
