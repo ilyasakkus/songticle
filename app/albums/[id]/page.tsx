@@ -1,15 +1,11 @@
+import { Suspense } from 'react'
 import { AlbumClient } from './AlbumClient'
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { notFound } from 'next/navigation'
 
-interface Props {
-  params: {
-    id: string
-  }
-}
-
-export default async function AlbumPage({ params }: Props) {
+const AlbumsPage = async ({ params }: { params: Promise<{ id: string }> }) => {
+  const id = (await params).id
   const supabase = createServerComponentClient({ cookies })
 
   // Fetch album data with artist info
@@ -23,7 +19,7 @@ export default async function AlbumPage({ params }: Props) {
         picture_medium
       )
     `)
-    .eq('id', params.id)
+    .eq('id', id)
     .single()
 
   if (albumError || !album) {
@@ -31,5 +27,15 @@ export default async function AlbumPage({ params }: Props) {
     return notFound()
   }
 
-  return <AlbumClient album={album} />
-} 
+  return (
+    <Suspense fallback={
+      <div className="flex justify-center items-center min-h-[200px]">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>
+    }>
+      <AlbumClient album={album} />
+    </Suspense>
+  )
+}
+
+export default AlbumsPage 
