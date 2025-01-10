@@ -71,7 +71,7 @@ export default function ArtistPage(props: { params: Promise<{ id: string }> }) {
       <div className="flex flex-col md:flex-row items-center md:items-start gap-8 mb-12">
         <div className="relative w-64 h-64 rounded-lg overflow-hidden">
           <Image
-            src={artist.picture_medium || '/placeholder-artist.jpg'}
+            src={artist.picture_medium}
             alt={artist.name}
             fill
             className="object-cover"
@@ -93,7 +93,7 @@ export default function ArtistPage(props: { params: Promise<{ id: string }> }) {
           >
             <figure className="relative w-full pt-[100%]">
               <Image
-                src={album.cover_medium || '/placeholder-album.jpg'}
+                src={album.cover_medium}
                 alt={album.title}
                 fill
                 className="object-cover"
