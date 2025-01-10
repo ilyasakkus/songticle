@@ -105,12 +105,12 @@ export default function StoryClient({ storyId }: StoryClientProps) {
           content: storyData.content,
           created_at: storyData.created_at,
           user_id: storyData.user_id,
-          songs: storyData.songs?.map(song => ({
-            id: song.id,
-            title: song.title,
-            artist_name: song.artists?.[0]?.name || '',
-            cover_image: song.cover_image
-          })) || [],
+          songs: Array.isArray(storyData.songs) && storyData.songs.length > 0 ? {
+            id: storyData.songs[0].id,
+            title: storyData.songs[0].title,
+            artist_name: storyData.songs[0].artists?.[0]?.name || '',
+            cover_image: storyData.songs[0].cover_image
+          } : null,
           author: profileData || null
         }
         setStory(transformedStory)
@@ -289,7 +289,7 @@ export default function StoryClient({ storyId }: StoryClientProps) {
               />
             )}
             <div>
-              <h1 className="text-2xl font-bold mb-2">{story.title}</h1>
+              <h1 className="text-2xl font-bold mb-2">{story.songs?.title}</h1>
               <p className="text-lg text-primary mb-1">{story.songs?.title}</p>
               <p className="text-sm text-gray-500 mb-4">{story.songs?.artist_name}</p>
               <div className="flex items-center gap-2 text-sm text-gray-500">
