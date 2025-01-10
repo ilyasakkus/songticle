@@ -57,7 +57,7 @@ export function useArtistSearch() {
               artist_id: artist.id,
               title: song.album_name || '',
               cover_medium: song.cover_image || '',
-              release_date: null // If you have this data, add it here
+              release_date: undefined // Optional field, using undefined instead of null
             });
           }
         });
