@@ -100,7 +100,7 @@ export default function ArtistPage(props: { params: Promise<{ id: string }> }) {
           >
             <figure className="relative w-full pt-[100%]">
               <Image
-                src={album.cover_medium}
+                src={album.cover_medium || '/placeholder-album.jpg'}
                 alt={album.title}
                 fill
                 className="object-cover"
