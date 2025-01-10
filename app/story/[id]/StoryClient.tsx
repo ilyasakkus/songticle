@@ -105,12 +105,12 @@ export default function StoryClient({ storyId }: StoryClientProps) {
           content: storyData.content,
           created_at: storyData.created_at,
           user_id: storyData.user_id,
-          songs: Array.isArray(storyData.songs) && storyData.songs.length > 0 ? {
-            id: storyData.songs[0].id,
-            title: storyData.songs[0].title,
-            artist_name: storyData.songs[0].artists?.[0]?.name || '',
-            cover_image: storyData.songs[0].cover_image
-          } : null,
+          songs: storyData.songs?.map(song => ({
+            id: song.id,
+            title: song.title,
+            artist_name: song.artists?.[0]?.name || '',
+            cover_image: song.cover_image
+          })) || [],
           author: profileData || null
         }
         setStory(transformedStory)
