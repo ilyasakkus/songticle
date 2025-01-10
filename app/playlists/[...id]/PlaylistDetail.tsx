@@ -206,7 +206,7 @@ export default function PlaylistDetail({ id }: PlaylistDetailProps) {
               </div>
               {song.preview_url && (
                 <button
-                  onClick={() => handlePlayPause(song.id, song.preview_url)}
+                  onClick={() => handlePlayPause(song.id, song.preview_url!)}
                   className="btn btn-ghost btn-circle"
                 >
                   {playingSongId === song.id ? (
