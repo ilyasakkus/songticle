@@ -178,7 +178,7 @@ export function Sidebar() {
             {recentAlbums.map((album) => (
               <Link
                 key={album.id}
-                href={`/albums/${album.id}/${slugify(album.title)}`}
+                href={`/albums/${album.id}`}
                 className="flex items-center gap-2 p-2 hover:bg-base-300 rounded-lg transition-colors"
               >
                 {album.cover_medium ? (

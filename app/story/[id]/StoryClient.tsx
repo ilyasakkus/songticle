@@ -105,12 +105,12 @@ export default function StoryClient({ storyId }: StoryClientProps) {
           content: storyData.content,
           created_at: storyData.created_at,
           user_id: storyData.user_id,
-          songs: storyData.songs && {
-            id: storyData.songs.id,
-            title: storyData.songs.title,
-            artist_name: storyData.songs.artists?.name || '',
-            cover_image: storyData.songs.cover_image
-          },
+          songs: Array.isArray(storyData.songs) && storyData.songs.length > 0 ? {
+            id: storyData.songs[0].id,
+            title: storyData.songs[0].title,
+            artist_name: storyData.songs[0].artists?.[0]?.name || '',
+            cover_image: storyData.songs[0].cover_image
+          } : null,
           author: profileData || null
         }
         setStory(transformedStory)
