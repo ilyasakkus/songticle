@@ -14,7 +14,7 @@ interface Album {
   artists: {
     id: number
     name: string
-  }
+  }[]
 }
 
 const PAGE_SIZE = 36
