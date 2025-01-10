@@ -103,7 +103,6 @@ export default function StoryClient({ storyId }: StoryClientProps) {
         // Transform story data to match the interface
         const transformedStory = {
           id: storyData.id,
-          title: storyData.title || '',
           content: storyData.content,
           created_at: storyData.created_at,
           user_id: storyData.user_id,
