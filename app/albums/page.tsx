@@ -222,7 +222,9 @@ export default function AlbumsPage() {
             </figure>
             <div className="card-body p-4">
               <h2 className="card-title text-sm">{album.title}</h2>
-              <p className="text-sm text-gray-500">{album.artists.name}</p>
+              <p className="text-sm text-gray-500">
+                {album.artists.map(artist => artist.name).join(', ')}
+              </p>
             </div>
           </Link>
         ))}
