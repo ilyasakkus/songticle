@@ -1,5 +1,5 @@
 import { Suspense } from 'react'
-import AlbumClient from './components/AlbumClient'
+import AlbumClient from '../../albums/AlbumClient'
 
 const AlbumPage = async ({ params }: { params: Promise<{ id: string }> }) => {
   const id = (await params).id
