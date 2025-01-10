@@ -111,6 +111,10 @@ type StoryWithRelations = {
       name: string
     }
   }
+  author: {
+    id: string
+    full_name: string
+  } | null
 }
 
 export const useStories = (following?: boolean) => {
