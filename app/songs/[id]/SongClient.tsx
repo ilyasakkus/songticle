@@ -162,10 +162,12 @@ export function SongClient({ song }: Props) {
         content: comment.content,
         created_at: comment.created_at,
         user_id: comment.user_id,
-        profiles: comment.profiles ? {
-          full_name: comment.profiles.full_name,
-          avatar_url: comment.profiles.avatar_url
-        } : null
+        profiles: comment.profiles && Array.isArray(comment.profiles) 
+          ? {
+              full_name: comment.profiles[0]?.full_name || '',
+              avatar_url: comment.profiles[0]?.avatar_url
+            }
+          : comment.profiles || null
       })) as Comment[]
 
       console.log('Fetched comments data:', commentsData)
