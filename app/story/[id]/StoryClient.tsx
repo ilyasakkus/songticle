@@ -10,7 +10,6 @@ import { SignInForm } from '../../components/auth/SignInForm'
 
 interface Story {
   id: number
-  title: string
   content: string
   created_at: string
   user_id: string
@@ -106,12 +105,12 @@ export default function StoryClient({ storyId }: StoryClientProps) {
           content: storyData.content,
           created_at: storyData.created_at,
           user_id: storyData.user_id,
-          songs: storyData.songs ? {
+          songs: storyData.songs && {
             id: storyData.songs.id,
             title: storyData.songs.title,
             artist_name: storyData.songs.artists?.name || '',
             cover_image: storyData.songs.cover_image
-          } : null,
+          },
           author: profileData || null
         }
         setStory(transformedStory)
