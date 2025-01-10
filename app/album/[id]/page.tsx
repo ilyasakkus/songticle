@@ -1,5 +1,5 @@
 import { Suspense } from 'react'
-import AlbumClient from './AlbumClient'
+import AlbumClient from './AlbumClient.tsx'
 
 interface PageProps {
   params: {
