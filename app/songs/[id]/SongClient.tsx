@@ -134,7 +134,7 @@ export function SongClient({ song }: Props) {
     try {
       console.log('Fetching comments for song:', song.id)
       
-      const { data: commentsData, error: commentsError } = await supabase
+      const { data: rawCommentsData, error: commentsError } = await supabase
         .from('song_comments')
         .select(`
           id,
@@ -156,6 +156,17 @@ export function SongClient({ song }: Props) {
         console.error('Error details:', commentsError.details)
         throw commentsError
       }
+
+      const commentsData = rawCommentsData?.map(comment => ({
+        id: comment.id,
+        content: comment.content,
+        created_at: comment.created_at,
+        user_id: comment.user_id,
+        profiles: comment.profiles ? {
+          full_name: comment.profiles.full_name,
+          avatar_url: comment.profiles.avatar_url
+        } : null
+      })) as Comment[]
 
       console.log('Fetched comments data:', commentsData)
       setComments(commentsData || [])
