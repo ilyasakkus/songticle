@@ -88,26 +88,43 @@ export function SongClient({ song }: Props) {
       setLoading(true)
       setError(null)
       
-      const response = await fetch(
-        `/api/deezer?q=${encodeURIComponent(
-          `${song.title} ${song.artists.name}`
-        )}`
-      )
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch preview')
+      // Check if we have required data
+      if (!song.title || !song.artists.name) {
+        setError('Missing song information')
+        return
       }
-      
-      const data = await response.json()
 
-      if (data.data && data.data.length > 0) {
-        setDeezerPreview(data.data[0].preview)
-      } else {
-        setError('No preview available')
+      const searchQuery = encodeURIComponent(`${song.title} ${song.artists.name}`)
+      
+      try {
+        const response = await fetch(`/api/deezer?q=${searchQuery}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+        
+        const data = await response.json()
+
+        if (data.data && data.data.length > 0) {
+          setDeezerPreview(data.data[0].preview)
+        } else {
+          setError('No preview available')
+          setDeezerPreview(null)
+        }
+      } catch (fetchError) {
+        console.error('Deezer API error:', fetchError)
+        setError('Preview temporarily unavailable')
+        setDeezerPreview(null)
       }
     } catch (err) {
-      console.error('Error fetching preview:', err)
+      console.error('Error in fetchDeezerPreview:', err)
       setError('Failed to load preview')
+      setDeezerPreview(null)
     } finally {
       setLoading(false)
     }
