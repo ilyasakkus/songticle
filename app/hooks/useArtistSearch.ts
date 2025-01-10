@@ -50,7 +50,7 @@ export function useArtistSearch() {
 
         // Group songs by album and create album objects
         const albumsMap = new Map<number, Album>();
-        songs.forEach(song => {
+        songs.forEach((song: Song) => {
           if (!albumsMap.has(song.album_id)) {
             albumsMap.set(song.album_id, {
               id: song.album_id,
