@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "../lib/utils";
-import { ModeToggle } from "./ModeToggle";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -39,7 +38,6 @@ export function Navbar() {
           ))}
         </nav>
         <div className="ml-auto flex items-center space-x-4">
-          <ModeToggle />
         </div>
       </div>
     </div>
