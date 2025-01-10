@@ -33,9 +33,9 @@ interface Comment {
   created_at: string
   user_id: string
   profiles: {
-    username: string
+    full_name: string
     avatar_url: string | null
-  }
+  } | null
 }
 
 interface Props {
@@ -120,9 +120,12 @@ export function SongClient({ song }: Props) {
       const { data: commentsData, error: commentsError } = await supabase
         .from('song_comments')
         .select(`
-          *,
-          profiles:user_id (
-            username,
+          id,
+          content,
+          created_at,
+          user_id,
+          profiles (
+            full_name,
             avatar_url
           )
         `)
@@ -373,10 +376,10 @@ export function SongClient({ song }: Props) {
           {comments.map((comment) => (
             <div key={comment.id} className="bg-base-200 rounded-lg p-4">
               <div className="flex items-center gap-2 mb-2">
-                {comment.profiles.avatar_url ? (
+                {comment.profiles?.avatar_url ? (
                   <Image
                     src={comment.profiles.avatar_url}
-                    alt={comment.profiles.username}
+                    alt={comment.profiles.full_name}
                     width={32}
                     height={32}
                     className="rounded-full"
@@ -384,11 +387,11 @@ export function SongClient({ song }: Props) {
                 ) : (
                   <div className="w-8 h-8 rounded-full bg-base-300 flex items-center justify-center">
                     <span className="text-sm font-bold">
-                      {comment.profiles.username[0].toUpperCase()}
+                      {comment.profiles?.full_name[0].toUpperCase()}
                     </span>
                   </div>
                 )}
-                <span className="font-semibold">{comment.profiles.username}</span>
+                <span className="font-semibold">{comment.profiles?.full_name}</span>
                 <span className="text-sm text-gray-500">
                   {new Date(comment.created_at).toLocaleDateString()}
                 </span>
