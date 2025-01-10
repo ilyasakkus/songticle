@@ -43,7 +43,7 @@ interface Props {
 }
 
 export function SongClient({ song }: Props) {
-  const { user } = useAuth()
+  const { user, setShowSignIn } = useAuth()
   const [isPlaying, setIsPlaying] = useState(false)
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null)
   const [deezerPreview, setDeezerPreview] = useState<string | null>(null)
