@@ -3,12 +3,13 @@ import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 
 interface Props {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
-export default async function ArtistPage({ params }: Props) {
+export default async function ArtistPage(props: Props) {
+  const params = await props.params;
   const supabase = createServerComponentClient({ cookies })
 
   // Fetch artist data

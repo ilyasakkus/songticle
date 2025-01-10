@@ -4,12 +4,13 @@ import { cookies } from 'next/headers'
 import { notFound } from 'next/navigation'
 
 interface Props {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
-export default async function SongPage({ params }: Props) {
+export default async function SongPage(props: Props) {
+  const params = await props.params;
   const supabase = createServerComponentClient({ cookies })
 
   // Fetch song data with album and artist info

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, use } from 'react';
 import Image from 'next/image'
 import Link from 'next/link'
 import { supabase } from '@/app/lib/supabase'
@@ -10,7 +10,8 @@ interface ArtistWithAlbums extends Artist {
   albums: (Album & { songs: Song[] })[]
 }
 
-export default function ArtistPage({ params }: { params: { id: string } }) {
+export default function ArtistPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   const [artist, setArtist] = useState<ArtistWithAlbums | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)

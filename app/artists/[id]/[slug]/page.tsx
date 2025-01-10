@@ -5,13 +5,14 @@ import { notFound } from 'next/navigation'
 import { slugify } from '../../../lib/utils'
 
 interface Props {
-  params: {
+  params: Promise<{
     id: string
     slug: string
-  }
+  }>
 }
 
-export default async function ArtistPage({ params }: Props) {
+export default async function ArtistPage(props: Props) {
+  const params = await props.params;
   const supabase = createServerComponentClient({ cookies })
 
   // Fetch artist data

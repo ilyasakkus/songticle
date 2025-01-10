@@ -12,7 +12,7 @@ export async function GET(request: Request) {
     const error_description = requestUrl.searchParams.get('error_description');
 
     // Create a Supabase client configured to use cookies
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
 
     // Handle OAuth error
