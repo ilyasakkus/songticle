@@ -10,7 +10,7 @@ import { formatDuration } from '@/app/lib/utils'
 interface AlbumWithDetails extends Album {
   songs: Song[]
   artist: Artist
-  cover_medium?: string
+  cover_medium: string
 }
 
 interface Props {
