@@ -24,7 +24,8 @@ export default function ArtistPage(props: { params: Promise<{ id: string }> }) {
           .select(`
             *,
             albums (
-              *,
+              id,
+              title,
               cover_medium,
               songs (*)
             )
