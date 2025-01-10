@@ -133,13 +133,13 @@ export const useStories = (following?: boolean) => {
             created_at,
             song_id,
             user_id,
-            songs:songs!stories_song_id_fkey (
+            songs:songs!inner (
               id,
               title,
               artist_id,
               cover_image,
               preview_url,
-              artists:artists!songs_artist_id_fkey (
+              artists:artists!inner (
                 name
               )
             )
