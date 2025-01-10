@@ -18,8 +18,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body>
+    <html lang="en" data-theme="dark" suppressHydrationWarning>
+      <body className={inter.className} suppressHydrationWarning>
         <AuthProvider>
           <div className="min-h-screen flex flex-col">
             <Header />
