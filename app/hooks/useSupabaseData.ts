@@ -114,7 +114,7 @@ type StoryWithRelations = {
 }
 
 export const useStories = (following?: boolean) => {
-  const [stories, setStories] = useState<Story[]>([])
+  const [stories, setStories] = useState<StoryWithRelations[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
