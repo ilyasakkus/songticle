@@ -10,13 +10,6 @@ interface ArtistWithAlbums extends Artist {
   albums: (Album & { songs: Song[] })[]
 }
 
-interface Album {
-  id: string
-  title: string
-  cover_medium: string
-  songs: Song[]
-}
-
 export default function ArtistPage(props: { params: Promise<{ id: string }> }) {
   const params = use(props.params);
   const [artist, setArtist] = useState<ArtistWithAlbums | null>(null)
