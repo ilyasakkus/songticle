@@ -95,7 +95,7 @@ export function useArtistSearch() {
   return { searchArtist, isLoading, error, searchResults };
 }
 
-type Story = {
+type StoryWithRelations = {
   id: number
   content: string
   created_at: string
@@ -109,12 +109,8 @@ type Story = {
     preview_url: string | null
     artists: {
       name: string
-    } | null
-  } | null
-  author: {
-    id: string
-    full_name: string
-  } | null
+    }
+  }
 }
 
 export const useStories = (following?: boolean) => {
@@ -133,13 +129,13 @@ export const useStories = (following?: boolean) => {
             created_at,
             song_id,
             user_id,
-            songs:songs!inner (
+            songs!stories_song_id_fkey (
               id,
               title,
               artist_id,
               cover_image,
               preview_url,
-              artists:artists!inner (
+              artists!songs_artist_id_fkey (
                 name
               )
             )
@@ -153,7 +149,10 @@ export const useStories = (following?: boolean) => {
           return
         }
 
-        const { data: storiesData, error: storiesError } = await query
+        const { data: storiesData, error: storiesError } = await query as { 
+          data: StoryWithRelations[] | null
+          error: any 
+        }
 
         if (storiesError) {
           throw storiesError
@@ -179,14 +178,14 @@ export const useStories = (following?: boolean) => {
             created_at: story.created_at,
             song_id: story.song_id,
             user_id: story.user_id,
-            songs: story.songs ? {
+            songs: {
               id: story.songs.id,
               title: story.songs.title,
               artist_id: story.songs.artist_id,
               cover_image: story.songs.cover_image,
               preview_url: story.songs.preview_url,
               artists: story.songs.artists
-            } : null,
+            },
             author: profileMap.get(story.user_id) || null
           }))
           
