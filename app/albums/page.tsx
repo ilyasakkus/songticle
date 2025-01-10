@@ -7,14 +7,16 @@ import Image from 'next/image'
 import { Search } from 'lucide-react'
 import { slugify } from '../lib/utils'
 
+interface Artist {
+  id: string
+  name: string
+}
+
 interface Album {
-  id: number
+  id: string
   title: string
-  cover_medium: string | null
-  artists: {
-    id: number
-    name: string
-  }
+  cover_medium: string
+  artists: Artist[]
 }
 
 const PAGE_SIZE = 36
@@ -77,8 +79,13 @@ export default function AlbumsPage() {
       if (error) throw error
 
       const transformedData = data?.map(album => ({
-        ...album,
-        artists: album.artists
+        id: album.id,
+        title: album.title,
+        cover_medium: album.cover_medium,
+        artists: album.artists ? [album.artists].map(artist => ({
+          id: artist.id,
+          name: artist.name
+        })) : []
       })) || []
 
       setAlbums(transformedData)
