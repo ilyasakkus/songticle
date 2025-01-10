@@ -1,13 +1,14 @@
 import { Suspense } from 'react'
 import AlbumClient from './components/AlbumClient'
 
-interface PageProps {
+type Props = {
   params: {
     id: string
   }
+  searchParams: { [key: string]: string | string[] | undefined }
 }
 
-export default function AlbumPage({ params }: PageProps) {
+export default function AlbumPage({ params }: Props) {
   return (
     <Suspense fallback={
       <div className="flex justify-center items-center min-h-[200px]">
