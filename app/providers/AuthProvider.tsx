@@ -7,16 +7,19 @@ import { supabase } from '../lib/supabase'
 interface AuthContextType {
   user: User | null
   loading: boolean
+  setShowSignIn: (show: boolean) => void
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
-  loading: true
+  loading: true,
+  setShowSignIn: () => {}
 })
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  const [showSignIn, setShowSignIn] = useState(false)
 
   useEffect(() => {
     let mounted = true
@@ -66,7 +69,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   return (
-    <AuthContext.Provider value={{ user, loading }}>
+    <AuthContext.Provider value={{ user, loading, setShowSignIn }}>
       {children}
     </AuthContext.Provider>
   )
