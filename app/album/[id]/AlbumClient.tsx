@@ -10,7 +10,7 @@ import { formatDuration } from '@/app/lib/utils'
 interface AlbumWithDetails extends Album {
   songs: Song[]
   artist: Artist
-  cover_image?: string
+  cover_medium?: string
 }
 
 interface Props {
@@ -73,7 +73,7 @@ export default function AlbumClient({ albumId }: Props) {
       <div className="flex flex-col md:flex-row items-center md:items-start gap-8 mb-12">
         <div className="relative w-64 h-64 rounded-lg overflow-hidden">
           <Image
-            src={album.cover_image || '/placeholder-album.jpg'}
+            src={album.cover_medium || '/placeholder-album.jpg'}
             alt={album.title}
             fill
             className="object-cover"
