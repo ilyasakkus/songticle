@@ -5,7 +5,6 @@ import { cookies } from 'next/headers'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Breadcrumb } from '@/app/components/Breadcrumb'
 
 const AlbumsPage = async ({ params }: { params: Promise<{ id: string }> }) => {
   const id = (await params).id
@@ -32,13 +31,7 @@ const AlbumsPage = async ({ params }: { params: Promise<{ id: string }> }) => {
 
   return (
     <div className="space-y-6">
-      <Breadcrumb 
-        items={[
-          { label: 'Artists', href: '/artists' },
-          { label: album.artists.name, href: `/artist/${album.artists.id}` },
-          { label: album.title }
-        ]} 
-      />
+
       
       <Suspense fallback={
         <div className="flex justify-center items-center min-h-[200px]">

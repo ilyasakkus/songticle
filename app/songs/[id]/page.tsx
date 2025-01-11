@@ -4,7 +4,6 @@ import { cookies } from 'next/headers'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Breadcrumb } from '@/app/components/Breadcrumb'
 
 interface Props {
   params: Promise<{
@@ -41,14 +40,6 @@ export default async function SongPage(props: Props) {
 
   return (
     <div className="space-y-6">
-      <Breadcrumb 
-        items={[
-          { label: 'Sanatçılar', href: '/artists' },
-          { label: song.artist_name, href: `/artist/${song.artist_id}` },
-          { label: song.album_title, href: `/albums/${song.album_id}` },
-          { label: song.title }
-        ]} 
-      />
       
       {/* Song Header */}
       <SongClient song={song} />

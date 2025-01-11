@@ -2,7 +2,6 @@
 
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { notFound } from 'next/navigation'
-import { Breadcrumb } from '@/app/components/Breadcrumb'
 import { useEffect, useState } from 'react'
 
 interface Playlist {
@@ -62,12 +61,7 @@ export default function PlaylistPage({ params }: PlaylistPageProps) {
 
   return (
     <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-6 space-y-6">
-      <Breadcrumb 
-        items={[
-          { label: 'Playlists', href: '/playlists' },
-          { label: playlist.title }
-        ]} 
-      />
+
       
       {/* Playlist Content */}
       <div className="flex flex-col gap-6">

@@ -1,7 +1,6 @@
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { notFound } from 'next/navigation'
-import { Breadcrumb } from '@/app/components/Breadcrumb'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Music } from 'lucide-react'
@@ -100,12 +99,7 @@ export default async function PlaylistPage({ params }: PlaylistPageProps) {
 
     return (
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-6 space-y-6">
-        <Breadcrumb 
-          items={[
-            { label: 'Playlists', href: '/playlists' },
-            { label: playlist.title }
-          ]} 
-        />
+   
         
         <div className="flex flex-col gap-6">
           <div className="flex items-center gap-4">
