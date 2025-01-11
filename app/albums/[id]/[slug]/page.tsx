@@ -32,8 +32,12 @@ interface Props {
   }
 }
 
-export default async function AlbumPage({ params: { id, slug } }: Props) {
-  const cookieStore = cookies()
+export default async function AlbumPage({ params }: Props) {
+  // Await params
+  const { id, slug } = await Promise.resolve(params)
+  
+  // Await cookies
+  const cookieStore = await cookies()
   const supabase = createServerComponentClient({ cookies: () => cookieStore })
 
   try {
