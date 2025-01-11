@@ -6,8 +6,19 @@ import Link from 'next/link'
 import { Music } from 'lucide-react'
 
 function slugify(text: string): string {
-  // Özel karakterleri temizle ve küçük harfe çevir
-  const cleanText = text
+  if (!text) return 'null'
+
+  // Türkçe karakterleri değiştir
+  const turkishMap: { [key: string]: string } = {
+    'ı': 'i', 'ğ': 'g', 'ü': 'u', 'ş': 's', 'ö': 'o', 'ç': 'c',
+    'İ': 'i', 'Ğ': 'g', 'Ü': 'u', 'Ş': 's', 'Ö': 'o', 'Ç': 'c'
+  }
+
+  // Önce Türkçe karakterleri değiştir
+  const textWithoutTurkish = text.replace(/[ıİğĞüÜşŞöÖçÇ]/g, letter => turkishMap[letter] || letter)
+
+  // Sonra normal slugify işlemini yap
+  const cleanText = textWithoutTurkish
     .toLowerCase()
     .replace(/[^a-z0-9\s-]/g, '') // Sadece harfler, rakamlar, boşluklar ve tire kalır
     .trim()
@@ -21,8 +32,20 @@ function slugify(text: string): string {
     return 'x' + cleanText
   }
 
-  // Eğer temizlenmiş metin boşsa veya sadece özel karakterlerden oluşuyorsa null dön
-  return cleanText.length > 0 ? cleanText : null
+  // Eğer temizlenmiş metin boşsa 'null' dön
+  return cleanText.length > 0 ? cleanText : 'null'
+}
+
+function compareSlug(slug1: string, slug2: string): boolean {
+  // URL decode yap ve karşılaştır
+  try {
+    const decodedSlug1 = decodeURIComponent(slug1).toLowerCase()
+    const decodedSlug2 = decodeURIComponent(slug2).toLowerCase()
+    return decodedSlug1 === decodedSlug2
+  } catch {
+    // Decode hatası olursa normal karşılaştır
+    return slug1.toLowerCase() === slug2.toLowerCase()
+  }
 }
 
 interface Props {
@@ -77,12 +100,11 @@ export default async function AlbumPage({ params }: Props) {
     // Slug kontrolü
     const correctSlug = slugify(album.title)
     
-    // Eğer slug oluşturulamadıysa (sadece özel karakterlerden oluşuyorsa)
-    // veya slug parametresi zaten null ise, direkt göster
-    if (!correctSlug || slug === 'null') {
+    // Eğer slug 'null' ise veya doğru slug ile eşleşiyorsa devam et
+    if (slug === 'null' || compareSlug(slug, correctSlug)) {
       // Devam et, redirect yapma
-    } else if (slug !== correctSlug) {
-      // Slug varsa ve yanlışsa redirect yap
+    } else {
+      // Slug yanlışsa redirect yap
       return redirect(`/albums/${id}/${correctSlug}`)
     }
 
@@ -135,7 +157,7 @@ export default async function AlbumPage({ params }: Props) {
                 <span className="w-8 text-center text-base-content/50">{index + 1}</span>
                 <div className="flex-1 min-w-0">
                   <Link 
-                    href={`/songs/${song.id}/${slugify(song.title) || 'null'}`}
+                    href={`/songs/${song.id}/${slugify(song.title)}`}
                     className="font-medium hover:text-primary block truncate"
                   >
                     {song.title}
