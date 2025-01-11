@@ -2,7 +2,40 @@
 
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { supabase } from '../../lib/supabase'
+
+// Slugify fonksiyonu
+function slugify(text: string): string {
+  if (!text) return 'null'
+
+  // Türkçe karakterleri değiştir
+  const turkishMap: { [key: string]: string } = {
+    'ı': 'i', 'ğ': 'g', 'ü': 'u', 'ş': 's', 'ö': 'o', 'ç': 'c',
+    'İ': 'i', 'Ğ': 'g', 'Ü': 'u', 'Ş': 's', 'Ö': 'o', 'Ç': 'c'
+  }
+
+  // Önce Türkçe karakterleri değiştir
+  const textWithoutTurkish = text.replace(/[ıİğĞüÜşŞöÖçÇ]/g, letter => turkishMap[letter] || letter)
+
+  // Sonra normal slugify işlemini yap
+  const cleanText = textWithoutTurkish
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '') // Sadece harfler, rakamlar, boşluklar ve tire kalır
+    .trim()
+    .replace(/\s+/g, '-') // Boşlukları tire ile değiştir
+    .replace(/-+/g, '-') // Birden fazla tireyi tek tireye indir
+    .replace(/^-+|-+$/g, '') // Baştaki ve sondaki tireleri kaldır
+
+  // İlk karakter harf veya rakam değilse ve metin boş değilse, 'x' ekle
+  const firstChar = cleanText.charAt(0)
+  if (cleanText.length > 0 && !firstChar.match(/[a-z0-9]/)) {
+    return 'x' + cleanText
+  }
+
+  // Eğer temizlenmiş metin boşsa 'null' dön
+  return cleanText.length > 0 ? cleanText : 'null'
+}
 
 interface Artist {
   id: number
@@ -119,29 +152,44 @@ export function ArtistClient({ artist }: Props) {
       {/* Albums Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {albums.map((album) => (
-          <div key={album.id} className="card bg-base-100 shadow-lg">
-            <figure className="px-6 pt-6">
-              {album.cover_medium && (
-                <Image
-                  src={album.cover_medium}
-                  alt={album.title}
-                  width={300}
-                  height={300}
-                  className="rounded-xl"
-                />
-              )}
-            </figure>
-            <div className="card-body">
-              <h2 className="card-title">{album.title}</h2>
-              
-              {/* Songs List */}
+          <div key={album.id} className="card bg-base-100 shadow-lg hover:shadow-xl transition-shadow">
+            <Link href={`/albums/${album.id}/${slugify(album.title)}`}>
+              <figure className="px-6 pt-6">
+                {album.cover_medium ? (
+                  <Image
+                    src={album.cover_medium}
+                    alt={album.title}
+                    width={300}
+                    height={300}
+                    className="rounded-xl"
+                  />
+                ) : (
+                  <div className="w-[300px] h-[300px] rounded-xl bg-base-300 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-base-content opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                    </svg>
+                  </div>
+                )}
+              </figure>
+              <div className="card-body">
+                <h2 className="card-title hover:text-primary transition-colors">{album.title}</h2>
+              </div>
+            </Link>
+            
+            {/* Songs List */}
+            <div className="px-6 pb-6">
               <div className="space-y-2">
                 {album.songs.map((song) => (
                   <div 
                     key={song.id}
                     className="flex items-center justify-between p-2 hover:bg-base-200 rounded-lg transition-colors"
                   >
-                    <span className="text-sm">{song.title}</span>
+                    <Link 
+                      href={`/songs/${song.id}/${slugify(song.title)}`}
+                      className="text-sm hover:text-primary transition-colors"
+                    >
+                      {song.title}
+                    </Link>
                     {song.preview_url && (
                       <button className="btn btn-ghost btn-sm btn-circle">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
