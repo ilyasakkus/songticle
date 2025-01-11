@@ -114,16 +114,12 @@ export default function StoryClient({ storyId }: StoryClientProps) {
           content: storyData.content,
           created_at: storyData.created_at,
           user_id: storyData.user_id,
-          songs: storyData.songs ? {
-            id: storyData.songs.id,
-            title: storyData.songs.title,
-            artist_name: storyData.songs.artists?.name || '',
-            cover_image: storyData.songs.cover_image,
-            preview_url: storyData.songs.preview_url,
-            artists: storyData.songs.artists ? {
-              id: storyData.songs.artists.id,
-              name: storyData.songs.artists.name
-            } : null
+          songs: storyData.songs?.[0] ? {
+            id: storyData.songs[0].id,
+            title: storyData.songs[0].title,
+            artist_name: storyData.songs[0].artists?.[0]?.name || '',
+            cover_image: storyData.songs[0].cover_image,
+            preview_url: storyData.songs[0].preview_url
           } : null,
           author: profileData || null
         }
