@@ -139,72 +139,73 @@ export function StoryList({ following = false }: StoryListProps) {
               className="block"
             >
               <div className="card bg-base-100 shadow-sm hover:shadow-md transition-shadow">
-                <div className="flex flex-row items-center p-2">
-                  {/* Album Cover Thumbnail */}
-                  <div className="flex-shrink-0 w-16 h-16 relative rounded-lg overflow-hidden bg-gray-100">
-                    {story.songs?.cover_image ? (
-                      <Image
-                        src={story.songs.cover_image}
-                        alt={story.songs.title || 'Album cover'}
-                        fill
-                        className="object-cover"
-                        sizes="64px"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
-                        </svg>
-                      </div>
-                    )}
-                    {story.songs?.preview_url && (
-                      <button
-                        onClick={() => handlePlayPause(story.songs!.id, story.songs!.preview_url!)}
-                        className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 hover:opacity-100 transition-opacity"
-                      >
-                        {playingSongId === story.songs.id ? (
-                          <Pause className="h-6 w-6 text-white" />
-                        ) : (
-                          <Play className="h-6 w-6 text-white" />
-                        )}
-                      </button>
-                    )}
-                  </div>
-
-                  {/* Content */}
-                  <div className="flex-1 ml-4">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="font-medium text-sm line-clamp-1">
-                          {story.songs?.title}
-                        </h3>
-                        <div className="text-xs text-gray-500 flex items-center gap-2">
-                          <span>{story.songs?.artists?.name}</span>
-                          <span>•</span>
-                          <span>Shared by {story.author?.full_name || 'Anonymous'}</span>
-                          <span>•</span>
-                          <span>{new Date(story.created_at!).toLocaleDateString()}</span>
+                <div className="p-4">
+                  {/* Header: Album Cover + Title + Artist */}
+                  <div className="flex gap-4">
+                    {/* Album Cover */}
+                    <div className="flex-shrink-0 w-16 h-16 relative rounded-lg overflow-hidden bg-gray-100">
+                      {story.songs?.cover_image ? (
+                        <Image
+                          src={story.songs.cover_image}
+                          alt={story.songs.title || 'Album cover'}
+                          fill
+                          className="object-cover"
+                          sizes="64px"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                          </svg>
                         </div>
-                      </div>
-                      
-                      {/* Actions */}
-                      <div className="flex gap-2">
-                        <button className="btn btn-ghost btn-sm flex items-center gap-2">
-                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="w-4 h-4 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path></svg>
-                          <span className="text-sm">Add comment</span>
-                        </button>
-                        <button 
-                          className="btn btn-ghost btn-sm flex items-center gap-2"
-                          onClick={(e) => handleLikeClick(e)}
+                      )}
+                      {story.songs?.preview_url && (
+                        <button
+                          onClick={() => handlePlayPause(story.songs!.id, story.songs!.preview_url!)}
+                          className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 hover:opacity-100 transition-opacity"
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="w-4 h-4 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                          <span className="text-sm">Like</span>
+                          {playingSongId === story.songs.id ? (
+                            <Pause className="h-6 w-6 text-white" />
+                          ) : (
+                            <Play className="h-6 w-6 text-white" />
+                          )}
                         </button>
+                      )}
+                    </div>
+
+                    {/* Title, Artist, and Meta Info */}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-base line-clamp-1">
+                        {story.songs?.title}
+                      </h3>
+                      <p className="text-sm text-gray-500 line-clamp-1">
+                        {story.songs?.artists?.name}
+                      </p>
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1 text-xs text-gray-500">
+                        <span className="line-clamp-1">By {story.author?.full_name || 'Anonymous'}</span>
+                        <span className="hidden md:inline">•</span>
+                        <span>{new Date(story.created_at!).toLocaleDateString()}</span>
                       </div>
                     </div>
-                    
-                    <p className="text-sm mt-1 line-clamp-2 text-gray-600">{story.content}</p>
+
+                    {/* Actions */}
+                    <div className="flex items-start gap-1 ml-2">
+                      <button 
+                        className="btn btn-ghost btn-sm btn-square"
+                        onClick={(e) => handleLikeClick(e)}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="w-5 h-5 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                      </button>
+                      <button className="btn btn-ghost btn-sm btn-square">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="w-5 h-5 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path></svg>
+                      </button>
+                    </div>
                   </div>
+
+                  {/* Story Content */}
+                  <p className="text-sm mt-3 line-clamp-2 text-gray-600">
+                    {story.content}
+                  </p>
                 </div>
               </div>
             </Link>
