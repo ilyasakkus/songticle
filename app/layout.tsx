@@ -10,6 +10,14 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'Songticle',
   description: 'Share your song stories',
+  icons: {
+    icon: [
+      {
+        url: '/favicon.svg',
+        type: 'image/svg+xml',
+      }
+    ]
+  }
 }
 
 export default function RootLayout({
