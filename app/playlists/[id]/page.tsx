@@ -1,25 +1,67 @@
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+'use client'
+
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { notFound } from 'next/navigation'
 import { Breadcrumb } from '@/app/components/Breadcrumb'
+import { useEffect, useState } from 'react'
 
-export default async function PlaylistPage({ params }: { params: { id: string } }) {
-  const supabase = createServerComponentClient({ cookies })
+interface Playlist {
+  id: number
+  title: string
+  user_id: string
+  created_at: string
+}
 
-  // Fetch playlist data
-  const { data: playlist, error: playlistError } = await supabase
-    .from('playlists')
-    .select('*')
-    .eq('id', params.id)
-    .single()
+interface PlaylistPageProps {
+  params: {
+    id: string
+  }
+}
 
-  if (playlistError || !playlist) {
-    console.error('Error fetching playlist:', playlistError)
+export default function PlaylistPage({ params }: PlaylistPageProps) {
+  const [playlist, setPlaylist] = useState<Playlist | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const supabase = createClientComponentClient()
+
+  useEffect(() => {
+    if (!params?.id) return
+
+    async function fetchPlaylist() {
+      try {
+        const { data, error } = await supabase
+          .from('playlists')
+          .select('*')
+          .eq('id', params.id)
+          .single()
+
+        if (error) throw error
+        setPlaylist(data)
+      } catch (err) {
+        console.error('Error fetching playlist:', err)
+        setError('Failed to load playlist')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchPlaylist()
+  }, [params?.id])
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-[200px]">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>
+    )
+  }
+
+  if (error || !playlist) {
     return notFound()
   }
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-6 space-y-6">
       <Breadcrumb 
         items={[
           { label: 'Playlists', href: '/playlists' },
