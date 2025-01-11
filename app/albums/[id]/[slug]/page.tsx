@@ -6,13 +6,20 @@ import Link from 'next/link'
 import { Music } from 'lucide-react'
 
 function slugify(text: string): string {
-  // Özel karakterleri temizle
+  // Özel karakterleri temizle ve küçük harfe çevir
   const cleanText = text
     .toLowerCase()
     .replace(/[^a-z0-9\s-]/g, '') // Sadece harfler, rakamlar, boşluklar ve tire kalır
     .trim()
     .replace(/\s+/g, '-') // Boşlukları tire ile değiştir
     .replace(/-+/g, '-') // Birden fazla tireyi tek tireye indir
+    .replace(/^-+|-+$/g, '') // Baştaki ve sondaki tireleri kaldır
+
+  // İlk karakter harf veya rakam değilse ve metin boş değilse, 'x' ekle
+  const firstChar = cleanText.charAt(0)
+  if (cleanText.length > 0 && !firstChar.match(/[a-z0-9]/)) {
+    return 'x' + cleanText
+  }
 
   // Eğer temizlenmiş metin boşsa veya sadece özel karakterlerden oluşuyorsa null dön
   return cleanText.length > 0 ? cleanText : null
