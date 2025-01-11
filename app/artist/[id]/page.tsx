@@ -1,125 +1,110 @@
 'use client'
 
-import { useEffect, useState, use } from 'react';
 import Image from 'next/image'
 import Link from 'next/link'
-import { supabase } from '@/app/lib/supabase'
-import type { Artist, Song } from '@/app/types/database.types'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { notFound } from 'next/navigation'
+import { Breadcrumb } from '@/app/components/Breadcrumb'
+import { useEffect, useState } from 'react'
 
 interface Album {
   id: number
   title: string
   cover_medium: string | null
-  artist_id: number
-  artist_name: string
-  songs?: Song[]
-  songs_count?: number
+  songs: { count: number }
 }
 
-interface ArtistWithAlbums extends Artist {
-  albums: Album[]
+interface Artist {
+  id: number
+  name: string
+  picture_medium: string | null
+  albums?: Album[]
 }
 
-export default function ArtistPage(props: { params: Promise<{ id: string }> }) {
-  const params = use(props.params);
-  const [artist, setArtist] = useState<ArtistWithAlbums | null>(null)
+interface ArtistPageProps {
+  params: {
+    id: string
+  }
+}
+
+export default function ArtistPage({ params }: ArtistPageProps) {
+  const [artist, setArtist] = useState<Artist | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const supabase = createClientComponentClient()
 
   useEffect(() => {
+    if (!params?.id) return
+
     async function fetchArtist() {
       try {
-        // First fetch artist details
-        const { data: artistData, error: artistError } = await supabase
+        const { data, error } = await supabase
           .from('artists')
-          .select('*')
+          .select(`
+            *,
+            albums (
+              id,
+              title,
+              cover_medium,
+              songs (count)
+            )
+          `)
           .eq('id', params.id)
           .single()
 
-        if (artistError) throw artistError
-
-        // Then fetch albums with songs count
-        const { data: albumsData, error: albumsError } = await supabase
-          .from('albums')
-          .select(`
-            id,
-            title,
-            cover_medium,
-            artist_id,
-            artist_name,
-            songs (count)
-          `)
-          .eq('artist_id', params.id)
-
-        if (albumsError) throw albumsError
-
-        // Transform albums data to include songs count
-        const albumsWithCount = albumsData.map(album => ({
-          ...album,
-          songs_count: album.songs?.[0]?.count || 0
-        }))
-
-        // Combine artist and albums data
-        const artistWithAlbums = {
-          ...artistData,
-          albums: albumsWithCount
-        }
-
-        console.log('Artist with albums:', artistWithAlbums)
-        setArtist(artistWithAlbums)
+        if (error) throw error
+        setArtist(data)
       } catch (err) {
         console.error('Error fetching artist:', err)
-        setError('Sanatçı bilgileri yüklenirken bir hata oluştu')
+        setError('Failed to load artist')
       } finally {
         setLoading(false)
       }
     }
 
     fetchArtist()
-  }, [params.id])
+  }, [params?.id])
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="loading loading-spinner loading-lg"></div>
+      <div className="flex justify-center items-center min-h-[200px]">
+        <span className="loading loading-spinner loading-lg"></span>
       </div>
     )
   }
 
   if (error || !artist) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
-        <div className="alert alert-error">
-          <span>{error || 'Sanatçı bulunamadı'}</span>
-        </div>
-      </div>
-    )
+    return notFound()
   }
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <Breadcrumb 
+        items={[
+          { label: 'Artists', href: '/artists' },
+          { label: artist.name }
+        ]} 
+      />
+
       {/* Artist Header */}
       <div className="flex flex-col md:flex-row items-center md:items-start gap-8 mb-12">
-        <div className="relative w-64 h-64 rounded-lg overflow-hidden">
+        <div className="w-48 h-48 relative rounded-full overflow-hidden">
           <Image
-            src={artist.picture_medium}
+            src={artist.picture_medium || '/placeholder-artist.jpg'}
             alt={artist.name}
             fill
             className="object-cover"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            priority
           />
         </div>
-        <div className="flex-1">
+        <div className="flex-1 text-center md:text-left">
           <h1 className="text-4xl font-bold mb-4">{artist.name}</h1>
-          <p className="text-lg text-gray-500">
-            {artist.albums?.length || 0} albüm
-          </p>
         </div>
       </div>
 
       {/* Albums Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {artist.albums?.map((album) => (
+        {artist.albums?.map((album, index) => (
           <div 
             key={album.id} 
             className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-200"
@@ -132,6 +117,7 @@ export default function ArtistPage(props: { params: Promise<{ id: string }> }) {
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  priority={index < 4}
                 />
               </figure>
             </Link>
@@ -143,7 +129,7 @@ export default function ArtistPage(props: { params: Promise<{ id: string }> }) {
                 {album.title}
               </Link>
               <p className="text-sm text-gray-500">
-                {album.songs_count} şarkı
+                {album.songs.count} songs
               </p>
             </div>
           </div>
