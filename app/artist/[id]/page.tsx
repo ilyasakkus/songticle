@@ -1,140 +1,128 @@
 'use client'
 
-import Image from 'next/image'
-import Link from 'next/link'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
 import { notFound } from 'next/navigation'
 import { Breadcrumb } from '@/app/components/Breadcrumb'
-import { useEffect, useState } from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { Music } from 'lucide-react'
 
 interface Album {
   id: number
   title: string
-  cover_medium: string | null
-  songs: { count: number }
+  cover_image: string
+  songs_count: number
 }
 
 interface Artist {
   id: number
   name: string
-  picture_medium: string | null
-  albums?: Album[]
+  image_url: string
+  albums: Album[]
 }
 
 interface ArtistPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
-export default function ArtistPage({ params }: ArtistPageProps) {
-  const [artist, setArtist] = useState<Artist | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const supabase = createClientComponentClient()
+export default async function ArtistPage({ params }: ArtistPageProps) {
+  const cookieStore = cookies()
+  const { id } = await params
+  const supabase = createServerComponentClient({ cookies: () => cookieStore })
 
-  useEffect(() => {
-    if (!params?.id) return
+  try {
+    const { data: artist, error: artistError } = await supabase
+      .from('artists')
+      .select('*')
+      .eq('id', id)
+      .single()
 
-    async function fetchArtist() {
-      try {
-        const { data, error } = await supabase
-          .from('artists')
-          .select(`
-            *,
-            albums (
-              id,
-              title,
-              cover_medium,
-              songs (count)
-            )
-          `)
-          .eq('id', params.id)
-          .single()
+    if (artistError) throw new Error('Artist not found')
 
-        if (error) throw error
-        setArtist(data)
-      } catch (err) {
-        console.error('Error fetching artist:', err)
-        setError('Failed to load artist')
-      } finally {
-        setLoading(false)
-      }
+    const { data: albums, error: albumsError } = await supabase
+      .from('albums')
+      .select(`
+        id,
+        title,
+        cover_image,
+        songs (count)
+      `)
+      .eq('artist_id', id)
+
+    if (albumsError) throw new Error('Albums not found')
+
+    const artistWithAlbums: Artist = {
+      ...artist,
+      albums: albums.map(album => ({
+        id: album.id,
+        title: album.title,
+        cover_image: album.cover_image,
+        songs_count: album.songs?.[0]?.count || 0
+      }))
     }
 
-    fetchArtist()
-  }, [params?.id])
-
-  if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[200px]">
-        <span className="loading loading-spinner loading-lg"></span>
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-6 space-y-6">
+        <Breadcrumb 
+          items={[
+            { label: 'Artists', href: '/artists' },
+            { label: artistWithAlbums.name }
+          ]} 
+        />
+        
+        <div className="flex flex-col gap-6">
+          <div className="flex items-center gap-4">
+            {artistWithAlbums.image_url && (
+              <Image
+                src={artistWithAlbums.image_url}
+                alt={artistWithAlbums.name}
+                width={100}
+                height={100}
+                className="rounded-full"
+              />
+            )}
+            <h1 className="text-3xl font-bold">{artistWithAlbums.name}</h1>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {artistWithAlbums.albums.map((album) => (
+              <Link 
+                key={album.id}
+                href={`/albums/${album.id}`}
+                className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow"
+              >
+                <figure className="relative aspect-square">
+                  {album.cover_image ? (
+                    <Image
+                      src={album.cover_image}
+                      alt={album.title}
+                      fill
+                      className="object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-base-200">
+                      <Music className="w-12 h-12" />
+                    </div>
+                  )}
+                </figure>
+                <div className="card-body p-4">
+                  <h2 className="card-title hover:text-primary hover:underline">
+                    {album.title}
+                  </h2>
+                  <p className="text-sm opacity-70">
+                    {album.songs_count} songs
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
       </div>
     )
-  }
-
-  if (error || !artist) {
+  } catch (error) {
     return notFound()
   }
-
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <Breadcrumb 
-        items={[
-          { label: 'Artists', href: '/artists' },
-          { label: artist.name }
-        ]} 
-      />
-
-      {/* Artist Header */}
-      <div className="flex flex-col md:flex-row items-center md:items-start gap-8 mb-12">
-        <div className="w-48 h-48 relative rounded-full overflow-hidden">
-          <Image
-            src={artist.picture_medium || '/placeholder-artist.jpg'}
-            alt={artist.name}
-            fill
-            className="object-cover"
-            priority
-          />
-        </div>
-        <div className="flex-1 text-center md:text-left">
-          <h1 className="text-4xl font-bold mb-4">{artist.name}</h1>
-        </div>
-      </div>
-
-      {/* Albums Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {artist.albums?.map((album, index) => (
-          <div 
-            key={album.id} 
-            className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-200"
-          >
-            <Link href={`/albums/${album.id}`}>
-              <figure className="relative w-full pt-[100%]">
-                <Image
-                  src={album.cover_medium || '/placeholder-album.jpg'}
-                  alt={album.title}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  priority={index < 4}
-                />
-              </figure>
-            </Link>
-            <div className="card-body">
-              <Link 
-                href={`/albums/${album.id}`}
-                className="card-title hover:text-primary hover:underline"
-              >
-                {album.title}
-              </Link>
-              <p className="text-sm text-gray-500">
-                {album.songs.count} songs
-              </p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
 } 
