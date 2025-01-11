@@ -32,7 +32,9 @@ export default function RootLayout({
           <div className="min-h-screen flex flex-col">
             <Header />
             <div className="flex-1 flex">
-              <Sidebar />
+              <div className="hidden lg:block">
+                <Sidebar />
+              </div>
               <main className="flex-1 bg-base-200 p-4">
                 {children}
               </main>

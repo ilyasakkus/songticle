@@ -112,7 +112,7 @@ export function Sidebar() {
   }
 
   return (
-    <div className="w-64 bg-base-200 h-full p-4 flex flex-col gap-6">
+    <div className="hidden lg:block w-64 bg-base-200 h-full p-4 flex flex-col gap-6">
       {/* Popular Artists Section */}
       <div>
         <button 

@@ -10,6 +10,7 @@ import { useProfile } from '../hooks/useProfile';
 import { SignInForm } from './auth/SignInForm';
 import { SignUpForm } from './auth/SignUpForm';
 import { supabase } from '../lib/supabase';
+import { MobileMenu } from './MobileMenu';
 
 const navItems = [
   { href: '/', label: 'Home', icon: Home },
@@ -28,35 +29,38 @@ export function Header() {
 
   const handleSignOut = async () => {
     try {
-      const { error } = await supabase.auth.signOut()
-      if (error) throw error
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
       
       // Clear all cookies
       document.cookie.split(';').forEach(cookie => {
         document.cookie = cookie
           .replace(/^ +/, '')
           .replace(/=.*/, '=;expires=' + new Date().toUTCString() + ';path=/')
-      })
+      });
       
       // Force reload to clear all states
-      window.location.href = '/'
+      window.location.href = '/';
     } catch (error) {
-      console.error('Error signing out:', error)
+      console.error('Error signing out:', error);
     }
-  }
+  };
 
   return (
     <header className="bg-base-100 shadow-sm">
       <div className="container mx-auto">
         <div className="navbar min-h-16 px-4">
-          {/* Left side - Title */}
+          {/* Left side - Title and Mobile Menu */}
           <div className="flex-1 flex items-center gap-4">
+            <div className="lg:hidden">
+              <MobileMenu />
+            </div>
             <Link href="/" className="text-2xl font-bold text-primary">
               Songticle
             </Link>
             
-            {/* Navigation Menu */}
-            <nav className="flex items-center gap-1 overflow-x-auto">
+            {/* Navigation Menu - Hidden on Mobile */}
+            <nav className="hidden lg:flex items-center gap-1 overflow-x-auto">
               {navItems.map(({ href, label, icon: Icon }) => {
                 const isActive = pathname === href;
                 
@@ -77,7 +81,7 @@ export function Header() {
               })}
             </nav>
           </div>
-
+          
           {/* Right side - Auth/User Actions */}
           <div className="flex-none gap-4">
             {authLoading ? (
@@ -158,5 +162,5 @@ export function Header() {
         </div>
       )}
     </header>
-  )
+  );
 }
