@@ -124,7 +124,7 @@ export default function ArtistPage(props: { params: Promise<{ id: string }> }) {
             key={album.id} 
             className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-200"
           >
-            <Link href={`/albums/${album.id}`} className="block">
+            <Link href={`/albums/${album.id}`}>
               <figure className="relative w-full pt-[100%]">
                 <Image
                   src={album.cover_medium || '/placeholder-album.jpg'}
