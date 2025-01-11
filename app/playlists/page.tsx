@@ -42,6 +42,13 @@ function getExcerpt(content: string, maxLength: number = 300) {
   return firstParagraphs.slice(0, maxLength) + '...'
 }
 
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
 export default function PlaylistsPage() {
   const [playlists, setPlaylists] = useState<Playlist[]>([])
   const [loading, setLoading] = useState(true)
@@ -164,7 +171,10 @@ export default function PlaylistsPage() {
                   />
                 )}
                 <div>
-                  <Link href={`/playlists/${playlist.id}`} className="hover:underline">
+                  <Link 
+                    href={`/playlists/${playlist.id}/${slugify(playlist.title)}`} 
+                    className="hover:underline"
+                  >
                     <h2 className="card-title">{playlist.title}</h2>
                   </Link>
                   <p className="text-gray-500">{playlist.description}</p>
@@ -215,7 +225,7 @@ export default function PlaylistsPage() {
                   {playlist.songs.length > 1 && (
                     <div className="text-center mt-2">
                       <Link 
-                        href={`/playlists/${playlist.id}`}
+                        href={`/playlists/${playlist.id}/${slugify(playlist.title)}`}
                         className="text-sm text-gray-500 hover:underline inline-flex items-center gap-2"
                       >
                         View all {playlist.songs.length} songs <ArrowRight className="h-4 w-4" />

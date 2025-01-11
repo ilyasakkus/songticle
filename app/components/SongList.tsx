@@ -39,6 +39,13 @@ interface SongListProps {
   artistSearch: string
 }
 
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
 export function SongList({ songSearch, albumSearch, artistSearch }: SongListProps) {
   const [songs, setSongs] = useState<Song[]>([])
   const [loading, setLoading] = useState(true)
@@ -206,7 +213,7 @@ export function SongList({ songSearch, albumSearch, artistSearch }: SongListProp
             </div>
             <div className="flex-1 min-w-0">
               <Link 
-                href={`/songs/${song.id}`}
+                href={`/songs/${song.id}/${slugify(song.title)}`}
                 className="block hover:text-primary"
               >
                 <h2 className="text-base sm:text-lg font-semibold truncate">{song.title}</h2>

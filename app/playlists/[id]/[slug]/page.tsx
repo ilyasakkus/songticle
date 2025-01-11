@@ -88,7 +88,7 @@ interface Playlist {
 interface PageProps {
   params: Promise<{ 
     id: string
-    slug?: string 
+    slug: string 
   }>
 }
 
@@ -134,9 +134,9 @@ export default async function PlaylistPage({ params }: PageProps) {
       return notFound()
     }
 
-    // Slug kontrolü ve yönlendirme
+    // Slug kontrolü
     const correctSlug = slugify(playlist.title)
-    if (!slug || slug !== correctSlug) {
+    if (slug !== correctSlug) {
       return redirect(`/playlists/${id}/${correctSlug}`)
     }
 
@@ -166,7 +166,7 @@ export default async function PlaylistPage({ params }: PageProps) {
         </div>
         <div class="flex-1 min-w-0">
           <h3 class="font-semibold truncate">
-            <a href="/songs/${song.id}" class="hover:text-primary">${song.title}</a>
+            <a href="/songs/${song.id}/${slugify(song.title)}" class="hover:text-primary">${song.title}</a>
           </h3>
           <p class="text-sm text-base-content/70 truncate">
             <a href="/artist/${song.artists.id}" class="hover:text-primary">${song.artists.name}</a>
