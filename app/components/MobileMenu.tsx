@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Menu, X, Star, Clock, Music, ChevronDown, ChevronRight } from 'lucide-react'
 import { Sidebar } from './Sidebar'
 import Link from 'next/link'
@@ -9,6 +9,27 @@ import { useAuth } from '../providers/AuthProvider'
 import { usePathname } from 'next/navigation'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { slugify } from '../lib/utils'
+import type { Artist, Album, Song } from '@/app/types/database.types'
+
+interface PopularArtist {
+  id: number
+  name: string
+  picture_medium: string
+}
+
+interface PopularAlbum {
+  id: number
+  title: string
+  cover_medium: string
+  artist_name: string
+}
+
+interface PopularSong {
+  id: number
+  title: string
+  preview_url: string
+  artist_name: string
+}
 
 const navItems = [
   { href: '/', label: 'Home', icon: Menu },
@@ -27,9 +48,9 @@ export function MobileMenu() {
     albums: false,
     songs: false
   })
-  const [popularArtists, setPopularArtists] = useState([])
-  const [recentAlbums, setRecentAlbums] = useState([])
-  const [popularSongs, setPopularSongs] = useState([])
+  const [popularArtists, setPopularArtists] = useState<PopularArtist[]>([])
+  const [recentAlbums, setRecentAlbums] = useState<PopularAlbum[]>([])
+  const [popularSongs, setPopularSongs] = useState<PopularSong[]>([])
   const [loading, setLoading] = useState(true)
   const supabase = createClientComponentClient()
 
