@@ -119,7 +119,11 @@ export default function StoryClient({ storyId }: StoryClientProps) {
             title: storyData.songs[0].title,
             artist_name: storyData.songs[0].artists?.[0]?.name || '',
             cover_image: storyData.songs[0].cover_image,
-            preview_url: storyData.songs[0].preview_url
+            preview_url: storyData.songs[0].preview_url,
+            artists: {
+              id: storyData.songs[0].artists?.[0]?.id || 0,
+              name: storyData.songs[0].artists?.[0]?.name || ''
+            }
           } : null,
           author: profileData || null
         }
