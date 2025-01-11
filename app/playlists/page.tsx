@@ -164,7 +164,7 @@ export default function PlaylistsPage() {
                   />
                 )}
                 <div>
-                  <Link href={`/playlists/${playlist.id}/${playlist.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')}`} className="hover:underline">
+                  <Link href={`/playlists/${playlist.id}`} className="hover:underline">
                     <h2 className="card-title">{playlist.title}</h2>
                   </Link>
                   <p className="text-gray-500">{playlist.description}</p>
@@ -215,7 +215,7 @@ export default function PlaylistsPage() {
                   {playlist.songs.length > 1 && (
                     <div className="text-center mt-2">
                       <Link 
-                        href={`/playlists/${playlist.id}/${playlist.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')}`}
+                        href={`/playlists/${playlist.id}`}
                         className="text-sm text-gray-500 hover:underline inline-flex items-center gap-2"
                       >
                         View all {playlist.songs.length} songs <ArrowRight className="h-4 w-4" />
