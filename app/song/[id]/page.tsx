@@ -17,12 +17,13 @@ interface Song {
   album_title: string
 }
 
-type SongPageProps = {
-  params: Promise<{ id: string }>
+interface SongPageProps {
+  params: {
+    id: string
+  }
 }
 
-export default async function SongPage({ params }: SongPageProps) {
-  const { id } = await params
+export default function SongPage({ params }: SongPageProps) {
   const [song, setSong] = useState<Song | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -44,7 +45,7 @@ export default async function SongPage({ params }: SongPageProps) {
               title
             )
           `)
-          .eq('id', id)
+          .eq('id', params.id)
           .single()
 
         if (songError) throw new Error('Song not found')
@@ -65,7 +66,7 @@ export default async function SongPage({ params }: SongPageProps) {
     }
 
     fetchSong()
-  }, [id, supabase])
+  }, [params.id, supabase])
 
   if (loading) {
     return (

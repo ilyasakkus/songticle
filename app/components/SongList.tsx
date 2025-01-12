@@ -40,10 +40,51 @@ interface SongListProps {
 }
 
 function slugify(text: string): string {
-  return text
+  if (!text) return 'null'
+
+  // Türkçe karakterleri dönüştür
+  const turkishToEnglish: { [key: string]: string } = {
+    'Ş': 'S', 'ş': 's',
+    'Ğ': 'G', 'ğ': 'g',
+    'Ü': 'U', 'ü': 'u',
+    'Ö': 'O', 'ö': 'o',
+    'Ç': 'C', 'ç': 'c',
+    'İ': 'I', 'ı': 'i', 'I': 'i', 'i': 'i'
+  }
+
+  // Metni dönüştür
+  let cleanText = text
+    // Her karakteri kontrol et ve dönüştür
+    .split('')
+    .map(char => turkishToEnglish[char] || char)
+    .join('')
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
+    .trim()
+
+  // Özel karakterleri ve boşlukları temizle
+  cleanText = cleanText
+    // Noktalama işaretlerini ve özel karakterleri boşluğa çevir (sayılar hariç)
+    .replace(/[^\w\s0-9-]/g, ' ')
+    // Birden fazla boşluğu tek boşluğa indir
+    .replace(/\s+/g, ' ')
+    .trim()
+    // Boşlukları tire ile değiştir
+    .replace(/\s/g, '-')
+    // Birden fazla tireyi tek tireye indir
+    .replace(/-+/g, '-')
+    // Baştaki ve sondaki tireleri kaldır
     .replace(/^-+|-+$/g, '')
+
+  // Eğer metin boşsa 'null' dön
+  if (cleanText.length === 0) return 'null'
+
+  // İlk karakter harf veya rakam değilse 'x' ekle
+  const firstChar = cleanText.charAt(0)
+  if (!firstChar.match(/[a-z0-9]/)) {
+    cleanText = 'x' + cleanText
+  }
+
+  return cleanText
 }
 
 export function SongList({ songSearch, albumSearch, artistSearch }: SongListProps) {

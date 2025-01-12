@@ -8,53 +8,35 @@ import { Music } from 'lucide-react'
 function slugify(text: string): string {
   if (!text) return 'null'
 
-  // Türkçe karakterleri dönüştür
-  const replacements = {
-    'ş': 's', 'Ş': 's',
-    'ı': 'i', 'İ': 'i', 'ı': 'i',
-    'ç': 'c', 'Ç': 'c',
-    'ğ': 'g', 'Ğ': 'g',
-    'ü': 'u', 'Ü': 'u',
-    'ö': 'o', 'Ö': 'o'
+  // Türkçe karakterleri değiştir
+  const turkishMap: { [key: string]: string } = {
+    'ı': 'i', 'ğ': 'g', 'ü': 'u', 'ş': 's', 'ö': 'o', 'ç': 'c',
+    'İ': 'i', 'Ğ': 'g', 'Ü': 'u', 'Ş': 's', 'Ö': 'o', 'Ç': 'c'
   }
 
-  // Metni dönüştür
-  let cleanText = text.toLowerCase()
+  // Önce Türkçe karakterleri değiştir
+  const textWithoutTurkish = text.replace(/[ıİğĞüÜşŞöÖçÇ]/g, letter => turkishMap[letter] || letter)
 
-  // Her bir Türkçe karakteri değiştir
-  for (let [key, value] of Object.entries(replacements)) {
-    cleanText = cleanText.replace(new RegExp(key, 'g'), value)
-  }
-
-  // Metni temizle
-  cleanText = cleanText
-    .trim()
-    // Virgülleri ve noktalı virgülleri boşluğa çevir
-    .replace(/[,;]/g, ' ')
-    // Sayıları koru ama aralarına tire ekle
-    .replace(/(\d)[,.](\d)/g, '$1-$2') // 1.2 -> 1-2
-    .replace(/(\d)\s+(\d)/g, '$1-$2')   // 1 2 -> 1-2
-    // Diğer özel karakterleri temizle
+  // Sonra normal slugify işlemini yap
+  const cleanText = textWithoutTurkish
+    .toLowerCase()
     .replace(/[^a-z0-9\s-]/g, '') // Sadece harfler, rakamlar, boşluklar ve tire kalır
+    .trim()
     .replace(/\s+/g, '-') // Boşlukları tire ile değiştir
     .replace(/-+/g, '-') // Birden fazla tireyi tek tireye indir
     .replace(/^-+|-+$/g, '') // Baştaki ve sondaki tireleri kaldır
 
-  // Eğer metin boşsa 'null' dön
-  if (cleanText.length === 0) return 'null'
-
-  // İlk karakter harf veya rakam değilse 'x' ekle
+  // İlk karakter harf veya rakam değilse ve metin boş değilse, 'x' ekle
   const firstChar = cleanText.charAt(0)
-  if (!firstChar.match(/[a-z0-9]/)) {
-    cleanText = 'x' + cleanText
+  if (cleanText.length > 0 && !firstChar.match(/[a-z0-9]/)) {
+    return 'x' + cleanText
   }
 
-  return cleanText
+  // Eğer temizlenmiş metin boşsa 'null' dön
+  return cleanText.length > 0 ? cleanText : 'null'
 }
 
 function compareSlug(slug1: string, slug2: string): boolean {
-  if (!slug1 || !slug2) return false
-  
   // URL decode yap ve karşılaştır
   try {
     const decodedSlug1 = decodeURIComponent(slug1).toLowerCase()
@@ -67,26 +49,26 @@ function compareSlug(slug1: string, slug2: string): boolean {
 }
 
 interface Props {
-  params: Promise<{
+  params: {
     id: string
     slug: string
-  }>
+  }
 }
 
-export default async function AlbumPage(props: Props) {
+export default async function AlbumPage({ params }: Props) {
   // Await params
-  const { id, slug } = await props.params
-  
-  // Validate id parameter
-  if (!id || typeof id !== 'string') {
-    return notFound()
-  }
+  const { id, slug } = await Promise.resolve(params)
   
   // Await cookies
   const cookieStore = await cookies()
   const supabase = createServerComponentClient({ cookies: () => cookieStore })
 
   try {
+    // Validate id parameter
+    if (!id || typeof id !== 'string') {
+      return notFound()
+    }
+
     const { data: album, error: albumError } = await supabase
       .from('albums')
       .select(`

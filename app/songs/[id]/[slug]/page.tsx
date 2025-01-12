@@ -9,36 +9,37 @@ function slugify(text: string): string {
   if (!text) return 'null'
 
   // Türkçe karakterleri dönüştür
-  const replacements = {
-    'ş': 's', 'Ş': 's',
-    'ı': 'i', 'İ': 'i', 'ı': 'i',
-    'ç': 'c', 'Ç': 'c',
-    'ğ': 'g', 'Ğ': 'g',
-    'ü': 'u', 'Ü': 'u',
-    'ö': 'o', 'Ö': 'o'
+  const turkishToEnglish = {
+    'Ş': 'S', 'ş': 's',
+    'Ğ': 'G', 'ğ': 'g',
+    'Ü': 'U', 'ü': 'u',
+    'Ö': 'O', 'ö': 'o',
+    'Ç': 'C', 'ç': 'c',
+    'İ': 'I', 'ı': 'i', 'I': 'i', 'i': 'i'
   }
 
   // Metni dönüştür
-  let cleanText = text.toLowerCase()
-
-  // Her bir Türkçe karakteri değiştir
-  for (let [key, value] of Object.entries(replacements)) {
-    cleanText = cleanText.replace(new RegExp(key, 'g'), value)
-  }
-
-  // Metni temizle
-  cleanText = cleanText
+  let cleanText = text
+    // Her karakteri kontrol et ve dönüştür
+    .split('')
+    .map(char => turkishToEnglish[char] || char)
+    .join('')
+    .toLowerCase()
     .trim()
-    // Virgülleri ve noktalı virgülleri boşluğa çevir
-    .replace(/[,;]/g, ' ')
-    // Sayıları koru ama aralarına tire ekle
-    .replace(/(\d)[,.](\d)/g, '$1-$2') // 1.2 -> 1-2
-    .replace(/(\d)\s+(\d)/g, '$1-$2')   // 1 2 -> 1-2
-    // Diğer özel karakterleri temizle
-    .replace(/[^a-z0-9\s-]/g, '') // Sadece harfler, rakamlar, boşluklar ve tire kalır
-    .replace(/\s+/g, '-') // Boşlukları tire ile değiştir
-    .replace(/-+/g, '-') // Birden fazla tireyi tek tireye indir
-    .replace(/^-+|-+$/g, '') // Baştaki ve sondaki tireleri kaldır
+
+  // Özel karakterleri ve boşlukları temizle
+  cleanText = cleanText
+    // Noktalama işaretlerini ve özel karakterleri boşluğa çevir (sayılar hariç)
+    .replace(/[^\w\s0-9-]/g, ' ')
+    // Birden fazla boşluğu tek boşluğa indir
+    .replace(/\s+/g, ' ')
+    .trim()
+    // Boşlukları tire ile değiştir
+    .replace(/\s/g, '-')
+    // Birden fazla tireyi tek tireye indir
+    .replace(/-+/g, '-')
+    // Baştaki ve sondaki tireleri kaldır
+    .replace(/^-+|-+$/g, '')
 
   // Eğer metin boşsa 'null' dön
   if (cleanText.length === 0) return 'null'
