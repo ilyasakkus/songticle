@@ -15,14 +15,16 @@ function slugify(text: string): string {
     'İ': 'i', 'Ğ': 'g', 'Ü': 'u', 'Ş': 's', 'Ö': 'o', 'Ç': 'c'
   }
 
-  // Önce Türkçe karakterleri değiştir
-  const textWithoutTurkish = text.replace(/[ıİğĞüÜşŞöÖçÇ]/g, letter => turkishMap[letter] || letter)
-
-  // Sonra normal slugify işlemini yap
-  const cleanText = textWithoutTurkish
+  // Metni temizle ve dönüştür
+  let cleanText = text
+    // Türkçe karakterleri değiştir
+    .split('')
+    .map(char => turkishMap[char] || char)
+    .join('')
     .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '') // Sadece harfler, rakamlar, boşluklar ve tire kalır
     .trim()
+    // Özel karakterleri ve boşlukları temizle
+    .replace(/[^\w\s0-9-]/g, ' ') // Sadece harfler, rakamlar, boşluklar ve tire kalır
     .replace(/\s+/g, '-') // Boşlukları tire ile değiştir
     .replace(/-+/g, '-') // Birden fazla tireyi tek tireye indir
     .replace(/^-+|-+$/g, '') // Baştaki ve sondaki tireleri kaldır
