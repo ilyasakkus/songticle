@@ -53,42 +53,29 @@ function slugify(text: string): string {
   return cleanText
 }
 
-function compareSlug(slug1: string, slug2: string): boolean {
-  if (!slug1 || !slug2) return false
-  
-  // URL decode yap ve karşılaştır
-  try {
-    const decodedSlug1 = decodeURIComponent(slug1).toLowerCase()
-    const decodedSlug2 = decodeURIComponent(slug2).toLowerCase()
-    return decodedSlug1 === decodedSlug2
-  } catch {
-    // Decode hatası olursa normal karşılaştır
-    return slug1.toLowerCase() === slug2.toLowerCase()
-  }
-}
-
 type PageProps = {
-  params: {
+  params: Promise<{
     id: string
     slug: string
-  }
+  }>
   searchParams: { [key: string]: string | string[] | undefined }
 }
 
 export default async function AlbumPage({ params }: PageProps) {
-  const { id, slug } = params
+  // Await params
+  const { id, slug } = await params
   
   // Validate id parameter
   if (!id || typeof id !== 'string') {
     return notFound()
   }
-  
-  // Await cookies
-  const cookieStore = await cookies()
+
+  // Create Supabase client
+  const cookieStore = cookies()
   const supabase = createServerComponentClient({ cookies: () => cookieStore })
 
   try {
-    // Fetch song data with album and artist info
+    // Fetch album data with artist and songs info
     const { data: album, error: albumError } = await supabase
       .from('albums')
       .select(`
@@ -158,7 +145,7 @@ export default async function AlbumPage({ params }: PageProps) {
             <h1 className="text-3xl font-bold mb-2">{album.title}</h1>
             {album.artists && (
               <Link 
-                href={`/artists/${album.artists.id}`}
+                href={`/artists/${album.artists.id}/${slugify(album.artists.name)}`}
                 className="text-xl text-base-content/70 hover:text-primary"
               >
                 {album.artists.name}
