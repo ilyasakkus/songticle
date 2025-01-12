@@ -120,12 +120,18 @@ export default async function AlbumPage({ params }: PageProps) {
     // Slug kontrolü
     const correctSlug = slugify(album.title)
     
-    // Eğer slug 'null' ise veya doğru slug ile eşleşiyorsa devam et
-    if (slug === 'null' || compareSlug(slug, correctSlug)) {
-      // Devam et, redirect yapma
-    } else {
-      // Slug yanlışsa redirect yap
-      return redirect(`/albums/${id}/${correctSlug}`)
+    // Gelen slug'ı decode edelim
+    let decodedSlug
+    try {
+      decodedSlug = decodeURIComponent(slug)
+    } catch {
+      decodedSlug = slug
+    }
+
+    // Eğer slug 'null' ise veya doğru slug ile eşleşmiyorsa redirect yapalım
+    if (decodedSlug !== correctSlug && decodedSlug !== 'null') {
+      const redirectUrl = `/albums/${id}/${encodeURIComponent(correctSlug)}`
+      return redirect(redirectUrl)
     }
 
     return (
