@@ -2,23 +2,9 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { formatDistanceToNow } from 'date-fns'
-
-
-interface SupabaseComment {
-  id: number
-  song_id: number
-  content: string
-  created_at: string
-  user_id: string
-  profiles: {
-    full_name: string | null
-    avatar_url: string | null
-  }
-}
-
+import { useAuth } from '../providers/AuthProvider'
 
 interface Comment {
   id: number
@@ -40,10 +26,8 @@ export function CommentSection({ songId }: CommentSectionProps) {
   const [newComment, setNewComment] = useState('')
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [authChecked, setAuthChecked] = useState(false)
   const supabase = createClientComponentClient()
-  const router = useRouter()
+  const { user, setShowSignIn } = useAuth()
 
   const fetchComments = useCallback(async () => {
     if (!songId) {
@@ -107,39 +91,9 @@ export function CommentSection({ songId }: CommentSectionProps) {
     }
   }, [songId, supabase])
 
-  const checkAuth = useCallback(async () => {
-    try {
-      const { data: { session }, error } = await supabase.auth.getSession()
-      
-      if (error) {
-        console.error('Auth check error:', error)
-        setIsLoggedIn(false)
-        return
-      }
-
-      console.log('Session check result:', { 
-        hasSession: !!session,
-        userId: session?.user?.id
-      })
-      
-      setIsLoggedIn(!!session)
-    } catch (error) {
-      console.error('Error checking auth:', error)
-      setIsLoggedIn(false)
-    } finally {
-      setAuthChecked(true)
-    }
-  }, [supabase])
-
   useEffect(() => {
-    checkAuth()
-  }, [checkAuth])
-
-  useEffect(() => {
-    if (authChecked) {
-      fetchComments()
-    }
-  }, [fetchComments, authChecked])
+    fetchComments()
+  }, [fetchComments])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -148,11 +102,10 @@ export function CommentSection({ songId }: CommentSectionProps) {
     
     try {
       setSubmitting(true)
-      const { data: { session } } = await supabase.auth.getSession()
       
-      if (!session) {
-        console.log('No session found when trying to submit comment')
-        alert('Please sign in to comment')
+      if (!user) {
+        console.log('No user found when trying to submit comment')
+        setShowSignIn(true)
         return
       }
 
@@ -160,7 +113,7 @@ export function CommentSection({ songId }: CommentSectionProps) {
         .from('song_comments')
         .insert({
           song_id: songId,
-          user_id: session.user.id,
+          user_id: user.id,
           content: newComment.trim(),
           created_at: new Date().toISOString()
         })
@@ -189,7 +142,7 @@ export function CommentSection({ songId }: CommentSectionProps) {
       <h2 className="text-2xl font-bold mb-4">Comments</h2>
       
       {/* Comment Form - Only show if logged in */}
-      {isLoggedIn ? (
+      {user ? (
         <form onSubmit={handleSubmit} className="mb-6">
           <textarea
             value={newComment}
@@ -207,7 +160,7 @@ export function CommentSection({ songId }: CommentSectionProps) {
         </form>
       ) : (
         <div className="alert alert-info mb-6">
-          <p>Please <button onClick={() => router.push('/login')} className="underline">sign in</button> to comment.</p>
+          <p>Please <button onClick={() => setShowSignIn(true)} className="underline">sign in</button> to comment.</p>
         </div>
       )}
 
