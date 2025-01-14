@@ -123,6 +123,18 @@ const SongPage = async (props: Props) => {
       return redirect(redirectUrl)
     }
 
+    // Fetch preview URL from Deezer API
+    const searchQuery = encodeURIComponent(`${song.title} ${song.artists.name}`)
+    const deezerResponse = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/deezer?q=${searchQuery}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    
+    const deezerData = await deezerResponse.json()
+    const previewUrl = deezerData.data?.[0]?.preview || null
+
     return (
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row gap-8">
@@ -173,7 +185,7 @@ const SongPage = async (props: Props) => {
             )}
 
             {/* Preview Button */}
-            <PreviewButton previewUrl={song.preview_url} />
+            <PreviewButton previewUrl={previewUrl} />
 
             {/* Like Button */}
             <div className="mt-4">
