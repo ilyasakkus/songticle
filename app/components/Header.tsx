@@ -89,14 +89,14 @@ export function Header() {
             ) : user ? (
               <>
                 <Link href="/add">
-                  <button className="btn btn-primary">
-                    <PlusCircle className="w-4 h-4 mr-2" />
-                    Add Song Story
+                  <button className="btn btn-primary btn-sm md:btn-md">
+                    <PlusCircle className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
+                    <span className="text-xs md:text-sm">Add Song Story</span>
                   </button>
                 </Link>
                 <div className="dropdown dropdown-end">
                   <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
-                    <div className="w-10 rounded-full">
+                    <div className="w-8 md:w-10 rounded-full">
                       <Image
                         src={profile?.avatar_url || '/placeholder-avatar.jpg'}
                         alt={profile?.full_name || 'User avatar'}
