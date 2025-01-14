@@ -39,6 +39,7 @@ export function CommentSection({ songId }: CommentSectionProps) {
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [authChecked, setAuthChecked] = useState(false)
   const supabase = createClientComponentClient()
   const router = useRouter()
 
@@ -105,14 +106,38 @@ export function CommentSection({ songId }: CommentSectionProps) {
   }, [songId, supabase])
 
   const checkAuth = useCallback(async () => {
-    const { data: { session } } = await supabase.auth.getSession()
-    setIsLoggedIn(!!session)
+    try {
+      const { data: { session }, error } = await supabase.auth.getSession()
+      
+      if (error) {
+        console.error('Auth check error:', error)
+        setIsLoggedIn(false)
+        return
+      }
+
+      console.log('Session check result:', { 
+        hasSession: !!session,
+        userId: session?.user?.id
+      })
+      
+      setIsLoggedIn(!!session)
+    } catch (error) {
+      console.error('Error checking auth:', error)
+      setIsLoggedIn(false)
+    } finally {
+      setAuthChecked(true)
+    }
   }, [supabase])
 
   useEffect(() => {
-    fetchComments()
     checkAuth()
-  }, [fetchComments, checkAuth])
+  }, [checkAuth])
+
+  useEffect(() => {
+    if (authChecked) {
+      fetchComments()
+    }
+  }, [fetchComments, authChecked])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -124,6 +149,7 @@ export function CommentSection({ songId }: CommentSectionProps) {
       const { data: { session } } = await supabase.auth.getSession()
       
       if (!session) {
+        console.log('No session found when trying to submit comment')
         alert('Please sign in to comment')
         return
       }
