@@ -233,7 +233,7 @@ export function SongList({ songSearch, albumSearch, artistSearch }: SongListProp
         {songs.map((song) => (
           <div 
             key={song.id}
-            className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-base-100 rounded-lg shadow hover:shadow-md transition-shadow"
+            className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-base-100 rounded-lg shadow hover:shadow-md transition-shadow max-w-3xl mx-auto w-full"
           >
             <div className="shrink-0">
               {song.album.cover_medium ? (
@@ -259,26 +259,20 @@ export function SongList({ songSearch, albumSearch, artistSearch }: SongListProp
               >
                 <h2 className="text-base sm:text-lg font-semibold truncate">{song.title}</h2>
               </Link>
-              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-500">
-                <button 
-                  onClick={(e) => {
-                    e.preventDefault()
-                    window.location.href = `/artist/${song.artist.id}`
-                  }}
-                  className="text-left hover:text-primary hover:underline truncate"
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-sm text-gray-500">
+                <Link 
+                  href={`/artists/${song.artist.id}/${slugify(song.artist.name)}`}
+                  className="hover:text-primary hover:underline truncate"
                 >
                   {song.artist.name}
-                </button>
+                </Link>
                 <span className="hidden sm:inline">•</span>
-                <button 
-                  onClick={(e) => {
-                    e.preventDefault()
-                    window.location.href = `/albums/${song.album.id}`
-                  }}
-                  className="text-left hover:text-primary hover:underline truncate"
+                <Link 
+                  href={`/albums/${song.album.id}/${slugify(song.album.title)}`}
+                  className="hover:text-primary hover:underline truncate"
                 >
                   {song.album.title}
-                </button>
+                </Link>
               </div>
             </div>
           </div>
