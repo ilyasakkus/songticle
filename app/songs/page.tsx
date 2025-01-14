@@ -16,26 +16,23 @@ export default function SongsPage() {
   const debouncedArtistSearch = useDebounce(artistSearchTerm, 300)
 
   return (
-    <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-6 space-y-6">
+    <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6">
       {/* Search Section */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 sm:gap-4">
         <SearchInput 
           placeholder="Search songs..." 
           value={songSearchTerm}
           onChange={(e) => setSongSearchTerm(e.target.value)}
-          className="w-full"
         />
         <SearchInput 
           placeholder="Search by album..." 
           value={albumSearchTerm}
           onChange={(e) => setAlbumSearchTerm(e.target.value)}
-          className="w-full"
         />
         <SearchInput 
           placeholder="Search by artist..." 
           value={artistSearchTerm}
           onChange={(e) => setArtistSearchTerm(e.target.value)}
-          className="w-full lg:col-span-1"
         />
       </div>
 
