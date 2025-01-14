@@ -68,7 +68,10 @@ Important:
       ]
     })
 
-    const content = message.content[0].text || ''
+    // Extract content from the message response
+    const content = message.content[0].type === 'text' 
+      ? message.content[0].text 
+      : ''
 
     return NextResponse.json({ 
       content,

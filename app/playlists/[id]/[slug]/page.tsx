@@ -116,8 +116,9 @@ interface PlaylistSongResponse {
 
 export default async function PlaylistPage({ params }: PageProps) {
   const { id, slug } = await params
-  const cookieStore = await cookies()
-  const supabase = createServerComponentClient({ cookies: () => cookieStore })
+  const supabase = createServerComponentClient({ 
+    cookies
+  })
 
   try {
     const { data: playlist, error } = await supabase
