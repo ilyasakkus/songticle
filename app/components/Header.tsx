@@ -106,7 +106,11 @@ export function Header() {
                       />
                     </div>
                   </div>
-                  <ul tabIndex={0} className="dropdown-content z-50 menu menu-sm p-2 shadow-lg bg-base-100 rounded-box w-52 mt-2">
+                  <ul 
+                    tabIndex={0} 
+                    className="dropdown-content z-[999] menu menu-sm p-2 shadow-lg bg-base-100 rounded-box w-52 mt-2 absolute"
+                    style={{ position: 'fixed', right: '1rem', top: '3.5rem' }}
+                  >
                     <li>
                       <Link href="/profile" className="py-2">
                         Profile
