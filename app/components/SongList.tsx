@@ -231,9 +231,8 @@ export function SongList({ songSearch, albumSearch, artistSearch }: SongListProp
       {/* Songs List */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {songs.map((song) => (
-          <Link 
+          <div 
             key={song.id}
-            href={`/songs/${song.id}/${slugify(song.title)}`}
             className="card bg-base-100 shadow-sm hover:shadow-md transition-shadow overflow-hidden"
           >
             <div className="p-3">
@@ -256,27 +255,30 @@ export function SongList({ songSearch, albumSearch, artistSearch }: SongListProp
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h2 className="font-semibold text-base line-clamp-1 hover:text-primary transition-colors">
-                    {song.title}
-                  </h2>
+                  <Link 
+                    href={`/songs/${song.id}/${slugify(song.title)}`}
+                    className="block"
+                  >
+                    <h2 className="font-semibold text-base line-clamp-1 hover:text-primary transition-colors">
+                      {song.title}
+                    </h2>
+                  </Link>
                   <div className="flex flex-col gap-1 mt-1">
-                    <Link 
-                      href={`/artists/${song.artist.id}/${slugify(song.artist.name)}`}
-                      className="text-sm text-base-content/70 hover:text-primary hover:underline truncate"
-                    >
-                      {song.artist.name}
-                    </Link>
-                    <Link 
-                      href={`/albums/${song.album.id}/${slugify(song.album.title)}`}
-                      className="text-sm text-base-content/60 hover:text-primary hover:underline truncate"
-                    >
-                      {song.album.title}
-                    </Link>
+                    <div className="text-sm text-base-content/70 hover:text-primary hover:underline truncate">
+                      <Link href={`/artists/${song.artist.id}/${slugify(song.artist.name)}`}>
+                        {song.artist.name}
+                      </Link>
+                    </div>
+                    <div className="text-sm text-base-content/60 hover:text-primary hover:underline truncate">
+                      <Link href={`/albums/${song.album.id}/${slugify(song.album.title)}`}>
+                        {song.album.title}
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </Link>
+          </div>
         ))}
       </div>
 
