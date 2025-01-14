@@ -197,27 +197,31 @@ export default async function PlaylistPage({ params }: PageProps) {
 
     // Şarkı kartı HTML'ini oluştur
     const songCardHtml = (song: any, index: number) => `
-      <div class="flex items-center gap-3 sm:gap-4 bg-base-100 p-3 sm:p-4 rounded-lg mb-4 shadow-sm hover:shadow-md transition-shadow">
-        <span class="w-6 sm:w-8 text-center text-base-content/60 text-sm sm:text-base shrink-0">${index + 1}</span>
-        <div class="w-14 h-14 sm:w-16 sm:h-16 shrink-0">
-          ${song.cover_image 
-            ? `<img src="${song.cover_image}" alt="${song.title}" class="w-full h-full object-cover rounded-lg" />`
-            : `<div class="w-full h-full flex items-center justify-center bg-base-200 rounded-lg">
-                <svg class="w-6 h-6 sm:w-8 sm:h-8 text-base-content/20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M9 18V5l12-2v13" stroke-linecap="round" stroke-linejoin="round"/>
-                  <circle cx="6" cy="18" r="3"/>
-                  <circle cx="21" cy="16" r="3"/>
-                </svg>
-              </div>`
-          }
-        </div>
-        <div class="flex-1 min-w-0">
-          <h3 class="font-semibold truncate text-base sm:text-lg mb-1">
-            <a href="/songs/${song.id}/${slugify(song.title)}" class="hover:text-primary transition-colors">${song.title}</a>
-          </h3>
-          <p class="text-sm sm:text-base text-base-content/70 truncate">
-            <a href="/artists/${song.artists.id}/${slugify(song.artists.name)}" class="hover:text-primary transition-colors">${song.artists.name}</a>
-          </p>
+      <div class="card bg-base-100 shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+        <div class="p-3">
+          <div class="flex gap-3">
+            <span class="w-6 text-center text-base-content/60 text-sm shrink-0">${index + 1}</span>
+            <div class="w-14 h-14 shrink-0">
+              ${song.cover_image 
+                ? `<img src="${song.cover_image}" alt="${song.title}" class="w-full h-full object-cover rounded-lg" />`
+                : `<div class="w-full h-full flex items-center justify-center bg-base-200 rounded-lg">
+                    <svg class="w-6 h-6 text-base-content/20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M9 18V5l12-2v13" stroke-linecap="round" stroke-linejoin="round"/>
+                      <circle cx="6" cy="18" r="3"/>
+                      <circle cx="21" cy="16" r="3"/>
+                    </svg>
+                  </div>`
+              }
+            </div>
+            <div class="flex-1 min-w-0">
+              <h3 class="font-semibold truncate text-base mb-1">
+                <a href="/songs/${song.id}/${slugify(song.title)}" class="hover:text-primary transition-colors">${song.title}</a>
+              </h3>
+              <p class="text-sm text-base-content/70 truncate">
+                <a href="/artists/${song.artists.id}/${slugify(song.artists.name)}" class="hover:text-primary transition-colors">${song.artists.name}</a>
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     `
@@ -233,18 +237,22 @@ export default async function PlaylistPage({ params }: PageProps) {
 
     return (
       <div className="w-full min-h-screen overflow-x-hidden">
-        <div className="max-w-4xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6">
-          <div className="flex flex-col gap-4 sm:gap-6">
+        <div className="max-w-3xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
+          <div className="flex flex-col gap-4">
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold mb-3">{playlist.title}</h1>
               {playlist.description && (
-                <p className="text-base-content/70 text-base sm:text-lg leading-relaxed">{playlist.description}</p>
+                <p className="text-base-content/70 text-base leading-relaxed">{playlist.description}</p>
               )}
               {playlist.content && (
                 <div 
-                  className="mt-6 sm:mt-8 prose prose-base sm:prose-lg max-w-none text-justify"
+                  className="mt-6 prose prose-sm sm:prose-base max-w-none"
                   dangerouslySetInnerHTML={{ 
                     __html: content
+                  }}
+                  style={{
+                    wordWrap: 'break-word',
+                    overflowWrap: 'break-word'
                   }}
                 />
               )}
