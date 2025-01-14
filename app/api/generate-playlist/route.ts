@@ -9,12 +9,28 @@ interface Song {
 
 export async function POST(request: Request) {
   try {
-    const { artistName, songs } = await request.json()
+    const body = await request.json()
+    
+    if (!body.artistName || !body.songs || !Array.isArray(body.songs)) {
+      console.error('Invalid request body:', body)
+      return NextResponse.json({ 
+        error: 'Invalid request. artistName and songs array are required.' 
+      }, { status: 400 })
+    }
+
+    const { artistName, songs } = body
 
     // Limit to 10 random songs if more than 10
     const selectedSongs = songs.length > 10 
       ? songs.sort(() => 0.5 - Math.random()).slice(0, 10)
       : songs
+
+    if (!process.env.ANTHROPIC_API_KEY) {
+      console.error('ANTHROPIC_API_KEY is not set')
+      return NextResponse.json({ 
+        error: 'API key configuration error' 
+      }, { status: 500 })
+    }
 
     const anthropic = new Anthropic({
       apiKey: process.env.ANTHROPIC_API_KEY
@@ -56,6 +72,8 @@ Important:
 - Do not use any markdown symbols (like #, *, ) in the text
 - Do not include bullet points in the final text`
 
+    console.log('Sending request to Anthropic with prompt:', prompt)
+
     const message = await anthropic.messages.create({
       model: 'claude-3-opus-20240229',
       max_tokens: 2000,
@@ -68,17 +86,35 @@ Important:
       ]
     })
 
+    if (!message || !message.content || !message.content[0]) {
+      console.error('Invalid response from Anthropic:', message)
+      return NextResponse.json({ 
+        error: 'Invalid response from AI service' 
+      }, { status: 500 })
+    }
+
     // Extract content from the message response
     const content = message.content[0].type === 'text' 
       ? message.content[0].text 
       : ''
 
+    if (!content) {
+      console.error('Empty content from Anthropic')
+      return NextResponse.json({ 
+        error: 'Empty response from AI service' 
+      }, { status: 500 })
+    }
+
+    console.log('Successfully generated content')
+
     return NextResponse.json({ 
       content,
-      selectedSongs // Return selected songs for playlist creation
+      selectedSongs
     })
   } catch (error) {
-    console.error('Error generating playlist content:', error)
-    return NextResponse.json({ error: 'Failed to generate content' }, { status: 500 })
+    console.error('Error in generate-playlist route:', error)
+    return NextResponse.json({ 
+      error: error instanceof Error ? error.message : 'Failed to generate content' 
+    }, { status: 500 })
   }
 } 

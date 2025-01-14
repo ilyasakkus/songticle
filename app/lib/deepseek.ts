@@ -12,6 +12,8 @@ export async function generatePlaylistContent(
   apiKey: string
 ): Promise<string | null> {
   try {
+    console.log('Generating playlist content for:', { artistName, songCount: songs.length })
+
     const response = await fetch('/api/generate-playlist', {
       method: 'POST',
       headers: {
@@ -23,15 +25,22 @@ export async function generatePlaylistContent(
       })
     })
 
+    const data = await response.json()
+
     if (!response.ok) {
-      throw new Error('Failed to generate content')
+      console.error('API Error:', data.error)
+      throw new Error(data.error || 'Failed to generate content')
     }
 
-    const data = await response.json()
+    if (!data.content) {
+      console.error('No content in response:', data)
+      throw new Error('No content received from API')
+    }
+
     return data.content
 
   } catch (error) {
-    console.error('Error generating playlist content:', error)
-    return null
+    console.error('Error in generatePlaylistContent:', error)
+    throw error
   }
 } 
