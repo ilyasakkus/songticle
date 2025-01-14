@@ -16,38 +16,40 @@ export default function SongsPage() {
   const debouncedArtistSearch = useDebounce(artistSearchTerm, 300)
 
   return (
-    <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6">
-      {/* Search Section */}
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 sm:gap-4">
-        <SearchInput 
-          placeholder="Search songs..." 
-          value={songSearchTerm}
-          onChange={(e) => setSongSearchTerm(e.target.value)}
-        />
-        <SearchInput 
-          placeholder="Search by album..." 
-          value={albumSearchTerm}
-          onChange={(e) => setAlbumSearchTerm(e.target.value)}
-        />
-        <SearchInput 
-          placeholder="Search by artist..." 
-          value={artistSearchTerm}
-          onChange={(e) => setArtistSearchTerm(e.target.value)}
-        />
-      </div>
-
-      {/* Songs Grid */}
-      <Suspense fallback={
-        <div className="flex justify-center items-center min-h-[200px]">
-          <span className="loading loading-spinner loading-lg"></span>
+    <div className="w-full min-h-screen overflow-x-hidden">
+      <div className="max-w-7xl mx-auto px-1 xs:px-2 sm:px-4 lg:px-8 py-2 xs:py-4 sm:py-6 space-y-2 xs:space-y-4 sm:space-y-6">
+        {/* Search Section */}
+        <div className="grid grid-cols-1 gap-1.5 xs:gap-2 sm:grid-cols-2 lg:grid-cols-3 sm:gap-4 w-full max-w-full">
+          <SearchInput 
+            placeholder="Search songs..." 
+            value={songSearchTerm}
+            onChange={(e) => setSongSearchTerm(e.target.value)}
+          />
+          <SearchInput 
+            placeholder="Search by album..." 
+            value={albumSearchTerm}
+            onChange={(e) => setAlbumSearchTerm(e.target.value)}
+          />
+          <SearchInput 
+            placeholder="Search by artist..." 
+            value={artistSearchTerm}
+            onChange={(e) => setArtistSearchTerm(e.target.value)}
+          />
         </div>
-      }>
-        <SongList 
-          songSearch={debouncedSongSearch}
-          albumSearch={debouncedAlbumSearch}
-          artistSearch={debouncedArtistSearch}
-        />
-      </Suspense>
+
+        {/* Songs Grid */}
+        <Suspense fallback={
+          <div className="flex justify-center items-center min-h-[200px]">
+            <span className="loading loading-spinner loading-lg"></span>
+          </div>
+        }>
+          <SongList 
+            songSearch={debouncedSongSearch}
+            albumSearch={debouncedAlbumSearch}
+            artistSearch={debouncedArtistSearch}
+          />
+        </Suspense>
+      </div>
     </div>
   )
 } 
