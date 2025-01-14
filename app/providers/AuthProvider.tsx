@@ -8,12 +8,14 @@ interface AuthContextType {
   user: User | null
   loading: boolean
   setShowSignIn: (show: boolean) => void
+  showSignIn: boolean
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
-  setShowSignIn: () => {}
+  setShowSignIn: () => {},
+  showSignIn: false
 })
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -69,7 +71,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   return (
-    <AuthContext.Provider value={{ user, loading, setShowSignIn }}>
+    <AuthContext.Provider value={{ user, loading, showSignIn, setShowSignIn }}>
       {children}
     </AuthContext.Provider>
   )

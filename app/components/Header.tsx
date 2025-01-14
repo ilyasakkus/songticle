@@ -22,9 +22,8 @@ const navItems = [
 
 export function Header() {
   const pathname = usePathname();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, showSignIn, setShowSignIn } = useAuth();
   const { profile, loading: profileLoading } = useProfile(user?.id);
-  const [showSignIn, setShowSignIn] = useState(false);
   const [showSignUp, setShowSignUp] = useState(false);
 
   const handleSignOut = async () => {
