@@ -229,59 +229,60 @@ export function SongList({ songSearch, albumSearch, artistSearch }: SongListProp
   return (
     <div className="space-y-6">
       {/* Songs List */}
-      <div className="grid gap-2 sm:gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {songs.map((song) => (
-          <div 
+          <Link 
             key={song.id}
-            className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-base-100 rounded-lg shadow hover:shadow-md transition-shadow max-w-3xl mx-auto w-full"
+            href={`/songs/${song.id}/${slugify(song.title)}`}
+            className="card bg-base-100 shadow-sm hover:shadow-md transition-shadow overflow-hidden"
           >
-            <div className="shrink-0">
-              {song.album.cover_medium ? (
-                <Image
-                  src={song.album.cover_medium}
-                  alt={song.album.title}
-                  width={48}
-                  height={48}
-                  className="rounded sm:w-16 sm:h-16"
-                />
-              ) : (
-                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded bg-base-300 flex items-center justify-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 sm:h-8 sm:w-8 text-base-content opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
-                  </svg>
+            <div className="p-3">
+              <div className="flex gap-3">
+                <div className="shrink-0">
+                  {song.album.cover_medium ? (
+                    <Image
+                      src={song.album.cover_medium}
+                      alt={song.album.title}
+                      width={64}
+                      height={64}
+                      className="rounded-lg"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 rounded-lg bg-base-300 flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-base-content opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                      </svg>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-            <div className="flex-1 min-w-0">
-              <Link 
-                href={`/songs/${song.id}/${slugify(song.title)}`}
-                className="block hover:text-primary"
-              >
-                <h2 className="text-base sm:text-lg font-semibold truncate">{song.title}</h2>
-              </Link>
-              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-sm text-gray-500">
-                <Link 
-                  href={`/artists/${song.artist.id}/${slugify(song.artist.name)}`}
-                  className="hover:text-primary hover:underline truncate"
-                >
-                  {song.artist.name}
-                </Link>
-                <span className="hidden sm:inline">•</span>
-                <Link 
-                  href={`/albums/${song.album.id}/${slugify(song.album.title)}`}
-                  className="hover:text-primary hover:underline truncate"
-                >
-                  {song.album.title}
-                </Link>
+                <div className="flex-1 min-w-0">
+                  <h2 className="font-semibold text-base line-clamp-1 hover:text-primary transition-colors">
+                    {song.title}
+                  </h2>
+                  <div className="flex flex-col gap-1 mt-1">
+                    <Link 
+                      href={`/artists/${song.artist.id}/${slugify(song.artist.name)}`}
+                      className="text-sm text-base-content/70 hover:text-primary hover:underline truncate"
+                    >
+                      {song.artist.name}
+                    </Link>
+                    <Link 
+                      href={`/albums/${song.album.id}/${slugify(song.album.title)}`}
+                      className="text-sm text-base-content/60 hover:text-primary hover:underline truncate"
+                    >
+                      {song.album.title}
+                    </Link>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex justify-center items-center gap-1 sm:gap-2 mt-6 sm:mt-8 flex-wrap">
+        <div className="flex justify-center items-center gap-1 sm:gap-2 mt-6 flex-wrap">
           <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1 || loading}
