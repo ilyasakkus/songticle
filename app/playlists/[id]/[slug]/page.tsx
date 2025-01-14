@@ -110,7 +110,7 @@ interface PlaylistSongResponse {
     title: string
     cover_image: string | null
     preview_url: string | null
-    artists: Artist
+    artists: Artist[]
   }
 }
 
@@ -187,13 +187,13 @@ export default async function PlaylistPage({ params }: PageProps) {
       return
     }
 
-    const songs = (playlistSongs as PlaylistSongResponse[]).map(ps => ({
+    const songs = playlistSongs?.map(ps => ({
       id: ps.song_id,
       title: ps.songs.title,
       cover_image: ps.songs.cover_image,
       preview_url: ps.songs.preview_url,
-      artists: ps.songs.artists || { id: 'unknown', name: 'Unknown Artist' }
-    }))
+      artists: ps.songs.artists?.[0] || { id: 'unknown', name: 'Unknown Artist' }
+    })) || []
 
     // Şarkı kartı HTML'ini oluştur
     const songCardHtml = (song: any, index: number) => `
