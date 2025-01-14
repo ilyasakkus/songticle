@@ -216,7 +216,7 @@ export default async function PlaylistPage({ params }: PageProps) {
             <a href="/songs/${song.id}/${slugify(song.title)}" class="hover:text-primary">${song.title}</a>
           </h3>
           <p class="text-sm text-base-content/70 truncate">
-            <a href="/artist/${song.artists.id}" class="hover:text-primary">${song.artists.ame}</a>
+            <a href="/artists/${song.artists.id}" class="hover:text-primary">${song.artists.name}</a>
           </p>
         </div>
       </div>
