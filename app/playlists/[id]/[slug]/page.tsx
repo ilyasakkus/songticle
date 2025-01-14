@@ -197,13 +197,13 @@ export default async function PlaylistPage({ params }: PageProps) {
 
     // Şarkı kartı HTML'ini oluştur
     const songCardHtml = (song: any, index: number) => `
-      <div class="flex items-center gap-4 bg-base-100 p-4 rounded-lg mb-4">
-        <span class="w-8 text-center text-gray-500">${index + 1}</span>
-        <div class="w-16 h-16 shrink-0">
+      <div class="flex items-center gap-2 xs:gap-4 bg-base-100 p-2 xs:p-4 rounded-lg mb-4 overflow-hidden">
+        <span class="w-6 xs:w-8 text-center text-gray-500 shrink-0">${index + 1}</span>
+        <div class="w-12 h-12 xs:w-16 xs:h-16 shrink-0">
           ${song.cover_image 
             ? `<img src="${song.cover_image}" alt="${song.title}" class="w-full h-full object-cover rounded" />`
             : `<div class="w-full h-full flex items-center justify-center bg-base-200 rounded">
-                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg class="w-4 h-4 xs:w-6 xs:h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M9 18V5l12-2v13" stroke-linecap="round" stroke-linejoin="round"/>
                   <circle cx="6" cy="18" r="3"/>
                   <circle cx="21" cy="16" r="3"/>
@@ -211,11 +211,11 @@ export default async function PlaylistPage({ params }: PageProps) {
               </div>`
           }
         </div>
-        <div class="flex-1 min-w-0">
-          <h3 class="font-semibold truncate">
+        <div class="flex-1 min-w-0 overflow-hidden">
+          <h3 class="font-semibold truncate text-sm xs:text-base">
             <a href="/songs/${song.id}/${slugify(song.title)}" class="hover:text-primary">${song.title}</a>
           </h3>
-          <p class="text-sm text-base-content/70 truncate">
+          <p class="text-xs xs:text-sm text-base-content/70 truncate">
             <a href="/artists/${song.artists.id}" class="hover:text-primary">${song.artists.name}</a>
           </p>
         </div>
@@ -232,21 +232,23 @@ export default async function PlaylistPage({ params }: PageProps) {
     })
 
     return (
-      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-6 space-y-6">
-        <div className="flex flex-col gap-6">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">{playlist.title}</h1>
-            {playlist.description && (
-              <p className="text-base-content/70 text-lg leading-relaxed">{playlist.description}</p>
-            )}
-            {playlist.content && (
-              <div 
-                className="mt-8 prose prose-lg max-w-none text-justify"
-                dangerouslySetInnerHTML={{ 
-                  __html: content
-                }}
-              />
-            )}
+      <div className="w-full min-h-screen overflow-x-hidden">
+        <div className="max-w-7xl mx-auto px-1 xs:px-2 sm:px-4 lg:px-8 py-2 xs:py-4 sm:py-6">
+          <div className="flex flex-col gap-4 xs:gap-6">
+            <div>
+              <h1 className="text-2xl xs:text-3xl font-bold mb-2">{playlist.title}</h1>
+              {playlist.description && (
+                <p className="text-base-content/70 text-base xs:text-lg leading-relaxed">{playlist.description}</p>
+              )}
+              {playlist.content && (
+                <div 
+                  className="mt-4 xs:mt-8 prose prose-sm xs:prose-base lg:prose-lg max-w-none text-justify overflow-hidden"
+                  dangerouslySetInnerHTML={{ 
+                    __html: content
+                  }}
+                />
+              )}
+            </div>
           </div>
         </div>
       </div>
