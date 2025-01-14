@@ -95,7 +95,7 @@ export function Header() {
                   </button>
                 </Link>
                 <div className="dropdown dropdown-end">
-                  <label tabIndex={0} className="btn btn-ghost btn-sm btn-circle avatar">
+                  <label tabIndex={0} className="btn btn-ghost btn-sm btn-circle avatar cursor-pointer">
                     <div className="w-7 sm:w-8 rounded-full">
                       <Image
                         src={profile?.avatar_url || '/placeholder-avatar.jpg'}
@@ -106,14 +106,14 @@ export function Header() {
                       />
                     </div>
                   </label>
-                  <ul tabIndex={0} className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52">
+                  <ul tabIndex={0} className="mt-3 z-50 p-2 shadow-lg menu menu-sm dropdown-content bg-base-100 rounded-box w-52">
                     <li>
-                      <Link href="/profile" className="justify-between">
+                      <Link href="/profile" className="justify-between py-2">
                         Profile
                       </Link>
                     </li>
                     <li>
-                      <button onClick={handleSignOut}>
+                      <button onClick={handleSignOut} className="py-2">
                         Sign out
                       </button>
                     </li>
