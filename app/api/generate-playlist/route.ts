@@ -9,6 +9,13 @@ interface Song {
 
 export async function POST(request: Request) {
   try {
+    // Log all environment variables (be careful not to log sensitive data in production)
+    console.log('Environment variables available:', {
+      hasAnthropicKey: !!process.env.ANTHROPIC_API_KEY,
+      keyLength: process.env.ANTHROPIC_API_KEY?.length,
+      nodeEnv: process.env.NODE_ENV
+    })
+
     const body = await request.json()
     
     if (!body.artistName || !body.songs || !Array.isArray(body.songs)) {
@@ -26,9 +33,9 @@ export async function POST(request: Request) {
       : songs
 
     if (!process.env.ANTHROPIC_API_KEY) {
-      console.error('ANTHROPIC_API_KEY is not set')
+      console.error('ANTHROPIC_API_KEY is missing from environment')
       return NextResponse.json({ 
-        error: 'API key configuration error' 
+        error: 'API key configuration error. Please check server environment variables.' 
       }, { status: 500 })
     }
 
