@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { formatDistanceToNow } from 'date-fns'
 
+
 interface SupabaseComment {
   id: number
   song_id: number
@@ -17,6 +18,7 @@ interface SupabaseComment {
     avatar_url: string | null
   }
 }
+
 
 interface Comment {
   id: number
