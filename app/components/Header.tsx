@@ -47,15 +47,15 @@ export function Header() {
   };
 
   return (
-    <header className="bg-base-100 shadow-sm">
-      <div className="container mx-auto">
-        <div className="navbar min-h-16 px-4">
+    <header className="bg-base-100 shadow-sm w-full overflow-x-hidden">
+      <div className="max-w-5xl mx-auto">
+        <div className="navbar min-h-14 px-2 sm:px-4">
           {/* Left side - Title and Mobile Menu */}
-          <div className="flex-1 flex items-center gap-4">
+          <div className="flex-1 flex items-center gap-2 sm:gap-4">
             <div className="lg:hidden">
               <MobileMenu />
             </div>
-            <Link href="/" className="text-2xl font-bold text-primary">
+            <Link href="/" className="text-lg sm:text-2xl font-bold text-primary">
               Songticle
             </Link>
             
@@ -69,7 +69,7 @@ export function Header() {
                     key={href}
                     href={href}
                     className={`
-                      flex items-center gap-2 px-4 py-3 transition-colors
+                      flex items-center gap-2 px-3 py-2 transition-colors
                       hover:text-primary
                       ${isActive ? 'text-primary border-b-2 border-primary' : 'text-base-content'}
                     `}
@@ -81,27 +81,27 @@ export function Header() {
               })}
             </nav>
           </div>
-          
+
           {/* Right side - Auth/User Actions */}
-          <div className="flex-none gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             {authLoading ? (
               <div className="loading loading-spinner loading-sm" />
             ) : user ? (
               <>
                 <Link href="/add">
-                  <button className="btn btn-primary btn-sm md:btn-md">
-                    <PlusCircle className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
-                    <span className="text-xs md:text-sm">Add Song Story</span>
+                  <button className="btn btn-primary btn-sm h-8 min-h-8 px-2 sm:px-3">
+                    <PlusCircle className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span className="text-xs hidden xs:inline">Add Story</span>
                   </button>
                 </Link>
                 <div className="dropdown dropdown-end">
-                  <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
-                    <div className="w-8 md:w-10 rounded-full">
+                  <label tabIndex={0} className="btn btn-ghost btn-sm btn-circle avatar">
+                    <div className="w-7 sm:w-8 rounded-full">
                       <Image
                         src={profile?.avatar_url || '/placeholder-avatar.jpg'}
                         alt={profile?.full_name || 'User avatar'}
-                        width={40}
-                        height={40}
+                        width={32}
+                        height={32}
                         className="rounded-full"
                       />
                     </div>
@@ -123,13 +123,13 @@ export function Header() {
             ) : (
               <>
                 <button 
-                  className="btn btn-ghost"
+                  className="btn btn-ghost btn-sm h-8 min-h-8 text-xs sm:text-sm"
                   onClick={() => setShowSignIn(true)}
                 >
                   Sign In
                 </button>
                 <button 
-                  className="btn btn-primary"
+                  className="btn btn-primary btn-sm h-8 min-h-8 text-xs sm:text-sm"
                   onClick={() => setShowSignUp(true)}
                 >
                   Sign Up
