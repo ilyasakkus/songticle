@@ -110,7 +110,7 @@ interface PlaylistSongResponse {
     title: string
     cover_image: string | null
     preview_url: string | null
-    artists: Artist[]
+    artists: Artist
   }
 }
 
@@ -187,13 +187,13 @@ export default async function PlaylistPage({ params }: PageProps) {
       return
     }
 
-    const songs = playlistSongs?.map(ps => ({
+    const songs = (playlistSongs as any[]).map(ps => ({
       id: ps.song_id,
       title: ps.songs.title,
       cover_image: ps.songs.cover_image,
       preview_url: ps.songs.preview_url,
-      artists: ps.songs.artists?.[0] || { id: 'unknown', name: 'Unknown Artist' }
-    })) || []
+      artists: ps.songs.artists || { id: 'unknown', name: 'Unknown Artist' }
+    }))
 
     // Şarkı kartı HTML'ini oluştur
     const songCardHtml = (song: any, index: number) => `
@@ -216,7 +216,7 @@ export default async function PlaylistPage({ params }: PageProps) {
             <a href="/songs/${song.id}/${slugify(song.title)}" class="hover:text-primary">${song.title}</a>
           </h3>
           <p class="text-sm text-base-content/70 truncate">
-            <a href="/artist/${song.artists.id}" class="hover:text-primary">${song.artists.name}</a>
+            <a href="/artist/${song.artists.id}" class="hover:text-primary">${song.artists.ame}</a>
           </p>
         </div>
       </div>
