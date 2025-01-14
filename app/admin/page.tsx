@@ -58,17 +58,34 @@ export default function AdminPage() {
 
   const fetchArtists = async () => {
     try {
-      const { data, error } = await supabase
-        .from('artists')
-        .select('id, name')
-        .order('name');
+      let allArtists: Artist[] = []
+      let page = 0
+      const pageSize = 1000
+      let hasMore = true
 
-      if (error) throw error;
-      setArtists(data || []);
+      while (hasMore) {
+        const { data, error } = await supabase
+          .from('artists')
+          .select('id, name')
+          .order('name')
+          .range(page * pageSize, (page + 1) * pageSize - 1)
+
+        if (error) throw error
+
+        if (data) {
+          allArtists = [...allArtists, ...data]
+        }
+
+        // If we got less results than the page size, we've reached the end
+        hasMore = data && data.length === pageSize
+        page++
+      }
+
+      setArtists(allArtists)
     } catch (err) {
-      console.error('Error fetching artists:', err);
+      console.error('Error fetching artists:', err)
     }
-  };
+  }
 
   const handleSearch = async (query: string, type: 'track' | 'artist' | 'album') => {
     if (!query.trim()) return;
@@ -260,11 +277,11 @@ export default function AdminPage() {
         ? allSongs.sort(() => 0.5 - Math.random()).slice(0, 10)
         : allSongs
 
-      // Generate content using Deepseek AI
+      // Generate content using AI
       const content = await generatePlaylistContent(
         selectedArtistData.name,
         selectedSongs,
-        process.env.NEXT_PUBLIC_DEEPSEEK_API_KEY || ''
+        '' // API key is now handled server-side
       )
 
       if (!content) throw new Error('Failed to generate content')

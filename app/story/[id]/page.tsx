@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import { Music } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import React from 'react'
 
 interface Story {
   id: number
@@ -24,13 +25,17 @@ interface Story {
   } | null
 }
 
-interface StoryPageProps {
-  params: {
+interface Props {
+  params: Promise<{
     id: string
-  }
+  }>
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
-export default function StoryPage({ params }: StoryPageProps) {
+const StoryPage = async (props: Props) => {
+  const params = await props.params
+  const { id } = params
+
   const [story, setStory] = useState<Story | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -54,7 +59,7 @@ export default function StoryPage({ params }: StoryPageProps) {
               )
             )
           `)
-          .eq('id', params.id)
+          .eq('id', id)
           .single()
 
         if (storyError) throw new Error('Story not found')
@@ -69,7 +74,7 @@ export default function StoryPage({ params }: StoryPageProps) {
     }
 
     fetchStory()
-  }, [params.id, supabase])
+  }, [id, supabase])
 
   if (loading) {
     return (
@@ -106,7 +111,7 @@ export default function StoryPage({ params }: StoryPageProps) {
           <h1 className="text-3xl font-bold">{story.songs?.title}</h1>
           <div className="space-y-2">
             <p className="text-lg">
-              Artist: <a href={`/artist/${story.songs?.artists?.id}`} className="link link-primary">{story.songs?.artists?.name}</a>
+              Artist: <a href={`/artists/${story.songs?.artists?.id}/${slugify(story.songs?.artists?.name || '')}`} className="link link-primary">{story.songs?.artists?.name}</a>
             </p>
           </div>
           
@@ -121,4 +126,6 @@ export default function StoryPage({ params }: StoryPageProps) {
       </div>
     </div>
   )
-} 
+}
+
+export default StoryPage 

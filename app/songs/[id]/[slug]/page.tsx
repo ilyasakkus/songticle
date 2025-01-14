@@ -1,15 +1,19 @@
-import { SongClient } from '../SongClient'
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { notFound, redirect } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
+import { Music } from 'lucide-react'
+import React from 'react'
+import { PreviewButton } from '@/app/components/PreviewButton'
+import { LikeButton } from '@/app/components/LikeButton'
+import { CommentSection } from '@/app/components/CommentSection'
 
 function slugify(text: string): string {
   if (!text) return 'null'
 
   // Türkçe karakterleri dönüştür
-  const turkishToEnglish = {
+  const turkishToEnglish: { [key: string]: string } = {
     'Ş': 'S', 'ş': 's',
     'Ğ': 'G', 'ğ': 'g',
     'Ü': 'U', 'ü': 'u',
@@ -53,38 +57,25 @@ function slugify(text: string): string {
   return cleanText
 }
 
-function compareSlug(slug1: string, slug2: string): boolean {
-  if (!slug1 || !slug2) return false
-  
-  // URL decode yap ve karşılaştır
-  try {
-    const decodedSlug1 = decodeURIComponent(slug1).toLowerCase()
-    const decodedSlug2 = decodeURIComponent(slug2).toLowerCase()
-    return decodedSlug1 === decodedSlug2
-  } catch {
-    // Decode hatası olursa normal karşılaştır
-    return slug1.toLowerCase() === slug2.toLowerCase()
-  }
-}
-
 interface Props {
-  params: {
+  params: Promise<{
     id: string
     slug: string
-  }
+  }>
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
-export default async function SongPage({ params }: Props) {
-  // Await params
-  const { id, slug } = await Promise.resolve(params)
+const SongPage = async (props: Props) => {
+  const params = await props.params
+  const { id, slug } = params
   
   // Validate id parameter
   if (!id || typeof id !== 'string') {
     return notFound()
   }
-  
-  // Await cookies
-  const cookieStore = await cookies()
+
+  // Create Supabase client
+  const cookieStore = cookies()
   const supabase = createServerComponentClient({ cookies: () => cookieStore })
 
   try {
@@ -118,21 +109,87 @@ export default async function SongPage({ params }: Props) {
     // Slug kontrolü
     const correctSlug = slugify(song.title)
     
-    // Eğer slug 'null' ise veya doğru slug ile eşleşiyorsa devam et
-    if (slug === 'null' || compareSlug(slug, correctSlug)) {
-      // Devam et, redirect yapma
-    } else {
-      // Slug yanlışsa redirect yap
-      return redirect(`/songs/${id}/${correctSlug}`)
+    // Gelen slug'ı decode edelim
+    let decodedSlug
+    try {
+      decodedSlug = decodeURIComponent(slug)
+    } catch {
+      decodedSlug = slug
+    }
+
+    // Eğer slug 'null' ise veya doğru slug ile eşleşmiyorsa redirect yapalım
+    if (decodedSlug !== correctSlug && decodedSlug !== 'null') {
+      const redirectUrl = `/songs/${id}/${encodeURIComponent(correctSlug)}`
+      return redirect(redirectUrl)
     }
 
     return (
-      <div className="space-y-6">
-        <SongClient song={song} />
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="flex flex-col md:flex-row gap-8">
+          {/* Song Cover */}
+          <div className="shrink-0">
+            {song.albums?.cover_medium ? (
+              <Image
+                src={song.albums.cover_medium}
+                alt={song.title}
+                width={240}
+                height={240}
+                className="rounded-lg shadow-lg"
+              />
+            ) : (
+              <div className="w-60 h-60 rounded-lg bg-base-300 flex items-center justify-center">
+                <Music className="w-20 h-20 text-base-content opacity-20" />
+              </div>
+            )}
+          </div>
+
+          {/* Song Info */}
+          <div className="flex-1">
+            <h1 className="text-4xl font-bold mb-4">{song.title}</h1>
+            
+            {/* Artist Link */}
+            {song.artists && (
+              <div className="mb-4">
+                <Link 
+                  href={`/artists/${song.artists.id}/${slugify(song.artists.name)}`}
+                  className="text-xl text-base-content/70 hover:text-primary"
+                >
+                  {song.artists.name}
+                </Link>
+              </div>
+            )}
+
+            {/* Album Link */}
+            {song.albums && (
+              <div className="mb-4">
+                <span className="text-base-content/60">From the album </span>
+                <Link 
+                  href={`/albums/${song.albums.id}/${slugify(song.albums.title)}`}
+                  className="text-base-content/70 hover:text-primary"
+                >
+                  {song.albums.title}
+                </Link>
+              </div>
+            )}
+
+            {/* Preview Button */}
+            <PreviewButton previewUrl={song.preview_url} />
+
+            {/* Like Button */}
+            <div className="mt-4">
+              <LikeButton songId={song.id} />
+            </div>
+          </div>
+        </div>
+
+        {/* Comments Section */}
+        <CommentSection songId={song.id} />
       </div>
     )
   } catch (error) {
     console.error('Error:', error)
     return notFound()
   }
-} 
+}
+
+export default SongPage 

@@ -4,6 +4,7 @@ import { notFound, redirect } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Music } from 'lucide-react'
+import React from 'react'
 
 function slugify(text: string): string {
   if (!text) return 'null'
@@ -53,17 +54,39 @@ function slugify(text: string): string {
   return cleanText
 }
 
-type PageProps = {
+interface Props {
   params: Promise<{
     id: string
     slug: string
   }>
-  searchParams: { [key: string]: string | string[] | undefined }
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
-export default async function AlbumPage({ params }: PageProps) {
-  // Await params
-  const { id, slug } = await params
+// Song interface'ini ekleyelim
+interface Song {
+  id: number
+  title: string
+  preview_url: string | null
+  cover_image: string | null
+}
+
+// Album interface'ini ekleyelim
+interface Album {
+  id: number
+  title: string
+  cover_medium: string | null
+  songs: Song[]
+  artists?: {
+    id: number
+    name: string
+    picture_medium: string | null
+  }
+  release_date?: string
+}
+
+const AlbumPage = async (props: Props) => {
+  const params = await props.params
+  const { id, slug } = params
   
   // Validate id parameter
   if (!id || typeof id !== 'string') {
@@ -162,7 +185,7 @@ export default async function AlbumPage({ params }: PageProps) {
         {/* Songs List */}
         <div className="space-y-2">
           {album.songs && album.songs.length > 0 ? (
-            album.songs.map((song, index) => (
+            album.songs.map((song: Song, index: number) => (
               <div 
                 key={song.id}
                 className="flex items-center gap-4 p-4 bg-base-100 rounded-lg hover:bg-base-200 transition-colors"
@@ -199,4 +222,6 @@ export default async function AlbumPage({ params }: PageProps) {
     console.error('Error:', error)
     return notFound()
   }
-} 
+}
+
+export default AlbumPage 

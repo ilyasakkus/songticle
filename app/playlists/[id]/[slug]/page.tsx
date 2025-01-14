@@ -72,6 +72,8 @@ interface Song {
 
 interface PlaylistSong {
   position: number
+  created_at: string
+  song_id: number
   songs: Song
 }
 
@@ -85,6 +87,16 @@ interface Playlist {
   playlist_songs: PlaylistSong[]
 }
 
+interface TransformedSong {
+  id: number
+  title: string
+  cover_image: string | null
+  preview_url: string | null
+  artists: Artist
+  position: number
+  created_at: string
+}
+
 interface PageProps {
   params: Promise<{ 
     id: string
@@ -92,9 +104,19 @@ interface PageProps {
   }>
 }
 
+interface PlaylistSongResponse {
+  song_id: number
+  songs: {
+    title: string
+    cover_image: string | null
+    preview_url: string | null
+    artists: Artist
+  }
+}
+
 export default async function PlaylistPage({ params }: PageProps) {
   const { id, slug } = await params
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
   const supabase = createServerComponentClient({ cookies: () => cookieStore })
 
   try {
@@ -109,7 +131,9 @@ export default async function PlaylistPage({ params }: PageProps) {
         created_at,
         playlist_songs (
           position,
-          songs (
+          created_at,
+          song_id,
+          songs!playlist_songs_song_id_fkey (
             id,
             title,
             cover_image,
@@ -141,12 +165,34 @@ export default async function PlaylistPage({ params }: PageProps) {
     }
 
     // Transform and sort songs
-    const songs = playlist.playlist_songs
-      .sort((a, b) => (a.position || 0) - (b.position || 0))
-      .map(ps => ({
-        ...ps.songs,
-        artists: ps.songs.artists
-      }))
+    const { data: playlistSongs, error: playlistError } = await supabase
+      .from('playlist_songs')
+      .select(`
+        song_id,
+        songs (
+          title,
+          cover_image,
+          preview_url,
+          artists:artists!songs_artist_id_fkey (
+            id,
+            name
+          )
+        )
+      `)
+      .eq('playlist_id', playlist.id)
+
+    if (playlistError) {
+      console.error('Error fetching playlist songs:', playlistError)
+      return
+    }
+
+    const songs = (playlistSongs as PlaylistSongResponse[]).map(ps => ({
+      id: ps.song_id,
+      title: ps.songs.title,
+      cover_image: ps.songs.cover_image,
+      preview_url: ps.songs.preview_url,
+      artists: ps.songs.artists || { id: 'unknown', name: 'Unknown Artist' }
+    }))
 
     // Şarkı kartı HTML'ini oluştur
     const songCardHtml = (song: any, index: number) => `
