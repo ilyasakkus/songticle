@@ -63,7 +63,7 @@ Write about this song from "${song.album_name}". Include:
 
 First, write 1-2 paragraphs about ${artistName}, focusing on their musical style, impact on the industry, and what makes them unique as an artist.
 
-Then, for each song below, write a detailed paragraph about its significance. Each song section should start with the song title as a heading:
+Then, for each song below, write a paragraph about its significance. Each song section should start with the song title as a heading:
 
 ${songSections}
 
@@ -80,8 +80,8 @@ Important:
     console.log('Sending request to Anthropic with prompt:', prompt)
 
     const message = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
-      max_tokens: 5000,
+      model: 'claude-3-sonnet-20240229',
+      max_tokens: 4000,
       temperature: 0.5,
       messages: [
         {
