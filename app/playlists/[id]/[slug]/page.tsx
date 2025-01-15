@@ -236,7 +236,7 @@ export default async function PlaylistPage({ params }: PageProps) {
     })
 
     return (
-      <div className="w-full min-h-screen overflow-x-hidden">
+      <div className="w-full min-h-screen overflow-hidden">
         <div className="max-w-6xl mx-auto xs:px-2 xs:pl-4 sm:px-4 lg:px-8 py-4 sm:py-6">
           <div className="flex flex-col gap-4">
             <div>
