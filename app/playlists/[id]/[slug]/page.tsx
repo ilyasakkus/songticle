@@ -240,7 +240,7 @@ export default async function PlaylistPage({ params }: PageProps) {
         <div className="max-w-6xl mx-auto xs:px-2 xs:pl-4 sm:px-4 lg:px-8 py-4 sm:py-6">
           <div className="flex flex-col gap-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold mb-3">{playlist.title}</h1>
+              <h1 className="text-2xl sm:text-3xl xs:text-base font-bold mb-3">{playlist.title}</h1>
               {playlist.description && (
                 <p className="text-base-content/70 text-base leading-relaxed">{playlist.description}</p>
               )}
