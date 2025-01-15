@@ -237,16 +237,16 @@ export default async function PlaylistPage({ params }: PageProps) {
 
     return (
       <div className="w-full min-h-screen overflow-hidden">
-        <div className="max-w-5xl mx-auto xs:px-2 xs:pl-4 sm:px-4 lg:px-8 py-4 sm:py-6">
+        <div className="max-w-5xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-6">
           <div className="flex flex-col gap-4">
             <div>
               <h1 className="text-xl sm:text-3xl font-bold mb-3">{playlist.title}</h1>
               {playlist.description && (
-                <p className="text-base-content/70 pl-4 text-base sm:text-xl leading-relaxed">{playlist.description}</p>
+                <p className="text-base-content/70 text-base sm:text-xl leading-relaxed">{playlist.description}</p>
               )}
               {playlist.content && (
                 <div 
-                  className="mt-6 pb-2 prose prose-sm sm:prose-base max-w-none"
+                  className="mt-6 pb-2 prose prose-sm sm:prose-base max-w-none "
                   dangerouslySetInnerHTML={{ 
                     __html: content
                   }}
