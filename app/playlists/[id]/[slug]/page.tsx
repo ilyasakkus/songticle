@@ -253,7 +253,9 @@ export default async function PlaylistPage({ params }: PageProps) {
                   style={{
                     wordWrap: 'break-word',
                     overflowWrap: 'break-word',
-                    paddingRight: '6px'
+                    paddingRight: '6px',
+                    textAlign: 'justify',
+                    lineHeight: '1.8',
                   }}
                 />
               )}
