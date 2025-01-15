@@ -256,6 +256,8 @@ export default async function PlaylistPage({ params }: PageProps) {
                     paddingRight: '6px',
                     textAlign: 'justify',
                     lineHeight: '2',
+                    width: '100%',
+                    overflowX: 'hidden'
                   }}
                 />
               )}
