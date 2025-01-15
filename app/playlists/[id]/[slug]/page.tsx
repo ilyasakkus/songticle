@@ -197,15 +197,15 @@ export default async function PlaylistPage({ params }: PageProps) {
 
     // Şarkı kartı HTML'ini oluştur
     const songCardHtml = (song: any, index: number) => `
-      <div class="card bg-base-100 shadow-sm hover:shadow-md transition-shadow overflow-hidden">
-        <div class="p-3">
-          <div class="flex gap-3">
-            <span class="w-6 text-center text-base-content/60 text-sm shrink-0">${index + 1}</span>
-            <div class="w-14 h-14 shrink-0">
+      <div class="card bg-base-100 shadow-sm hover:shadow-md transition-shadow">
+        <div class="p-2 sm:p-3">
+          <div class="flex items-center gap-2 sm:gap-3 w-full min-w-0">
+            <span class="w-5 sm:w-6 text-center text-base-content/60 text-sm shrink-0">${index + 1}</span>
+            <div class="w-12 h-12 sm:w-14 sm:h-14 shrink-0">
               ${song.cover_image 
                 ? `<img src="${song.cover_image}" alt="${song.title}" class="w-full h-full object-cover rounded-lg" />`
                 : `<div class="w-full h-full flex items-center justify-center bg-base-200 rounded-lg">
-                    <svg class="w-6 h-6 text-base-content/20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6 text-base-content/20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="M9 18V5l12-2v13" stroke-linecap="round" stroke-linejoin="round"/>
                       <circle cx="6" cy="18" r="3"/>
                       <circle cx="21" cy="16" r="3"/>
@@ -213,11 +213,11 @@ export default async function PlaylistPage({ params }: PageProps) {
                   </div>`
               }
             </div>
-            <div class="flex-1 min-w-0">
-              <h3 class="font-semibold truncate text-base mb-1">
+            <div class="flex-1 min-w-0 overflow-hidden">
+              <h3 class="font-semibold truncate text-sm sm:text-base mb-0.5 sm:mb-1">
                 <a href="/songs/${song.id}/${slugify(song.title)}" class="hover:text-primary transition-colors">${song.title}</a>
               </h3>
-              <p class="text-sm text-base-content/70 truncate">
+              <p class="text-xs sm:text-sm text-base-content/70 truncate">
                 <a href="/artists/${song.artists.id}/${slugify(song.artists.name)}" class="hover:text-primary transition-colors">${song.artists.name}</a>
               </p>
             </div>
