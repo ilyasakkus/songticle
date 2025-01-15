@@ -242,7 +242,7 @@ export default async function PlaylistPage({ params }: PageProps) {
             <div>
               <h1 className="text-xl sm:text-3xl font-bold mb-3">{playlist.title}</h1>
               {playlist.description && (
-                <p className="text-base-content/70 pl-2 pt-2 text-base leading-relaxed">{playlist.description}</p>
+                <p className="text-base-content/70 pl-2 pt-2 text-base sm:text-xl leading-relaxed">{playlist.description}</p>
               )}
               {playlist.content && (
                 <div 
