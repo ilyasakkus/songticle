@@ -242,11 +242,11 @@ export default async function PlaylistPage({ params }: PageProps) {
             <div>
               <h1 className="text-xl sm:text-3xl font-bold mb-3">{playlist.title}</h1>
               {playlist.description && (
-                <p className="text-base-content/70 pl-2 text-base sm:text-xl leading-relaxed">{playlist.description}</p>
+                <p className="text-base-content/70 pl-4 text-base sm:text-xl leading-relaxed">{playlist.description}</p>
               )}
               {playlist.content && (
                 <div 
-                  className="mt-6 pb-2 pl-2 prose prose-sm sm:prose-base max-w-none"
+                  className="mt-6 pb-2 pl-4 prose prose-sm sm:prose-base max-w-none"
                   dangerouslySetInnerHTML={{ 
                     __html: content
                   }}
