@@ -236,7 +236,7 @@ export default async function PlaylistPage({ params }: PageProps) {
     })
 
     return (
-      <div className="w-full min-h-screen overflow-hidden">
+      <div className="w-full min-h-screen overflow-x-hidden">
         <div className="max-w-5xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-6">
           <div className="flex flex-col gap-4">
             <div>
@@ -246,18 +246,13 @@ export default async function PlaylistPage({ params }: PageProps) {
               )}
               {playlist.content && (
                 <div 
-                  className="mt-6 pb-2 prose prose-sm sm:prose-base max-w-none "
+                  className="mt-6 pb-2 prose prose-sm sm:prose-base max-w-none prose-p:text-justify prose-p:leading-relaxed"
                   dangerouslySetInnerHTML={{ 
                     __html: content
                   }}
                   style={{
                     wordWrap: 'break-word',
-                    overflowWrap: 'break-word',
-                    paddingRight: '6px',
-                    textAlign: 'justify',
-                    lineHeight: '2',
-                    width: '100%',
-                    overflowX: 'hidden'
+                    overflowWrap: 'break-word'
                   }}
                 />
               )}
