@@ -81,7 +81,7 @@ Important:
 
     const message = await anthropic.messages.create({
       model: 'claude-3-sonnet-20240229',
-      max_tokens: 5000,
+      max_tokens: 4000,
       temperature: 0.3,
       messages: [
         {
