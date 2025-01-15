@@ -246,15 +246,14 @@ export default async function PlaylistPage({ params }: PageProps) {
               )}
               {playlist.content && (
                 <div 
-                  className="mt-6 pb-2 pr-2 prose prose-sm sm:prose-base max-w-none "
+                  className="mt-6 pb-2 prose prose-sm sm:prose-base max-w-none "
                   dangerouslySetInnerHTML={{ 
                     __html: content
                   }}
                   style={{
                     wordWrap: 'break-word',
                     overflowWrap: 'break-word',
-                    width: '100%',
-                    maxWidth: '100%'
+                    paddingRight: '6px'
                   }}
                 />
               )}
