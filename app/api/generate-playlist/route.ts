@@ -7,6 +7,12 @@ interface Song {
   album_name: string
 }
 
+// Increase timeout to 2 minutes
+export const maxDuration = 120
+
+// Configure runtime
+export const runtime = 'edge'
+
 export async function POST(request: Request) {
   try {
     // Log all environment variables (be careful not to log sensitive data in production)
@@ -44,15 +50,8 @@ export async function POST(request: Request) {
     })
 
     const songSections = selectedSongs.map((song: Song) => {
-      const songCard = `
-<div class="song-card">
-  <div class="card bg-base-100 shadow-lg">
-  </div>
-</div>`
-
       return `
 h2 ${song.title}
-${songCard}
 
 Write about this song from "${song.album_name}". Include:
 • The song's musical style and composition
@@ -74,7 +73,6 @@ Important:
 - Keep each song description engaging and insightful
 - Focus on what makes each track unique
 - Start each song section with "h2 " followed by the song title (exactly as shown above)
-- Keep the HTML song cards exactly as provided
 - Write in flowing paragraphs
 - Do not use any markdown symbols (like #, *, ) in the text
 - Do not include bullet points in the final text`
@@ -82,9 +80,9 @@ Important:
     console.log('Sending request to Anthropic with prompt:', prompt)
 
     const message = await anthropic.messages.create({
-      model: 'claude-3-opus-20240229',
-      max_tokens: 2000,
-      temperature: 0.7,
+      model: 'claude-3-5-sonnet-20241022',
+      max_tokens: 5000,
+      temperature: 0.5,
       messages: [
         {
           role: 'user',
@@ -120,6 +118,22 @@ Important:
     })
   } catch (error) {
     console.error('Error in generate-playlist route:', error)
+    
+    // Check for specific error types
+    if (error instanceof Error) {
+      if (error.name === 'AbortError') {
+        return NextResponse.json({ 
+          error: 'Request timed out. Please try again.' 
+        }, { status: 504 })
+      }
+      
+      if (error.message.includes('rate limit')) {
+        return NextResponse.json({ 
+          error: 'Rate limit exceeded. Please try again in a few minutes.' 
+        }, { status: 429 })
+      }
+    }
+    
     return NextResponse.json({ 
       error: error instanceof Error ? error.message : 'Failed to generate content' 
     }, { status: 500 })
