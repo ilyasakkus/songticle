@@ -14,7 +14,10 @@ interface Props {
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const params = await props.params;
-  const supabase = createServerComponentClient({ cookies })
+  const cookieStore = cookies()
+  const supabase = createServerComponentClient({ 
+    cookies: () => cookieStore
+  })
 
   // Fetch story data
   const { data: story } = await supabase

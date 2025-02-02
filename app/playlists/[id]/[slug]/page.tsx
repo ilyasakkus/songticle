@@ -118,7 +118,10 @@ type Props = {
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const params = (await props.params);
-  const supabase = createServerComponentClient({ cookies })
+  const cookieStore = cookies()
+  const supabase = createServerComponentClient({ 
+    cookies: () => cookieStore
+  })
 
   // Fetch playlist data
   const { data: playlist } = await supabase
@@ -166,8 +169,9 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
 export default async function PlaylistPage(props: Props) {
   const { id, slug } = (await props.params);
+  const cookieStore = cookies()
   const supabase = createServerComponentClient({ 
-    cookies
+    cookies: () => cookieStore
   })
 
   try {
