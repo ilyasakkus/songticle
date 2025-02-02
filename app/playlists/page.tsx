@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import Link from 'next/link'
-import Image from 'next/image'
 import { Play, Pause, ArrowRight } from 'lucide-react'
+import { Image } from '@/app/components/ui/image'
 
 interface Artist {
   id: number
