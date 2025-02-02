@@ -56,11 +56,11 @@ function slugify(text: string): string {
 }
 
 interface Props {
-  params: Promise<{
+  params: {
     id: string
     slug: string
-  }>
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+  }
+  searchParams: { [key: string]: string | string[] | undefined }
 }
 
 // Song interface'ini ekleyelim
@@ -141,8 +141,7 @@ export async function generateMetadata({ params }: MetadataParams): Promise<Meta
 }
 
 const AlbumPage = async (props: Props) => {
-  const params = await props.params
-  const { id, slug } = params
+  const { id, slug } = props.params
   
   // Validate id parameter
   if (!id || typeof id !== 'string') {

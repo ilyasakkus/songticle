@@ -120,6 +120,7 @@ type Props = {
     id: string
     slug: string
   }
+  searchParams: { [key: string]: string | string[] | undefined }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -169,8 +170,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function PlaylistPage({ params }: PageProps) {
-  const { id, slug } = await params
+export default async function PlaylistPage(props: Props) {
+  const { id, slug } = props.params
   const supabase = createServerComponentClient({ 
     cookies
   })
