@@ -1,9 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { supabase } from '../../lib/supabase'
+import { Image } from '@/app/components/ui/image'
 
 // Slugify fonksiyonu
 function slugify(text: string): string {

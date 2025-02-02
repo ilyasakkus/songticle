@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import Image from 'next/image'
 import Link from 'next/link'
 import { slugify } from '../../lib/utils'
+import { Image } from '@/app/components/ui/image'
 
 interface Song {
   id: number
