@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { Music } from 'lucide-react'
 import { Image } from '@/app/components/ui/image'
 import React from 'react'
-import { Metadata } from 'next'
 
 function slugify(text: string): string {
   if (!text) return 'null'
@@ -77,7 +76,7 @@ interface Album {
   title: string
   cover_medium: string | null
   songs: Song[]
-  artist?: {
+  artists?: {
     id: number
     name: string
     picture_medium: string | null
@@ -85,68 +84,9 @@ interface Album {
   release_date?: string
 }
 
-type MetadataParams = {
-  params: Promise<{
-    id: string
-    slug: string
-  }>
-}
-
-export async function generateMetadata(props: MetadataParams): Promise<Metadata> {
-  const params = await props.params;
-  const cookieStore = cookies()
-  const supabase = createServerComponentClient({ 
-    cookies: () => cookieStore
-  })
-
-  // Fetch album data
-  const { data: album } = await supabase
-    .from('albums')
-    .select(`
-      title,
-      release_date,
-      artists (
-        name
-      ),
-      songs (
-        count
-      )
-    `)
-    .eq('id', params.id)
-    .single()
-
-  if (!album) {
-    return {
-      title: 'Album Not Found',
-      description: 'The requested album could not be found.'
-    }
-  }
-
-  const artistName = album.artists[0]?.name || 'Unknown Artist'
-  const songCount = album.songs?.length || 0
-  const releaseYear = new Date(album.release_date).getFullYear()
-
-  return {
-    title: `${album.title} by ${artistName} (${releaseYear}) | Album`,
-    description: `Listen to ${album.title}, the ${releaseYear} album by ${artistName}. Featuring ${songCount} tracks. Share your stories about this album or discover what others have to say about it.`,
-    openGraph: {
-      title: `${album.title} by ${artistName}`,
-      description: `Listen to ${album.title} (${releaseYear}) and discover stories about this album on Songticle.`,
-      type: 'music.album',
-      musicians: [artistName],
-      releaseDate: album.release_date,
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: `${album.title} by ${artistName}`,
-      description: `Listen and share stories about ${album.title} on Songticle.`,
-    }
-  }
-}
-
 const AlbumPage = async (props: Props) => {
-  const params = await props.params;
-  const { id, slug } = params;
+  const params = await props.params
+  const { id, slug } = params
   
   // Validate id parameter
   if (!id || typeof id !== 'string') {
@@ -155,9 +95,7 @@ const AlbumPage = async (props: Props) => {
 
   // Create Supabase client
   const cookieStore = cookies()
-  const supabase = createServerComponentClient({ 
-    cookies: () => cookieStore
-  })
+  const supabase = createServerComponentClient({ cookies: () => cookieStore })
 
   try {
     // Fetch album data with artist and songs info
@@ -230,10 +168,10 @@ const AlbumPage = async (props: Props) => {
             <h1 className="text-3xl font-bold mb-2">{album.title}</h1>
             {album.artists && (
               <Link 
-                href={`/artists/${album.artists[0].id}/${slugify(album.artists[0].name)}`}
+                href={`/artists/${album.artists.id}/${slugify(album.artists.name)}`}
                 className="text-xl text-base-content/70 hover:text-primary"
               >
-                {album.artists[0].name}
+                {album.artists.name}
               </Link>
             )}
             {album.release_date && (
@@ -286,4 +224,4 @@ const AlbumPage = async (props: Props) => {
   }
 }
 
-export default AlbumPage
+export default AlbumPage 

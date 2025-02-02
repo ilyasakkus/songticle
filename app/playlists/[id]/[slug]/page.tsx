@@ -3,14 +3,13 @@ import { cookies } from 'next/headers'
 import { notFound, redirect } from 'next/navigation'
 import { Music } from 'lucide-react'
 import { Image } from '@/app/components/ui/image'
-import { Metadata } from 'next'
 
 // Slugify fonksiyonu
 function slugify(text: string): string {
   return text
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
+    .replace(/^-+|-+$/g, '')
 }
 
 function formatContent(content: string) {
@@ -98,6 +97,13 @@ interface TransformedSong {
   created_at: string
 }
 
+interface PageProps {
+  params: Promise<{ 
+    id: string
+    slug: string 
+  }>
+}
+
 interface PlaylistSongResponse {
   song_id: number
   songs: {
@@ -108,70 +114,10 @@ interface PlaylistSongResponse {
   }
 }
 
-type Props = {
-  params: Promise<{
-    id: string
-    slug: string
-  }>
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
-}
-
-export async function generateMetadata(props: Props): Promise<Metadata> {
-  const params = (await props.params);
-  const cookieStore = cookies()
+export default async function PlaylistPage({ params }: PageProps) {
+  const { id, slug } = await params
   const supabase = createServerComponentClient({ 
-    cookies: () => cookieStore
-  })
-
-  // Fetch playlist data
-  const { data: playlist } = await supabase
-    .from('playlists')
-    .select(`
-      title,
-      description,
-      profiles (
-        full_name
-      ),
-      songs (
-        count
-      )
-    `)
-    .eq('id', params.id)
-    .single()
-
-  if (!playlist) {
-    return {
-      title: 'Playlist Not Found',
-      description: 'The requested playlist could not be found.'
-    }
-  }
-
-  const full_name = playlist.profiles?.[0]?.full_name || 'Anonymous'
-  const songCount = playlist.songs?.length || 0
-  const description = playlist.description || `A playlist by ${full_name}`
-
-  return {
-    title: `${playlist.title} - Playlist by ${full_name}`,
-    description: `${description}. A collection of ${songCount} songs curated by ${full_name}. Listen and discover the stories behind each track.`,
-    openGraph: {
-      title: `${playlist.title} - Playlist by ${full_name}`,
-      description: description,
-      type: 'music.playlist',
- 
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: `${playlist.title} - Playlist by ${full_name}`,
-      description: `Discover ${full_name}'s playlist on Songticle.`,
-    }
-  }
-}
-
-export default async function PlaylistPage(props: Props) {
-  const { id, slug } = (await props.params);
-  const cookieStore = cookies()
-  const supabase = createServerComponentClient({ 
-    cookies: () => cookieStore
+    cookies
   })
 
   try {
