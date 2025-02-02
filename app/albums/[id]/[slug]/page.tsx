@@ -56,13 +56,11 @@ function slugify(text: string): string {
 }
 
 interface Props {
-  params: Promise<{
+  params: {
     id: string
     slug: string
-  }>
-  id: string
-  slug: string
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+  }
+  searchParams: { [key: string]: string | string[] | undefined }
 }
 
 // Song interface'ini ekleyelim
@@ -88,14 +86,14 @@ interface Album {
 }
 
 type MetadataParams = {
-  params: Promise<{
+  params: {
     id: string
     slug: string
-  }>
+  }
 }
 
 export async function generateMetadata(props: MetadataParams): Promise<Metadata> {
-  const params = await props.params;
+  const params = props.params;
   const supabase = createServerComponentClient({ cookies })
 
   // Fetch album data
@@ -144,8 +142,7 @@ export async function generateMetadata(props: MetadataParams): Promise<Metadata>
 }
 
 const AlbumPage = async (props: Props) => {
-  const params = await props.params;
-  const { id, slug } = params;
+  const { id, slug } = props.params;
   
   // Validate id parameter
   if (!id || typeof id !== 'string') {
