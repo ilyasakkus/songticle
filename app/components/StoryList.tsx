@@ -6,6 +6,7 @@ import { useStories } from '../hooks/useSupabaseData';
 import { useAuth } from '../providers/AuthProvider';
 import Link from 'next/link';
 import { slugify } from '../lib/utils';
+import { getTrackPreview } from '../lib/deezer';
 
 interface StoryListProps {
   following?: boolean
