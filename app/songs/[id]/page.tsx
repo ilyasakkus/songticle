@@ -2,7 +2,7 @@ import { SongClient } from './SongClient'
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { notFound } from 'next/navigation'
-import Image from 'next/image'
+import { Image } from '@/app/components/ui/image'
 import Link from 'next/link'
 
 interface Props {

@@ -1,13 +1,13 @@
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { notFound, redirect } from 'next/navigation'
-import Image from 'next/image'
 import Link from 'next/link'
 import { Music } from 'lucide-react'
 import React from 'react'
 import { PreviewButton } from '@/app/components/PreviewButton'
 import { LikeButton } from '@/app/components/LikeButton'
 import { CommentSection } from '@/app/components/CommentSection'
+import { Image } from '@/app/components/ui/image'
 
 function slugify(text: string): string {
   if (!text) return 'null'
