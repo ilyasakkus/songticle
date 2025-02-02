@@ -6,24 +6,21 @@ import { slugify } from '../../../lib/utils'
 import { Metadata } from 'next'
 
 interface Props {
-  params: Promise<{
+  params: {
     id: string
     slug: string
-  }>
-  id: string
-  slug: string
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+  }
+  searchParams: { [key: string]: string | string[] | undefined }
 }
 
 type PropsMetadata = {
-  params: Promise<{
+  params: {
     id: string
     slug: string
-  }>
+  }
 }
 
 export async function generateMetadata(props: PropsMetadata): Promise<Metadata> {
-  const params = await props.params;
   const supabase = createServerComponentClient({ cookies })
 
   // Fetch artist data
@@ -39,7 +36,7 @@ export async function generateMetadata(props: PropsMetadata): Promise<Metadata> 
         count
       )
     `)
-    .eq('id', params.id)
+    .eq('id', props.params.id)
     .single()
 
   if (!artist) {
@@ -69,8 +66,7 @@ export async function generateMetadata(props: PropsMetadata): Promise<Metadata> 
 }
 
 export default async function ArtistPage(props: Props) {
-  const params = await props.params;
-  const { id, slug } = params;
+  const { id, slug } = props.params;
   const supabase = createServerComponentClient({ cookies })
 
   // Fetch artist data

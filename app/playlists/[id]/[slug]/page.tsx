@@ -109,17 +109,15 @@ interface PlaylistSongResponse {
 }
 
 type Props = {
-  params: Promise<{
+  params: {
     id: string
     slug: string
-  }>
-  id: string
-  slug: string
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+  }
+  searchParams: { [key: string]: string | string[] | undefined }
 }
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
-  const params = await props.params;
+  const params = props.params;
   const supabase = createServerComponentClient({ cookies })
 
   // Fetch playlist data
@@ -167,8 +165,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 }
 
 export default async function PlaylistPage(props: Props) {
-  const params = await props.params;
-  const { id, slug } = params;
+  const { id, slug } = props.params;
   const supabase = createServerComponentClient({ 
     cookies
   })

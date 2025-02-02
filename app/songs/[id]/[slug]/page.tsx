@@ -59,17 +59,14 @@ function slugify(text: string): string {
 }
 
 interface Props {
-  params: Promise<{
+  params: {
     id: string
     slug: string
-  }>
-  id: string
-  slug: string
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+  }
+  searchParams: { [key: string]: string | string[] | undefined }
 }
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
-  const params = await props.params;
   const supabase = createServerComponentClient({ cookies })
 
   // Fetch song data
@@ -84,7 +81,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
         title
       )
     `)
-    .eq('id', params.id)
+    .eq('id', props.params.id)
     .single()
 
   if (!song) {
@@ -114,10 +111,8 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 }
 
 const SongPage = async (props: Props) => {
-  const { id, slug } = (await props.params)
-  
   // Validate id parameter
-  if (!id || typeof id !== 'string') {
+  if (!props.params.id || typeof props.params.id !== 'string') {
     return notFound()
   }
 
@@ -140,7 +135,7 @@ const SongPage = async (props: Props) => {
           name
         )
       `)
-      .eq('id', id)
+      .eq('id', props.params.id)
       .single()
 
     if (songError) {
@@ -158,14 +153,14 @@ const SongPage = async (props: Props) => {
     // Gelen slug'ı decode edelim
     let decodedSlug
     try {
-      decodedSlug = decodeURIComponent(slug)
+      decodedSlug = decodeURIComponent(props.params.slug)
     } catch {
-      decodedSlug = slug
+      decodedSlug = props.params.slug
     }
 
     // Eğer slug 'null' ise veya doğru slug ile eşleşmiyorsa redirect yapalım
     if (decodedSlug !== correctSlug && decodedSlug !== 'null') {
-      const redirectUrl = `/songs/${id}/${encodeURIComponent(correctSlug)}`
+      const redirectUrl = `/songs/${props.params.id}/${encodeURIComponent(correctSlug)}`
       return redirect(redirectUrl)
     }
 
