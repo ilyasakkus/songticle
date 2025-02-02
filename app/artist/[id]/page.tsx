@@ -25,7 +25,7 @@ interface PageProps {
 
 export default async function ArtistPage({ params }: PageProps) {
   const cookieStore = await cookies()
-  const supabase = createServerComponentClient({ cookies: () => cookieStore })
+  const supabase = createServerComponentClient({ cookies: () => Promise.resolve(cookieStore) })
   const { id } = await params
 
   try {
