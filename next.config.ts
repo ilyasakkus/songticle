@@ -3,6 +3,7 @@ import type { NextConfig } from "next";
 /** @type {import('next').NextConfig} */
 const nextConfig: NextConfig = {
   images: {
+    unoptimized: true,
     domains: [
       'cdn-images.dzcdn.net', // Deezer CDN
       'e-cdns-images.dzcdn.net', // Alternative Deezer CDN
