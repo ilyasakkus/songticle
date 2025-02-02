@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import Link from 'next/link'
-import Image from 'next/image'
+import { Image } from '@/app/components/ui/image'
 import { useDebounce } from '../hooks/useDebounce'
 import { SearchInput } from './SearchInput'
 

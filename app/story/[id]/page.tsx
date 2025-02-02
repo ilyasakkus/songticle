@@ -2,7 +2,7 @@
 
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { notFound } from 'next/navigation'
-import Image from 'next/image'
+import { Image } from '@/app/components/ui/image'
 import { Music } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import React from 'react'

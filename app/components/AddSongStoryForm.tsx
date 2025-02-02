@@ -9,7 +9,7 @@ import { supabase } from '../lib/supabase';
 import { useSupabaseData } from '../hooks/useSupabaseData';
 import { useAuth } from '../providers/AuthProvider';
 import type { Song } from '../types/database.types';
-import Image from 'next/image';
+import { Image } from '@/app/components/ui/image';
 
 const formSchema = z.object({
   songId: z.number(),

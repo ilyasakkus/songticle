@@ -1,6 +1,6 @@
 'use client';
 
-import Image from 'next/image';
+import { Image } from './ui/image';
 import { formatDistanceToNow } from 'date-fns';
 import { ThumbsUp, MessageCircle, Music } from 'lucide-react';
 

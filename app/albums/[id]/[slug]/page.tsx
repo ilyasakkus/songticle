@@ -1,9 +1,9 @@
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { notFound, redirect } from 'next/navigation'
-import Image from 'next/image'
 import Link from 'next/link'
 import { Music } from 'lucide-react'
+import { Image } from '@/app/components/ui/image'
 import React from 'react'
 
 function slugify(text: string): string {

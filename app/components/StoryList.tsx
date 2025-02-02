@@ -4,8 +4,6 @@ import { useState } from 'react';
 import { Play, Pause } from 'lucide-react';
 import { useStories } from '../hooks/useSupabaseData';
 import { useAuth } from '../providers/AuthProvider';
-import Image from 'next/image'
-import { getTrackPreview } from '../lib/deezer';
 import Link from 'next/link';
 import { slugify } from '../lib/utils';
 
@@ -145,18 +143,14 @@ export function StoryList({ following = false }: StoryListProps) {
                     {/* Album Cover */}
                     <div className="flex-shrink-0 w-16 h-16 relative rounded-lg overflow-hidden bg-gray-100">
                       {story.songs?.cover_image ? (
-                        <Image
+                        <img
                           src={story.songs.cover_image}
                           alt={story.songs.title || 'Album cover'}
-                          fill
-                          className="object-cover"
-                          sizes="64px"
+                          className="w-full h-full object-cover"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
-                          </svg>
+                        <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                          <span className="text-gray-400">No image</span>
                         </div>
                       )}
                       {story.songs?.preview_url && (
