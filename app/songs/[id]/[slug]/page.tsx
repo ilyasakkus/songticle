@@ -8,6 +8,7 @@ import { PreviewButton } from '@/app/components/PreviewButton'
 import { LikeButton } from '@/app/components/LikeButton'
 import { CommentSection } from '@/app/components/CommentSection'
 import { Image } from '@/app/components/ui/image'
+import { Metadata } from 'next'
 
 function slugify(text: string): string {
   if (!text) return 'null'
@@ -58,16 +59,59 @@ function slugify(text: string): string {
 }
 
 interface Props {
-  params: Promise<{
+  params: {
     id: string
     slug: string
-  }>
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+  }
+  searchParams: { [key: string]: string | string[] | undefined }
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const supabase = createServerComponentClient({ cookies })
+  
+  // Fetch song data
+  const { data: song } = await supabase
+    .from('songs')
+    .select(`
+      title,
+      artists (
+        name
+      ),
+      albums (
+        title
+      )
+    `)
+    .eq('id', params.id)
+    .single()
+
+  if (!song) {
+    return {
+      title: 'Song Not Found',
+      description: 'The requested song could not be found.'
+    }
+  }
+
+  const artistName = song.artists?.[0]?.name || 'Unknown Artist'
+  const albumTitle = song.albums?.[0]?.title || 'Single'
+
+  return {
+    title: `${song.title} by ${artistName} | Listen and Share Stories`,
+    description: `Listen to ${song.title} by ${artistName} from the album ${albumTitle}. Share your story about this song or discover what others have to say about it.`,
+    openGraph: {
+      title: `${song.title} by ${artistName}`,
+      description: `Listen to ${song.title} and discover stories about this song on Songticle.`,
+      type: 'music.song',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${song.title} by ${artistName}`,
+      description: `Listen and share stories about ${song.title} on Songticle.`,
+    }
+  }
 }
 
 const SongPage = async (props: Props) => {
-  const params = await props.params
-  const { id, slug } = params
+  const { id, slug } = props.params
   
   // Validate id parameter
   if (!id || typeof id !== 'string') {
@@ -124,7 +168,7 @@ const SongPage = async (props: Props) => {
     }
 
     // Fetch preview URL from Deezer API
-    const searchQuery = encodeURIComponent(`${song.title} ${song.artists.name}`)
+    const searchQuery = encodeURIComponent(`${song.title} ${song.artists?.[0]?.name}`)
     const deezerResponse = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/deezer?q=${searchQuery}`, {
       method: 'GET',
       headers: {
@@ -140,9 +184,9 @@ const SongPage = async (props: Props) => {
         <div className="flex flex-col md:flex-row gap-8">
           {/* Song Cover */}
           <div className="shrink-0">
-            {song.albums?.cover_medium ? (
+            {song.albums?.[0]?.cover_medium ? (
               <Image
-                src={song.albums.cover_medium}
+                src={song.albums?.[0]?.cover_medium}
                 alt={song.title}
                 width={240}
                 height={240}
@@ -160,26 +204,26 @@ const SongPage = async (props: Props) => {
             <h1 className="text-4xl font-bold mb-4">{song.title}</h1>
             
             {/* Artist Link */}
-            {song.artists && (
+            {song.artists?.[0] && (
               <div className="mb-4">
                 <Link 
-                  href={`/artists/${song.artists.id}/${slugify(song.artists.name)}`}
+                  href={`/artists/${song.artists?.[0]?.id}/${slugify(song.artists?.[0]?.name)}`}
                   className="text-xl text-base-content/70 hover:text-primary"
                 >
-                  {song.artists.name}
+                  {song.artists?.[0]?.name}
                 </Link>
               </div>
             )}
 
             {/* Album Link */}
-            {song.albums && (
+            {song.albums?.[0] && (
               <div className="mb-4">
                 <span className="text-base-content/60">From the album </span>
                 <Link 
-                  href={`/albums/${song.albums.id}/${slugify(song.albums.title)}`}
+                  href={`/albums/${song.albums?.[0]?.id}/${slugify(song.albums?.[0]?.title)}`}
                   className="text-base-content/70 hover:text-primary"
                 >
-                  {song.albums.title}
+                  {song.albums?.[0]?.title}
                 </Link>
               </div>
             )}

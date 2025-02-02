@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Music } from 'lucide-react'
 import { Image } from '@/app/components/ui/image'
 import React from 'react'
+import { Metadata } from 'next'
 
 function slugify(text: string): string {
   if (!text) return 'null'
@@ -76,12 +77,67 @@ interface Album {
   title: string
   cover_medium: string | null
   songs: Song[]
-  artists?: {
+  artist?: {
     id: number
     name: string
     picture_medium: string | null
   }
   release_date?: string
+}
+
+type MetadataParams = {
+  params: {
+    id: string
+    slug: string
+  }
+}
+
+export async function generateMetadata({ params }: MetadataParams): Promise<Metadata> {
+  const supabase = createServerComponentClient({ cookies })
+  
+  // Fetch album data
+  const { data: album } = await supabase
+    .from('albums')
+    .select(`
+      title,
+      release_date,
+      artists (
+        name
+      ),
+      songs (
+        count
+      )
+    `)
+    .eq('id', params.id)
+    .single()
+
+  if (!album) {
+    return {
+      title: 'Album Not Found',
+      description: 'The requested album could not be found.'
+    }
+  }
+
+  const artistName = album.artists[0]?.name || 'Unknown Artist'
+  const songCount = album.songs?.length || 0
+  const releaseYear = new Date(album.release_date).getFullYear()
+
+  return {
+    title: `${album.title} by ${artistName} (${releaseYear}) | Album`,
+    description: `Listen to ${album.title}, the ${releaseYear} album by ${artistName}. Featuring ${songCount} tracks. Share your stories about this album or discover what others have to say about it.`,
+    openGraph: {
+      title: `${album.title} by ${artistName}`,
+      description: `Listen to ${album.title} (${releaseYear}) and discover stories about this album on Songticle.`,
+      type: 'music.album',
+      musicians: [artistName],
+      releaseDate: album.release_date,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${album.title} by ${artistName}`,
+      description: `Listen and share stories about ${album.title} on Songticle.`,
+    }
+  }
 }
 
 const AlbumPage = async (props: Props) => {
@@ -168,10 +224,10 @@ const AlbumPage = async (props: Props) => {
             <h1 className="text-3xl font-bold mb-2">{album.title}</h1>
             {album.artists && (
               <Link 
-                href={`/artists/${album.artists.id}/${slugify(album.artists.name)}`}
+                href={`/artists/${album.artists[0].id}/${slugify(album.artists[0].name)}`}
                 className="text-xl text-base-content/70 hover:text-primary"
               >
-                {album.artists.name}
+                {album.artists[0].name}
               </Link>
             )}
             {album.release_date && (
