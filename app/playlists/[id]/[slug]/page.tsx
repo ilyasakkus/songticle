@@ -113,7 +113,9 @@ type Props = {
     id: string
     slug: string
   }>
-  searchParams: { [key: string]: string | string[] | undefined }
+  id: string
+  slug: string
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
