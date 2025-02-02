@@ -56,10 +56,10 @@ function slugify(text: string): string {
 }
 
 interface Props {
-  params: {
+  params: Promise<{
     id: string
     slug: string
-  }
+  }>
   searchParams: { [key: string]: string | string[] | undefined }
 }
 
@@ -86,14 +86,14 @@ interface Album {
 }
 
 type MetadataParams = {
-  params: {
+  params: Promise<{
     id: string
     slug: string
-  }
+  }>
 }
 
 export async function generateMetadata(props: MetadataParams): Promise<Metadata> {
-  const params = props.params;
+  const params = await props.params;
   const supabase = createServerComponentClient({ cookies })
 
   // Fetch album data
@@ -142,7 +142,8 @@ export async function generateMetadata(props: MetadataParams): Promise<Metadata>
 }
 
 const AlbumPage = async (props: Props) => {
-  const { id, slug } = props.params;
+  const params = await props.params;
+  const { id, slug } = params;
   
   // Validate id parameter
   if (!id || typeof id !== 'string') {
@@ -150,7 +151,7 @@ const AlbumPage = async (props: Props) => {
   }
 
   // Create Supabase client
-  const supabase = createServerComponentClient({ cookies: () => cookies() })
+  const supabase = createServerComponentClient({ cookies })
 
   try {
     // Fetch album data with artist and songs info
@@ -279,4 +280,4 @@ const AlbumPage = async (props: Props) => {
   }
 }
 
-export default AlbumPage 
+export default AlbumPage
