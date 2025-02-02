@@ -3,7 +3,7 @@ import { cookies } from 'next/headers'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { Music } from 'lucide-react'
-import Image from '@/app/components/ui/image'
+import { Image } from '@/app/components/ui/image'
 
 interface Album {
   id: number

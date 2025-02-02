@@ -1,3 +1,7 @@
+'use client';
+
+import React from 'react';
+
 interface ImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   src: string;
   alt: string;
@@ -16,7 +20,7 @@ export function Image({
   className = '',
   ...props
 }: ImageProps) {
-  const style = fill
+  const style: React.CSSProperties = fill
     ? {
         position: 'absolute',
         height: '100%',
