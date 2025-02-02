@@ -117,7 +117,7 @@ const SongPage = async (props: Props) => {
   }
 
   // Create Supabase client
-  const supabase = createServerComponentClient({ cookies: () => (cookies() as unknown as UnsafeUnwrappedCookies) })
+  const supabase = createServerComponentClient({ cookies: async () => Promise.resolve(cookies() as unknown as UnsafeUnwrappedCookies) })
 
   try {
     // Fetch song data with album and artist info
