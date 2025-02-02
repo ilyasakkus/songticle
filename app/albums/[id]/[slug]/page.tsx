@@ -94,7 +94,10 @@ type MetadataParams = {
 
 export async function generateMetadata(props: MetadataParams): Promise<Metadata> {
   const params = await props.params;
-  const supabase = createServerComponentClient({ cookies })
+  const cookieStore = cookies()
+  const supabase = createServerComponentClient({ 
+    cookies: () => cookieStore
+  })
 
   // Fetch album data
   const { data: album } = await supabase
@@ -151,7 +154,10 @@ const AlbumPage = async (props: Props) => {
   }
 
   // Create Supabase client
-  const supabase = createServerComponentClient({ cookies })
+  const cookieStore = cookies()
+  const supabase = createServerComponentClient({ 
+    cookies: () => cookieStore
+  })
 
   try {
     // Fetch album data with artist and songs info
