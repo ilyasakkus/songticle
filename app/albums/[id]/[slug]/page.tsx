@@ -60,7 +60,7 @@ interface Props {
     id: string
     slug: string
   }>
-  searchParams: { [key: string]: string | string[] | undefined }
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
 // Song interface'ini ekleyelim

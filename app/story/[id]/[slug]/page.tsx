@@ -9,7 +9,7 @@ interface Props {
     id: string
     slug: string
   }>
-  searchParams: { [key: string]: string | string[] | undefined }
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
 export async function generateMetadata(props: Props): Promise<Metadata> {

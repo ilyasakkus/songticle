@@ -1,5 +1,5 @@
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import { cookies, type UnsafeUnwrappedCookies } from 'next/headers';
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { Music } from 'lucide-react'
@@ -59,11 +59,11 @@ function slugify(text: string): string {
 }
 
 interface Props {
-  params: {
+  params: Promise<{
     id: string
     slug: string
-  }
-  searchParams: { [key: string]: string | string[] | undefined }
+  }>
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
@@ -81,7 +81,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
         title
       )
     `)
-    .eq('id', props.params.id)
+    .eq('id', (await props.params).id)
     .single()
 
   if (!song) {
@@ -112,12 +112,12 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
 const SongPage = async (props: Props) => {
   // Validate id parameter
-  if (!props.params.id || typeof props.params.id !== 'string') {
+  if (!(await props.params).id || typeof (await props.params).id !== 'string') {
     return notFound()
   }
 
   // Create Supabase client
-  const supabase = createServerComponentClient({ cookies: () => cookies() })
+  const supabase = createServerComponentClient({ cookies: () => (cookies() as unknown as UnsafeUnwrappedCookies) })
 
   try {
     // Fetch song data with album and artist info
@@ -135,7 +135,7 @@ const SongPage = async (props: Props) => {
           name
         )
       `)
-      .eq('id', props.params.id)
+      .eq('id', (await props.params).id)
       .single()
 
     if (songError) {
@@ -153,14 +153,14 @@ const SongPage = async (props: Props) => {
     // Gelen slug'ı decode edelim
     let decodedSlug
     try {
-      decodedSlug = decodeURIComponent(props.params.slug)
+      decodedSlug = decodeURIComponent((await props.params).slug)
     } catch {
-      decodedSlug = props.params.slug
+      decodedSlug = (await props.params).slug
     }
 
     // Eğer slug 'null' ise veya doğru slug ile eşleşmiyorsa redirect yapalım
     if (decodedSlug !== correctSlug && decodedSlug !== 'null') {
-      const redirectUrl = `/songs/${props.params.id}/${encodeURIComponent(correctSlug)}`
+      const redirectUrl = `/songs/${(await props.params).id}/${encodeURIComponent(correctSlug)}`
       return redirect(redirectUrl)
     }
 
