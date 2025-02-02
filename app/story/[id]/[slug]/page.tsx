@@ -4,11 +4,12 @@ import { Metadata } from 'next'
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 
-type Props = {
+interface Props {
   params: {
     id: string
     slug: string
   }
+  searchParams: { [key: string]: string | string[] | undefined }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -65,15 +66,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function StoryPage(props: { params: Promise<{ id: string, slug: string }> }) {
-  const params = await props.params;
+export default async function StoryPage(props: Props) {
+  const { id, slug } = props.params
   return (
     <Suspense fallback={
       <div className="flex justify-center items-center min-h-[200px]">
         <span className="loading loading-spinner loading-lg"></span>
       </div>
     }>
-      <StoryClient storyId={params.id} />
+      <StoryClient storyId={id} />
     </Suspense>
   )
 } 
