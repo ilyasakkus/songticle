@@ -10,7 +10,7 @@ function slugify(text: string): string {
   return text
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
+    .replace(/^-+|-+$/g, '');
 }
 
 function formatContent(content: string) {
@@ -98,13 +98,6 @@ interface TransformedSong {
   created_at: string
 }
 
-interface PageProps {
-  params: Promise<{ 
-    id: string
-    slug: string 
-  }>
-}
-
 interface PlaylistSongResponse {
   song_id: number
   songs: {
@@ -116,16 +109,17 @@ interface PlaylistSongResponse {
 }
 
 type Props = {
-  params: {
+  params: Promise<{
     id: string
     slug: string
-  }
+  }>
   searchParams: { [key: string]: string | string[] | undefined }
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const params = await props.params;
   const supabase = createServerComponentClient({ cookies })
-  
+
   // Fetch playlist data
   const { data: playlist } = await supabase
     .from('playlists')
@@ -171,7 +165,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function PlaylistPage(props: Props) {
-  const { id, slug } = props.params
+  const params = await props.params;
+  const { id, slug } = params;
   const supabase = createServerComponentClient({ 
     cookies
   })

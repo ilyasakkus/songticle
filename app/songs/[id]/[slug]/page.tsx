@@ -59,16 +59,17 @@ function slugify(text: string): string {
 }
 
 interface Props {
-  params: {
+  params: Promise<{
     id: string
     slug: string
-  }
-  searchParams: { [key: string]: string | string[] | undefined }
+  }>
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const params = await props.params;
   const supabase = createServerComponentClient({ cookies })
-  
+
   // Fetch song data
   const { data: song } = await supabase
     .from('songs')
@@ -111,7 +112,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 const SongPage = async (props: Props) => {
-  const { id, slug } = props.params
+  const { id, slug } = (await props.params)
   
   // Validate id parameter
   if (!id || typeof id !== 'string') {
@@ -119,8 +120,7 @@ const SongPage = async (props: Props) => {
   }
 
   // Create Supabase client
-  const cookieStore = cookies()
-  const supabase = createServerComponentClient({ cookies: () => cookieStore })
+  const supabase = createServerComponentClient({ cookies: () => cookies() })
 
   try {
     // Fetch song data with album and artist info
