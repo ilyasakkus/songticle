@@ -13,11 +13,6 @@ export async function generatePlaylistContent(
   try {
     console.log('Generating playlist content for:', { artistName, songCount: songs.length })
 
-    if (!process.env.ANTHROPIC_API_KEY) {
-      console.error('ANTHROPIC_API_KEY is missing from environment')
-      throw new Error('API key configuration error. Please check server environment variables.')
-    }
-
     const response = await fetch('/api/generate-playlist', {
       method: 'POST',
       headers: {
