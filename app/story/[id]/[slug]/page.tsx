@@ -24,6 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       created_at,
       songs!stories_song_id_fkey (
         title,
+        cover_image,
         artists!songs_artist_id_fkey (
           name
         )
@@ -47,13 +48,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ? story.content.substring(0, 150) + '...' 
     : story.content
 
-  const title = story.songs 
-    ? `${story.profiles?.full_name || 'Someone'}'s story about ${story.songs.title} by ${story.songs.artists?.name || 'Unknown Artist'} - Songticle`
-    : `${story.profiles?.full_name || 'Someone'}'s story - Songticle`
+  const authorName = story.profiles?.[0]?.full_name || 'Someone'
+  const songTitle = story.songs?.[0]?.title || ''
+  const artistName = story.songs?.[0]?.artists?.[0]?.name || 'Unknown Artist'
+  const songCover = story.songs?.[0]?.cover_image || null
 
-  const description = story.songs
-    ? `Read ${story.profiles?.full_name || 'Someone'}'s story about ${story.songs.title} by ${story.songs.artists?.name || 'Unknown Artist'}: "${truncatedContent}"`
-    : `Read ${story.profiles?.full_name || 'Someone'}'s story: "${truncatedContent}"`
+  const title = songTitle 
+    ? `${authorName}'s story about ${songTitle} by ${artistName} - Songticle`
+    : `${authorName}'s story - Songticle`
+
+  const description = songTitle
+    ? `Read ${authorName}'s story about ${songTitle} by ${artistName}: "${truncatedContent}"`
+    : `Read ${authorName}'s story: "${truncatedContent}"`
 
   return {
     title,
@@ -63,12 +69,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
       type: 'article',
       url: `https://songticle.com/story/${id}/${slug}`,
-      images: story.songs?.cover_image ? [
+      images: songCover ? [
         {
-          url: story.songs.cover_image,
+          url: songCover,
           width: 500,
           height: 500,
-          alt: `${story.songs.title} album cover`
+          alt: `${songTitle} album cover`
         }
       ] : [
         {
@@ -83,7 +89,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       card: 'summary_large_image',
       title,
       description,
-      images: story.songs?.cover_image ? [story.songs.cover_image] : ['/og-image.jpg']
+      images: songCover ? [songCover] : ['/og-image.jpg']
     }
   }
 }
