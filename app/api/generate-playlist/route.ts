@@ -15,13 +15,6 @@ export const runtime = 'edge'
 
 export async function POST(request: Request) {
   try {
-    // Log environment variables (without exposing sensitive data)
-    console.log('Environment check:', {
-      hasAnthropicKey: !!process.env.ANTHROPIC_API_KEY,
-      keyLength: process.env.ANTHROPIC_API_KEY?.length,
-      nodeEnv: process.env.NODE_ENV
-    })
-
     const body = await request.json()
     
     if (!body.artistName || !body.songs || !Array.isArray(body.songs)) {
