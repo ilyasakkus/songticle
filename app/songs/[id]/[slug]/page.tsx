@@ -8,6 +8,7 @@ import { PreviewButton } from '@/app/components/PreviewButton'
 import { LikeButton } from '@/app/components/LikeButton'
 import { CommentSection } from '@/app/components/CommentSection'
 import { Image } from '@/app/components/ui/image'
+import { Metadata } from 'next'
 
 function slugify(text: string): string {
   if (!text) return 'null'
@@ -201,6 +202,67 @@ const SongPage = async (props: Props) => {
   } catch (error) {
     console.error('Error:', error)
     return notFound()
+  }
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id, slug } = await params
+  const supabase = createServerComponentClient({ cookies })
+
+  const { data: song } = await supabase
+    .from('songs')
+    .select(`
+      title,
+      artists!songs_artist_id_fkey (
+        name
+      ),
+      albums!songs_album_id_fkey (
+        title
+      )
+    `)
+    .eq('id', id)
+    .single()
+
+  if (!song) {
+    return {
+      title: 'Song Not Found',
+      description: 'The requested song could not be found.'
+    }
+  }
+
+  const title = `${song.title} by ${song.artists.name} `
+  const description = `Listen to ${song.title} by ${song.artists.name}${song.albums ? ` from the album ${song.albums.title}` : ''}. Discover and share your favorite music on Songticle.`
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: 'music.song',
+      url: `https://songticle.com/songs/${id}/${slug}`,
+      images: song.albums?.cover_medium ? [
+        {
+          url: song.albums.cover_medium,
+          width: 500,
+          height: 500,
+          alt: `${song.title} album cover`
+        }
+      ] : [
+        {
+          url: '/og-image.jpg',
+          width: 1200,
+          height: 630,
+          alt: song.title
+        }
+      ]
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: song.albums?.cover_medium ? [song.albums.cover_medium] : ['/og-image.jpg']
+    }
   }
 }
 

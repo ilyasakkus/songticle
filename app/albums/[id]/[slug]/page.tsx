@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Music } from 'lucide-react'
 import { Image } from '@/app/components/ui/image'
 import React from 'react'
+import { Metadata } from 'next'
 
 function slugify(text: string): string {
   if (!text) return 'null'
@@ -221,6 +222,70 @@ const AlbumPage = async (props: Props) => {
   } catch (error) {
     console.error('Error:', error)
     return notFound()
+  }
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id, slug } = await params
+  const supabase = createServerComponentClient({ cookies })
+
+  const { data: album } = await supabase
+    .from('albums')
+    .select(`
+      title,
+      release_date,
+      cover_medium,
+      artists!albums_artist_id_fkey (
+        name
+      ),
+      songs!songs_album_id_fkey (
+        title
+      )
+    `)
+    .eq('id', id)
+    .single()
+
+  if (!album) {
+    return {
+      title: 'Album Not Found',
+      description: 'The requested album could not be found.'
+    }
+  }
+
+  const releaseYear = album.release_date ? new Date(album.release_date).getFullYear() : ''
+  const title = `${album.title}${album.artists ? ` by ${album.artists.name}` : ''}${releaseYear ? ` (${releaseYear})` : ''} `
+  const description = `Listen to ${album.title}${album.artists ? ` by ${album.artists.name}` : ''}${releaseYear ? ` (${releaseYear})` : ''}. ${album.songs?.length ? `Featuring ${album.songs.length} tracks including ${album.songs[0].title}${album.songs.length > 1 ? ` and more` : ''}.` : ''} Discover and share your favorite music on Songticle.`
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: 'music.album',
+      url: `https://songticle.com/albums/${id}/${slug}`,
+      images: album.cover_medium ? [
+        {
+          url: album.cover_medium,
+          width: 500,
+          height: 500,
+          alt: `${album.title} album cover`
+        }
+      ] : [
+        {
+          url: '/og-image.jpg',
+          width: 1200,
+          height: 630,
+          alt: album.title
+        }
+      ]
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: album.cover_medium ? [album.cover_medium] : ['/og-image.jpg']
+    }
   }
 }
 

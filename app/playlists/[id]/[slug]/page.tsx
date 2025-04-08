@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import { notFound, redirect } from 'next/navigation'
 import { Music } from 'lucide-react'
 import { Image } from '@/app/components/ui/image'
+import { Metadata } from 'next'
 
 // Slugify fonksiyonu
 function slugify(text: string): string {
@@ -264,5 +265,51 @@ export default async function PlaylistPage({ params }: PageProps) {
   } catch (error) {
     console.error('Error:', error)
     return notFound()
+  }
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { id, slug } = await params
+  const supabase = createServerComponentClient({ cookies })
+
+  const { data: playlist } = await supabase
+    .from('playlists')
+    .select('title, description')
+    .eq('id', id)
+    .single()
+
+  if (!playlist) {
+    return {
+      title: 'Playlist Not Found',
+      description: 'The requested playlist could not be found.'
+    }
+  }
+
+  const title = `${playlist.title} - Songticle Playlist`
+  const description = playlist.description || `Listen to ${playlist.title} playlist on Songticle. Discover and share your favorite music.`
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+      url: `https://songticle.com/playlists/${id}/${slug}`,
+      images: [
+        {
+          url: '/og-image.jpg',
+          width: 1200,
+          height: 630,
+          alt: playlist.title
+        }
+      ]
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: ['/og-image.jpg']
+    }
   }
 } 
