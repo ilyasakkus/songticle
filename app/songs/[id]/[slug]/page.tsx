@@ -217,7 +217,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         name
       ),
       albums!songs_album_id_fkey (
-        title
+        title,
+        cover_medium
       )
     `)
     .eq('id', id)
@@ -230,8 +231,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
   }
 
-  const title = `${song.title} by ${song.artists.name} `
-  const description = `Listen to ${song.title} by ${song.artists.name}${song.albums ? ` from the album ${song.albums.title}` : ''}. Discover and share your favorite music on Songticle.`
+  const artistName = song.artists?.[0]?.name || 'Unknown Artist'
+  const albumTitle = song.albums?.[0]?.title || ''
+  const albumCover = song.albums?.[0]?.cover_medium || null
+
+  const title = `${song.title} by ${artistName} - Songticle`
+  const description = `Listen to ${song.title} by ${artistName}${albumTitle ? ` from the album ${albumTitle}` : ''}. Discover and share your favorite music on Songticle.`
 
   return {
     title,
@@ -241,9 +246,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
       type: 'music.song',
       url: `https://songticle.com/songs/${id}/${slug}`,
-      images: song.albums?.cover_medium ? [
+      images: albumCover ? [
         {
-          url: song.albums.cover_medium,
+          url: albumCover,
           width: 500,
           height: 500,
           alt: `${song.title} album cover`
@@ -261,7 +266,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       card: 'summary_large_image',
       title,
       description,
-      images: song.albums?.cover_medium ? [song.albums.cover_medium] : ['/og-image.jpg']
+      images: albumCover ? [albumCover] : ['/og-image.jpg']
     }
   }
 }

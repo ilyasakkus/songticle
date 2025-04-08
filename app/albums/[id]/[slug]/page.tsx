@@ -253,8 +253,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const releaseYear = album.release_date ? new Date(album.release_date).getFullYear() : ''
-  const title = `${album.title}${album.artists ? ` by ${album.artists.name}` : ''}${releaseYear ? ` (${releaseYear})` : ''} `
-  const description = `Listen to ${album.title}${album.artists ? ` by ${album.artists.name}` : ''}${releaseYear ? ` (${releaseYear})` : ''}. ${album.songs?.length ? `Featuring ${album.songs.length} tracks including ${album.songs[0].title}${album.songs.length > 1 ? ` and more` : ''}.` : ''} Discover and share your favorite music on Songticle.`
+  const artistName = album.artists?.[0]?.name || ''
+  const title = `${album.title}${artistName ? ` by ${artistName}` : ''}${releaseYear ? ` (${releaseYear})` : ''} - Songticle`
+  const description = `Listen to ${album.title}${artistName ? ` by ${artistName}` : ''}${releaseYear ? ` (${releaseYear})` : ''}. ${album.songs?.length ? `Featuring ${album.songs.length} tracks including ${album.songs[0].title}${album.songs.length > 1 ? ` and more` : ''}.` : ''} Discover and share your favorite music on Songticle.`
 
   return {
     title,
