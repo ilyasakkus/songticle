@@ -49,21 +49,35 @@ function slugify(text: string): string {
     .replace(/^-+|-+$/g, '')
 }
 
+const ITEMS_PER_PAGE = 10
+
 export default function PlaylistsPage() {
   const [playlists, setPlaylists] = useState<Playlist[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [playingSongId, setPlayingSongId] = useState<number | null>(null)
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
   const supabase = createClientComponentClient()
 
   useEffect(() => {
     fetchPlaylists()
-  }, [])
+  }, [currentPage])
 
   const fetchPlaylists = async () => {
     try {
       setLoading(true)
+      
+      // Get total count first
+      const { count } = await supabase
+        .from('playlists')
+        .select('*', { count: 'exact', head: true })
+
+      if (count) {
+        setTotalPages(Math.ceil(count / ITEMS_PER_PAGE))
+      }
+
       const { data, error } = await supabase
         .from('playlists')
         .select(`
@@ -84,6 +98,7 @@ export default function PlaylistsPage() {
           )
         `)
         .order('created_at', { ascending: false })
+        .range((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE - 1)
 
       if (error) throw error
 
@@ -136,7 +151,48 @@ export default function PlaylistsPage() {
     }
   }
 
-  if (loading) {
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const getPageNumbers = () => {
+    const pageNumbers: (number | string)[] = []
+    const maxVisiblePages = 5
+
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(i)
+      }
+    } else {
+      pageNumbers.push(1)
+
+      let start = Math.max(currentPage - Math.floor(maxVisiblePages / 2), 2)
+      let end = Math.min(start + maxVisiblePages - 3, totalPages - 1)
+
+      if (end === totalPages - 1) {
+        start = Math.max(end - maxVisiblePages + 3, 2)
+      }
+
+      if (start > 2) {
+        pageNumbers.push('...')
+      }
+
+      for (let i = start; i <= end; i++) {
+        pageNumbers.push(i)
+      }
+
+      if (end < totalPages - 1) {
+        pageNumbers.push('...')
+      }
+
+      pageNumbers.push(totalPages)
+    }
+
+    return pageNumbers
+  }
+
+  if (loading && playlists.length === 0) {
     return (
       <div className="flex justify-center items-center min-h-[200px]">
         <span className="loading loading-spinner loading-lg"></span>
@@ -238,6 +294,29 @@ export default function PlaylistsPage() {
           </div>
         ))}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex justify-center mt-8">
+          <div className="join">
+            {getPageNumbers().map((page, index) => (
+              page === '...' ? (
+                <button key={`ellipsis-${index}`} className="join-item btn btn-disabled">
+                  ...
+                </button>
+              ) : (
+                <button
+                  key={page}
+                  className={`join-item btn ${currentPage === page ? 'btn-active' : ''}`}
+                  onClick={() => handlePageChange(page as number)}
+                >
+                  {page}
+                </button>
+              )
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 } 

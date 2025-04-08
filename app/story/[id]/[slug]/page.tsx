@@ -12,6 +12,8 @@ interface Props {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params
+
   return {
     title: 'Songticle Story',
     description: 'Read stories about your favorite songs on Songticle',
@@ -19,7 +21,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: 'Songticle Story',
       description: 'Read stories about your favorite songs on Songticle',
       type: 'article',
-      url: `https://songticle.com/story/${params.id}`,
+      url: `https://songticle.com/story/${id}`,
       images: [
         {
           url: '/og-image.jpg',
