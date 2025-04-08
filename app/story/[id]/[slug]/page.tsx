@@ -8,75 +8,19 @@ import { Metadata } from 'next'
 interface Props {
   params: Promise<{ 
     id: string
-    slug: string 
   }>
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id, slug } = await params
-  const supabase = createServerComponentClient({ cookies })
-
-  // Fetch story data with song and author info
-  const { data: story, error: storyError } = await supabase
-    .from('stories')
-    .select(`
-      content,
-      created_at,
-      songs!stories_song_id_fkey (
-        title,
-        cover_image,
-        artists!songs_artist_id_fkey (
-          name
-        )
-      ),
-      profiles!stories_user_id_fkey (
-        full_name
-      )
-    `)
-    .eq('id', id)
-    .single()
-
-  if (!story) {
-    return {
-      title: 'Story Not Found',
-      description: 'The requested story could not be found.'
-    }
-  }
-
-  // Truncate content for meta description
-  const truncatedContent = story.content.length > 150 
-    ? story.content.substring(0, 150) + '...' 
-    : story.content
-
-  const authorName = story.profiles?.[0]?.full_name || 'Someone'
-  const songTitle = story.songs?.[0]?.title || ''
-  const artistName = story.songs?.[0]?.artists?.[0]?.name || 'Unknown Artist'
-  const songCover = story.songs?.[0]?.cover_image || null
-
-  const title = songTitle 
-    ? `${authorName}'s story about ${songTitle} by ${artistName} - Songticle`
-    : `${authorName}'s story - Songticle`
-
-  const description = songTitle
-    ? `Read ${authorName}'s story about ${songTitle} by ${artistName}: "${truncatedContent}"`
-    : `Read ${authorName}'s story: "${truncatedContent}"`
-
   return {
-    title,
-    description,
+    title: 'Songticle Story',
+    description: 'Read stories about your favorite songs on Songticle',
     openGraph: {
-      title,
-      description,
+      title: 'Songticle Story',
+      description: 'Read stories about your favorite songs on Songticle',
       type: 'article',
-      url: `https://songticle.com/story/${id}/${slug}`,
-      images: songCover ? [
-        {
-          url: songCover,
-          width: 500,
-          height: 500,
-          alt: `${songTitle} album cover`
-        }
-      ] : [
+      url: `https://songticle.com/story/${params.id}`,
+      images: [
         {
           url: '/og-image.jpg',
           width: 1200,
@@ -87,9 +31,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     twitter: {
       card: 'summary_large_image',
-      title,
-      description,
-      images: songCover ? [songCover] : ['/og-image.jpg']
+      title: 'Songticle Story',
+      description: 'Read stories about your favorite songs on Songticle',
+      images: ['/og-image.jpg']
     }
   }
 }
