@@ -280,8 +280,7 @@ export default function AdminPage() {
       // Generate content using AI
       const content = await generatePlaylistContent(
         selectedArtistData.name,
-        selectedSongs,
-        '' // API key is now handled server-side
+        selectedSongs
       )
 
       if (!content) throw new Error('Failed to generate content')
